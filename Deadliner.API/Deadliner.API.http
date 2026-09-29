@@ -1,0 +1,6 @@
+@Deadliner.API_HostAddress = http://localhost:5216
+
+GET {{Deadliner.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
