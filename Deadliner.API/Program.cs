@@ -15,4 +15,5 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 app.MapControllers();
 
+app.UseStaticFiles();
 app.Run();
