@@ -62,6 +62,11 @@
                 color: white;
             }
 
+            a.btn {
+                text-decoration: none;
+                display: inline-block;
+            }
+
             .btn:hover {background: #2560b8;}
 
             .green {border-left: 5px solid #22c55e;}
@@ -74,7 +79,12 @@
         
         <header>
             <span> DeadLiner</span>
+            <nav style="display:flex; gap:12px;">
+            <a href="index.html" class="btn">Заказы</a>
+            <a href="workshop.html" class="btn">Экран цеха</a>
+            <a href="reports.html" class="btn">Отчёты</a>
             <button class="btn" onclick="openCreate()">+ Новый заказ</button>
+    </nav>
         </header>
 
         <main>
