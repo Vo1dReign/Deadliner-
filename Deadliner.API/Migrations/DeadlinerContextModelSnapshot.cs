@@ -218,15 +218,12 @@ namespace Deadliner.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RolId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Telefon")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RolId");
+                    b.HasIndex("IdRoli");
 
                     b.ToTable("Sotrudniki");
                 });
@@ -251,12 +248,6 @@ namespace Deadliner.API.Migrations
                     b.Property<int>("IdMenedzhera")
                         .HasColumnType("int");
 
-                    b.Property<int>("KlientId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MenedzherId")
-                        .HasColumnType("int");
-
                     b.Property<DateOnly>("PlanDataOtgruzki")
                         .HasColumnType("date");
 
@@ -269,9 +260,9 @@ namespace Deadliner.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("KlientId");
+                    b.HasIndex("IdKlienta");
 
-                    b.HasIndex("MenedzherId");
+                    b.HasIndex("IdMenedzhera");
 
                     b.ToTable("Zakazy");
                 });
@@ -354,7 +345,7 @@ namespace Deadliner.API.Migrations
                 {
                     b.HasOne("Deadliner.API.Models.Rol", "Rol")
                         .WithMany("Sotrudniki")
-                        .HasForeignKey("RolId")
+                        .HasForeignKey("IdRoli")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -365,13 +356,13 @@ namespace Deadliner.API.Migrations
                 {
                     b.HasOne("Deadliner.API.Models.Klient", "Klient")
                         .WithMany("Zakazy")
-                        .HasForeignKey("KlientId")
+                        .HasForeignKey("IdKlienta")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Deadliner.API.Models.Sotrudnik", "Menedzher")
                         .WithMany("Zakazy")
-                        .HasForeignKey("MenedzherId")
+                        .HasForeignKey("IdMenedzhera")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

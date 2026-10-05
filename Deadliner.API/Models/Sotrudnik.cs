@@ -20,7 +20,8 @@ public class Sotrudnik
     public string Parol { get; set; } = string.Empty;
 
     // Навигационное свойство — объект роли
-    public Rol Rol { get; set; } = null!;
+    [System.ComponentModel.DataAnnotations.Schema.ForeignKey("IdRoli")]
+    public Rol? Rol { get; set; }
 
     // Навигационные свойства — связанные данные
     public ICollection<Zakaz> Zakazy { get; set; } = new List<Zakaz>();

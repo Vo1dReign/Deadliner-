@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async ()=>
 });
 
 async function loadClient() {
-    const response = await fetch(`${API}/klients`)
+    const response = await fetch(`${API}/klienty`)
     const clients = await response.json();
 
     const select = document.getElementById('clientId');
@@ -45,7 +45,9 @@ async function createOrder() {
 
      const order = {
         idKlienta: parseInt(clientId),
+        klientId: parseInt(clientId),
         idMenedzhera: parseInt(managerId),
+        menedzherId: parseInt(managerId),
         summaPredoplaty: parseFloat(prepayment) || 0,
         planDataOtgruzki: shipDate,
         status: 'в работе'

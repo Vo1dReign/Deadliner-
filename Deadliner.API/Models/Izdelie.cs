@@ -1,8 +1,5 @@
 namespace Deadliner.API.Models;
 
-/// <summary>
-/// Изделие — позиция внутри заказа (конкретный предмет мебели)
-/// </summary>
 public class Izdelie
 {
     public int Id { get; set; }
