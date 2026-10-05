@@ -4,6 +4,7 @@ using Deadliner.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Deadliner.API.Migrations
 {
     [DbContext(typeof(DeadlinerContext))]
-    partial class DeadlinerContextModelSnapshot : ModelSnapshot
+    [Migration("20261005135634_FixZakazForeignKeys")]
+    partial class FixZakazForeignKeys
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -218,12 +221,15 @@ namespace Deadliner.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("RolId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Telefon")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdRoli");
+                    b.HasIndex("RolId");
 
                     b.ToTable("Sotrudniki");
                 });
@@ -345,7 +351,7 @@ namespace Deadliner.API.Migrations
                 {
                     b.HasOne("Deadliner.API.Models.Rol", "Rol")
                         .WithMany("Sotrudniki")
-                        .HasForeignKey("IdRoli")
+                        .HasForeignKey("RolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -94,7 +94,15 @@
         a.btn {
             text-decoration: none;
             display: inline-block;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 24px;
         }
+
+        .btn:hover {background: #2560b8;}
 
         .badge.red { background: #3d0f0f; color: #ef4444; }
         .badge.green { background: #14401e; color: #22c55e; }
@@ -104,10 +112,9 @@
 <body>
 
     <header>
-    <nav style="display:flex; gap:12px; align-items:center;">
+    <nav style="display:flex; gap:12px;">
         <a href="index.html" class="btn"> Заказы</a>
         <a href="workshop.html" class="btn"> Экран цеха</a>
-        <a href="reports.html" class="btn"> Отчёты</a>
     </nav>
     <span>Отчёты</span>
 </header>

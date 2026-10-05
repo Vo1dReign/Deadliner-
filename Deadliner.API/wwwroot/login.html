@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeadLiner - Вход</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #1e2846;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: #2a3555;
+            padding: 40px;
+            border-radius: 12px;
+            width: 360px;
+        }
+
+        h2 {
+            margin-bottom: 24px;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            border-radius: 6px;
+            border: none;
+            background: #1e2846;
+            color: #fff;
+            font-size: 15px;
+        }
+
+        input::placeholder { color: #aaa; }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background: #3478dc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .btn:hover { background: #2560b8; }
+
+        #error {
+            color: #ef4444;
+            margin-top: 12px;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>🔐 DeadLiner</h2>
+        <input id="login" placeholder="Логин" type="text">
+        <input id="parol" placeholder="Пароль" type="password">
+        <button class="btn" onclick="doLogin()">Войти</button>
+        <div id="error"></div>
+        <a href="register.html" style="display: block; text-align: center; margin-top: 16px; color: #3478dc; text-decoration: none; font-size: 14px;">Новый сотрудник? Зарегистрируйтесь</a>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeadLiner - Регистрация сотрудника</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #1e2846;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: #2a3555;
+            padding: 40px;
+            border-radius: 12px;
+            width: 400px;
+        }
+
+        h2 {
+            margin-bottom: 24px;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            border-radius: 6px;
+            border: none;
+            background: #1e2846;
+            color: #fff;
+            font-size: 15px;
+        }
+
+        input::placeholder { color: #aaa; }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background: #22c55e;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn:hover { background: #16a34a; }
+        
+        .link {
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+            color: #3478dc;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Регистрация сотрудника</h2>
+        
+        <label>ФИО</label>
+        <input id="fio" placeholder="Например: Иванов Иван" type="text">
+
+        <label>Телефон</label>
+        <input id="telefon" placeholder="+375..." type="text">
+
+        <label>Должность (Роль)</label>
+        <select id="rol">
+            <option value="1">Администратор</option>
+            <option value="2">Менеджер</option>
+            <option value="3">Сотрудник цеха</option>
+        </select>
+
+        <label>Логин для входа</label>
+        <input id="login" placeholder="login123" type="text">
+
+        <label>Пароль</label>
+        <input id="parol" placeholder="Минимум 6 символов" type="password">
+
+        <button class="btn" onclick="registerUser()">Зарегистрировать</button>
+        <a href="login.html" class="link">Вернуться ко входу</a>
+    </div>
+
+    <script src="register.js"></script>
+</body>
+</html>

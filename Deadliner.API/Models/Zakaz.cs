@@ -24,8 +24,11 @@ public class Zakaz
     public string Status { get; set; } = "в работе";
 
     // Навигационные свойства
-    public Klient Klient { get; set; } = null!;
-    public Sotrudnik Menedzher { get; set; } = null!;
+    [System.ComponentModel.DataAnnotations.Schema.ForeignKey("IdKlienta")]
+    public Klient? Klient { get; set; }
+    
+    [System.ComponentModel.DataAnnotations.Schema.ForeignKey("IdMenedzhera")]
+    public Sotrudnik? Menedzher { get; set; }
 
     public ICollection<Izdelie> Izdeliya { get; set; } = new List<Izdelie>();
     public ICollection<EtapZakaza> EtapyZakaza { get; set; } = new List<EtapZakaza>();

@@ -27,8 +27,9 @@ async function loadOrders() {
             <td>${order.planDataOtgruzki}</td>
             <td>${daysLeft} дн.</td>
             <td>${order.status}</td>
-            <td>
-                <button class="btn" onclick="deleteOrder(${order.id})">Удалить</button>
+            <td style="display:flex; gap:8px;">
+                <a class="btn" href="items.html?zakazId=${order.id}">Изделия</a>
+                <button class="btn btn-danger" onclick="deleteOrder(${order.id})">Удалить</button>
             </td>
         `;
         tbody.appendChild(row);

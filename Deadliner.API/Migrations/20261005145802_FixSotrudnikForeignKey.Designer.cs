@@ -4,6 +4,7 @@ using Deadliner.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Deadliner.API.Migrations
 {
     [DbContext(typeof(DeadlinerContext))]
-    partial class DeadlinerContextModelSnapshot : ModelSnapshot
+    [Migration("20261005145802_FixSotrudnikForeignKey")]
+    partial class FixSotrudnikForeignKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
