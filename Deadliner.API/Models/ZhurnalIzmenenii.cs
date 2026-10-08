@@ -17,6 +17,9 @@ public class ZhurnalIzmenenii
     public string? OpisanieIzmenenia { get; set; }
 
     // Навигационные свойства
-    public Zakaz Zakaz { get; set; } = null!;
-    public Sotrudnik Sotrudnik { get; set; } = null!;
+    [System.ComponentModel.DataAnnotations.Schema.ForeignKey("IdZakaza")]
+    public Zakaz? Zakaz { get; set; }
+
+    [System.ComponentModel.DataAnnotations.Schema.ForeignKey("IdSotrudnika")]
+    public Sotrudnik? Sotrudnik { get; set; }
 }
