@@ -1,6 +1,10 @@
 const API = 'http://localhost:5216/api';
 
-document.addEventListener('DOMContentLoaded', loadOrders);
+document.addEventListener('DOMContentLoaded', () => {
+    const user = showUserInfo();
+    applyRoleRules(user);
+    loadOrders();
+});
 
 async function loadOrders() {
     const response = await fetch(`${API}/zakazy`);
@@ -29,7 +33,8 @@ async function loadOrders() {
             <td>${order.status}</td>
             <td style="display:flex; gap:8px;">
                 <a class="btn" href="items.html?zakazId=${order.id}">Изделия</a>
-                <button class="btn btn-danger" onclick="deleteOrder(${order.id})">Удалить</button>
+                <a class="btn" href="stages.html?zakazId=${order.id}">Этапы</a>
+                <button class="btn btn-danger manager-only" onclick="deleteOrder(${order.id})">Удалить</button>
             </td>
         `;
         tbody.appendChild(row);

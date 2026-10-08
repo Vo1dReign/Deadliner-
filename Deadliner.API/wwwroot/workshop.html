@@ -79,9 +79,10 @@
     <header>
     <span>Deadliner - Экран цеха</span>
     <nav style="display:flex; gap:12px; align-items:center;">
-        <a href="index.html" class="btn">Заказы</a>
-        <a href="reports.html" class="btn">Отчёты</a>
+        <a href="index.html" class="btn manager-only">Заказы</a>
+        <a href="reports.html" class="btn manager-only">Отчёты</a>
         <span id="clock">00:00:00</span>
+        <div id="userInfo" style="display:flex; align-items:center; margin-left:16px;"></div>
     </nav>
 </header>
 
@@ -98,6 +99,7 @@
         <tbody id="workshopTable"></tbody>
     </table>
 
+    <script src="auth.js"></script>
     <script src="workshop.js"></script>
 </body>
 </html>

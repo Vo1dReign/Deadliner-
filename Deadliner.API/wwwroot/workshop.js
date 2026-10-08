@@ -2,11 +2,12 @@ const API = 'http://localhost:5216/api';
 
 // Запускаем при загрузке
 document.addEventListener('DOMContentLoaded', () => {
+    const user = showUserInfo();
+    applyRoleRules(user);
     updateClock();
     loadWorkshop();
 
     setInterval(updateClock, 1000);
-
     setInterval(loadWorkshop, 30000);
 });
 

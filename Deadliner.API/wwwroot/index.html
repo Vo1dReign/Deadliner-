@@ -82,11 +82,13 @@
         
         <header>
             <span> DeadLiner</span>
-            <nav style="display:flex; gap:12px;">
-            <a href="workshop.html" class="btn">Экран цеха</a>
-            <a href="reports.html" class="btn">Отчёты</a>
-            <button class="btn" onclick="openCreate()">+ Новый заказ</button>
-    </nav>
+            <nav style="display:flex; gap:12px; align-items:center;">
+                <a href="workshop.html" class="btn">Экран цеха</a>
+                <a href="reports.html" class="btn manager-only">Отчёты</a>
+                <a href="catalog.html" class="btn manager-only">Справочник цеха</a>
+                <button class="btn manager-only" onclick="openCreate()">+ Новый заказ</button>
+                <div id="userInfo" style="display:flex; align-items:center; margin-left:16px;"></div>
+            </nav>
         </header>
 
         <main>
@@ -106,6 +108,7 @@
                 <tbody id="ordersTable"></tbody>
             </table>
         </main>
+        <script src="auth.js"></script>
         <script src="app.js"></script>
     </body>
 </html>

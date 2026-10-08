@@ -112,11 +112,12 @@
 <body>
 
     <header>
-    <nav style="display:flex; gap:12px;">
+    <span>Deadliner - Отчёты</span>
+    <nav style="display:flex; gap:12px; align-items:center;">
         <a href="index.html" class="btn"> Заказы</a>
         <a href="workshop.html" class="btn"> Экран цеха</a>
     </nav>
-    <span>Отчёты</span>
+    <div id="userInfo" style="display:flex; align-items:center; gap:8px; margin-left:auto;"></div>
 </header>
 
     <main>
@@ -151,6 +152,7 @@
         </table>
     </main>
 
+    <script src="auth.js"></script>
     <script src="reports.js"></script>
 </body>
 </html>
