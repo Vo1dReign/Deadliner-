@@ -13,14 +13,21 @@ async function loadOrders() {
     const tbody = document.getElementById(`ordersTable`);
     tbody.innerHTML = '';
 
+    // Читаем пороги из настроек (или берем стандартные 2 и 7 дней)
+    const thresh = JSON.parse(localStorage.getItem('customThresholds')) || { redDays: 2, yellowFrom: 3, yellowTo: 7 };
+
     orders.forEach(order => {
         const today = new Date();
         const shipDate = new Date(order.planDataOtgruzki);
-        const daysLeft = Math.ceil((shipDate - today)/ (1000 * 60 * 60 * 24));
+        const daysLeft = Math.ceil((shipDate - today) / (1000 * 60 * 60 * 24));
 
-        let colorClass = `green`;
-        if (daysLeft <= 2)colorClass = 'red';
-        else if (daysLeft <= 7)colorClass = 'yellow';
+        // Динамический выбор цвета по настройкам
+        let colorClass = 'green';
+        if (daysLeft <= thresh.redDays) {
+            colorClass = 'red';
+        } else if (daysLeft >= thresh.yellowFrom && daysLeft <= thresh.yellowTo) {
+            colorClass = 'yellow';
+        }
 
         const row = document.createElement('tr');
         row.className = colorClass;
