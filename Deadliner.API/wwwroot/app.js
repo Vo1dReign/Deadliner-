@@ -107,6 +107,7 @@ function renderTable(orders) {
                 <a class="btn" href="items.html?zakazId=${order.id}">Изделия</a>
                 <a class="btn" href="stages.html?zakazId=${order.id}">Этапы</a>
                 <a class="btn" href="audit.html?zakazId=${order.id}">История</a>
+                <a class="btn" href="print-order.html?zakazId=${order.id}" target="_blank">Наряд</a>
                 <button class="btn btn-danger manager-only" onclick="deleteOrder(${order.id})">Удалить</button>
             </td>
         `;
@@ -151,4 +152,25 @@ async function deleteOrder(id) {
 
 function openCreate() {
     window.location.href = 'order.html';
+}
+
+function exportToCSV() {
+    if (!allOrders || allOrders.length === 0) {
+        alert('Нет данных для выгрузки');
+        return;
+    }
+
+    let csvContent = "\uFEFFНомер заказа;Клиент;Дата приёма;Плановая отгрузка;Осталось дней;Статус\r\n";
+
+    allOrders.forEach(o => {
+        const client = (o.klient?.fioNazvanie ?? '—').replace(/;/g, ' ');
+        csvContent += `${o.id};"${client}";${o.dataPriema};${o.planDataOtgruzki};${o.daysLeft};${o.status}\r\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const dateStr = new Date().toISOString().slice(0, 10);
+    link.href = URL.createObjectURL(blob);
+    link.download = `Реестр_заказов_Deadliner_${dateStr}.csv`;
+    link.click();
 }
