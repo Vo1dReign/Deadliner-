@@ -28,14 +28,20 @@ async function loadWorkshop() {
     const tbody = document.getElementById('workshopTable');
     tbody.innerHTML = '';
 
+    const thresh = JSON.parse(localStorage.getItem('customThresholds')) || { redDays: 2, yellowFrom: 3, yellowTo: 7 };
+
     active.forEach(order => {
         const today = new Date();
         const shipDate = new Date(order.planDataOtgruzki);
         const daysLeft = Math.ceil((shipDate - today) / (1000 * 60 * 60 * 24));
 
+        // Динамический цвет по настройкам
         let colorClass = 'green';
-        if (daysLeft <= 2) colorClass = 'red';
-        else if (daysLeft <= 7) colorClass = 'yellow';
+        if (daysLeft <= thresh.redDays) {
+            colorClass = 'red';
+        } else if (daysLeft >= thresh.yellowFrom && daysLeft <= thresh.yellowTo) {
+            colorClass = 'yellow';
+        }
 
         const daysText = daysLeft < 0
             ? `<span class="overdue">ПРОСРОЧЕН на ${Math.abs(daysLeft)} дн.</span>`

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeadLiner - Настройки порогов срочности</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #1e2846;
+            color: #fff;
+        }
+
+        header {
+            background: #3478dc;
+            padding: 16px 32px;
+            font-size: 22px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        main {
+            padding: 32px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        h2 { font-size: 22px; }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            background: #3478dc;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover { background: #2560b8; }
+        .btn-success { background: #22c55e; font-size: 16px; padding: 12px 28px; }
+        .btn-success:hover { background: #16a34a; }
+
+        .card {
+            background: #2a3555;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 6px solid #3d4f7a;
+        }
+
+        .card.green { border-left-color: #22c55e; }
+        .card.yellow { border-left-color: #eab308; }
+        .card.red { border-left-color: #ef4444; }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: #aab4d0;
+            margin-bottom: 16px;
+        }
+
+        .inputs-row {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 14px;
+            color: #ddd;
+        }
+
+        input[type="number"] {
+            width: 90px;
+            padding: 8px 12px;
+            background: #1e2846;
+            border: 1px solid #3d4f7a;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3478dc;
+        }
+
+        .notice-box {
+            background: rgba(52, 120, 220, 0.15);
+            border: 1px solid #3478dc;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #cbd5e1;
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <span>DeadLiner - Конфигурация дедлайнов</span>
+        <div id="userInfo" style="display:flex; align-items:center;"></div>
+    </header>
+
+    <main>
+        <div class="top-bar">
+            <a href="index.html" class="btn">← Назад к заказам</a>
+            <h2>Управление пороговыми значениями срочности</h2>
+            <div></div>
+        </div>
+
+        <div class="notice-box">
+            💡 <strong>Как это работает:</strong> Система ежедневно сопоставляет плановую дату отгрузки заказа с текущей датой. Изменение чисел ниже сразу перенастроит цветовую сигнализацию на экране цеха и в реестре заказов.
+        </div>
+
+        <form id="settingsForm" onsubmit="saveSettings(event)">
+            <!-- Зеленая зона -->
+            <div class="card green">
+                <div class="card-title">🟢 Зелёная зона — Запас времени (штатный режим)</div>
+                <div class="card-desc">Заказ считается спокойным и безопасным по срокам.</div>
+                <div class="inputs-row">
+                    <div class="input-group">
+                        <label>Осталось более (дней):</label>
+                        <input type="number" id="greenDays" min="1" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Желтая зона -->
+            <div class="card yellow">
+                <div class="card-title">🟡 Жёлтая зона — Сигнал внимания (приближение срока)</div>
+                <div class="card-desc">Требуется повышенный контроль мастера смены.</div>
+                <div class="inputs-row">
+                    <div class="input-group">
+                        <label>От (дней):</label>
+                        <input type="number" id="yellowFrom" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label>До (дней):</label>
+                        <input type="number" id="yellowTo" min="1" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Красная зона -->
+            <div class="card red">
+                <div class="card-title">🔴 Красная зона — Критический дедлайн / Просрочка</div>
+                <div class="card-desc">Наивысший приоритет исполнения в цехе.</div>
+                <div class="inputs-row">
+                    <div class="input-group">
+                        <label>Осталось дней и менее (включая просрочку):</label>
+                        <input type="number" id="redDays" min="0" required>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: right; margin-top: 24px;">
+                <button type="submit" class="btn btn-success manager-only">💾 Сохранить параметры</button>
+            </div>
+        </form>
+    </main>
+
+    <script src="auth.js"></script>
+    <script src="settings.js"></script>
+</body>
+</html>
