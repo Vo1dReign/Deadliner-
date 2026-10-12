@@ -45,7 +45,7 @@ async function createOrder() {
     const shipDate = document.getElementById('shipDate').value;
 
     if (!clientId || !managerId || !shipDate){
-        alert('Заполните все обязательные поля!')
+        showToast('Заполните все обязательные поля!', 'warning');
         return;
     }
 
@@ -64,9 +64,11 @@ async function createOrder() {
         body: JSON.stringify(order)
     });
     if (response.ok) {
-        alert('Заказ создан!');
-        window.location.href = 'index.html';
+        showToast('Заказ успешно оформлен и запущен в производство!', 'success');
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1200);
     } else {
-        alert('Ошибка при создании заказа');
+        showToast('Ошибка при создании заказа', 'error');
     }
 }

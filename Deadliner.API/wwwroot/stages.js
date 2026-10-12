@@ -70,6 +70,7 @@ function renderTable(stages) {
         return;
     }
 
+    stages.forEach((item, index) => {
         const isDone = item.status === 'завершён';
         const isCurrent = item.status === 'в работе';
         const colorType = isDone ? 'green' : (isCurrent ? 'yellow' : 'slate');
@@ -98,7 +99,12 @@ function renderTable(stages) {
 }
 
 async function completeStage(stageId) {
-    if (!confirm('Подтвердить завершение данного технологического этапа?')) return;
+    const confirmed = await showConfirm(
+        'Завершение этапа',
+        'Вы подтверждаете выполнение данного технологического этапа производства?',
+        { confirmText: 'Завершить', isDanger: false, isInfo: true }
+    );
+    if (!confirmed) return;
 
     try {
         const res = await fetch(`${API}/etapyzakaza/${stageId}/complete`, {
@@ -106,11 +112,12 @@ async function completeStage(stageId) {
         });
 
         if (res.ok) {
+            showToast('Технологический этап успешно завершён!', 'success');
             loadStages();
         } else {
-            alert('Ошибка при отметке выполнения этапа');
+            showToast('Ошибка при отметке выполнения этапа', 'error');
         }
     } catch (err) {
-        alert('Ошибка связи с сервером');
+        showToast('Ошибка связи с сервером', 'error');
     }
 }

@@ -182,12 +182,13 @@ async function changeUserRole(userId, newRoleId, userName) {
         });
 
         if (res.ok) {
+            showToast(`Роль сотрудника ${userName} обновлена`, 'success');
             loadAdminDashboard();
         } else {
-            alert('Не удалось изменить роль');
+            showToast('Не удалось изменить роль', 'error');
         }
     } catch (e) {
-        alert('Ошибка связи с сервером');
+        showToast('Ошибка связи с сервером', 'error');
     }
 }
 
@@ -229,24 +230,34 @@ async function saveUser(event) {
             body: JSON.stringify({ fio, telefon: phone || null, idRoli: roleId, login, parol: password })
         });
         if (res.ok) {
+            showToast(`Сотрудник ${fio} успешно зарегистрирован!`, 'success');
             closeUserModal();
             loadAdminDashboard();
         } else {
-            alert('Ошибка при создании пользователя');
+            showToast('Ошибка при создании пользователя', 'error');
         }
     } catch (e) {
-        alert('Ошибка связи с сервером');
+        showToast('Ошибка связи с сервером', 'error');
     }
 }
 
 async function deleteUser(id, fio) {
-    if (!confirm(`Удалить сотрудника "${fio}"?`)) return;
+    const confirmed = await showConfirm(
+        'Удаление сотрудника',
+        `Вы действительно хотите удалить сотрудника "${fio}"? Доступ в систему будет закрыт.`
+    );
+    if (!confirmed) return;
+
     try {
         const res = await fetch(`${API}/sotrudniki/${id}`, { method: 'DELETE' });
-        if (res.ok) loadAdminDashboard();
-        else alert('Не удалось удалить пользователя');
+        if (res.ok) {
+            showToast(`Сотрудник "${fio}" удален`, 'success');
+            loadAdminDashboard();
+        } else {
+            showToast('Не удалось удалить пользователя', 'error');
+        }
     } catch (e) {
-        alert('Ошибка связи');
+        showToast('Ошибка связи с сервером', 'error');
     }
 }
 
@@ -289,7 +300,7 @@ async function updateUser(event) {
     const parol = document.getElementById('editPassword').value.trim();
 
     if (!fio || !login) {
-        alert('Заполните ФИО и логин!');
+        showToast('Заполните ФИО и логин!', 'warning');
         return;
     }
 
@@ -321,13 +332,14 @@ async function updateUser(event) {
                 showUserInfo();
             }
 
+            showToast('Данные сотрудника успешно обновлены!', 'success');
             closeEditUserModal();
             loadAdminDashboard();
         } else {
-            alert('Не удалось сохранить изменения профиля сотрудника');
+            showToast('Не удалось сохранить изменения профиля сотрудника', 'error');
         }
     } catch (e) {
-        alert('Ошибка связи с сервером');
+        showToast('Ошибка связи с сервером', 'error');
     }
 }
 
@@ -378,20 +390,34 @@ async function changeOrderStatus(orderId, newStatus) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: newStatus })
         });
-        if (!res.ok) alert('Не удалось обновить статус заказа');
+        if (res.ok) {
+            showToast(`Статус заказа #${orderId} изменён на "${newStatus}"`, 'success');
+        } else {
+            showToast('Не удалось обновить статус заказа', 'error');
+        }
     } catch (e) {
         console.error(e);
+        showToast('Ошибка связи с сервером', 'error');
     }
 }
 
 async function deleteAdminOrder(id) {
-    if (!confirm(`Административное удаление заказа #${id}. Подтвердить?`)) return;
+    const confirmed = await showConfirm(
+        'Административное удаление',
+        `Вы действительно хотите удалить заказ #${id}? Все связанные этапы будут удалены.`
+    );
+    if (!confirmed) return;
+
     try {
         const res = await fetch(`${API}/zakazy/${id}`, { method: 'DELETE' });
-        if (res.ok) loadAdminDashboard();
-        else alert('Не удалось удалить заказ');
+        if (res.ok) {
+            showToast(`Заказ #${id} удален`, 'success');
+            loadAdminDashboard();
+        } else {
+            showToast('Не удалось удалить заказ', 'error');
+        }
     } catch (e) {
-        alert('Ошибка связи');
+        showToast('Ошибка связи', 'error');
     }
 }
 
@@ -460,7 +486,7 @@ async function updateAdminClient(event) {
     const adresObekta = document.getElementById('editClientAddress').value.trim();
 
     if (!fioNazvanie) {
-        alert('Заполните ФИО заказчика или название компании!');
+        showToast('Заполните ФИО заказчика или название компании!', 'warning');
         return;
     }
 
@@ -479,24 +505,34 @@ async function updateAdminClient(event) {
         });
 
         if (res.ok) {
+            showToast('Данные заказчика успешно сохранены', 'success');
             closeEditClientModal();
             loadAdminDashboard();
         } else {
-            alert('Не удалось обновить данные заказчика');
+            showToast('Не удалось обновить данные заказчика', 'error');
         }
     } catch (e) {
-        alert('Ошибка связи с сервером');
+        showToast('Ошибка связи с сервером', 'error');
     }
 }
 
 async function deleteAdminClient(id) {
-    if (!confirm(`Удалить заказчика #${id}?`)) return;
+    const confirmed = await showConfirm(
+        'Удаление заказчика',
+        `Удалить заказчика #${id}? Связанные заказы могут быть затронуты.`
+    );
+    if (!confirmed) return;
+
     try {
         const res = await fetch(`${API}/klienty/${id}`, { method: 'DELETE' });
-        if (res.ok) loadAdminDashboard();
-        else alert('Не удалось удалить заказчика');
+        if (res.ok) {
+            showToast(`Заказчик #${id} удален`, 'success');
+            loadAdminDashboard();
+        } else {
+            showToast('Не удалось удалить заказчика', 'error');
+        }
     } catch (e) {
-        alert('Ошибка связи');
+        showToast('Ошибка связи', 'error');
     }
 }
 

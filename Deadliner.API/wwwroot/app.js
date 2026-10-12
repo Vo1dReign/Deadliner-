@@ -153,7 +153,7 @@ function renderTable(orders) {
                     <a class="btn-table-action action-blue" href="stages.html?zakazId=${order.id}">Маршрут</a>
                     <a class="btn-table-action action-slate" href="audit.html?zakazId=${order.id}">Аудит</a>
                     <a class="btn-table-action action-emerald" href="print-order.html?zakazId=${order.id}" target="_blank">Бланк</a>
-                    <button class="btn-table-action action-rose manager-only" onclick="deleteOrder(${order.id})">Удалить</button>
+                    <button class="btn-table-action action-rose admin-only" onclick="deleteOrder(${order.id})">Удалить</button>
                 </div>
             </td>
         `;
@@ -175,18 +175,24 @@ function sortTable(column) {
     applyFilters();
 }
 
-// Удаление заказа
+// Удаление заказа (только для Администратора)
 async function deleteOrder(id) {
-    if (!confirm('Вы действительно хотите удалить данный заказ?')) return;
+    const confirmed = await showConfirm(
+        'Удаление заказа',
+        `Вы действительно хотите безвозвратно удалить заказ #${id}? Все связанные технологические этапы и изделия будут удалены.`
+    );
+    if (!confirmed) return;
+
     try {
         const res = await fetch(`${API}/zakazy/${id}`, { method: 'DELETE' });
         if (res.ok) {
+            showToast(`Заказ #${id} успешно удалён из системы`, 'success');
             loadOrders();
         } else {
-            alert('Ошибка при удалении заказа');
+            showToast('Не удалось удалить заказ', 'error');
         }
     } catch (err) {
-        alert('Ошибка связи с сервером');
+        showToast('Ошибка связи с сервером', 'error');
     }
 }
 

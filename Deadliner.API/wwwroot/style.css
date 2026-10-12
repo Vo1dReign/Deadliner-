@@ -1,6 +1,4 @@
-/* ==============================================================================
-   DEADLINER MODERN DESIGN SYSTEM — VIBRANT SAAS DASHBOARD
-   ============================================================================== */
+
 
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
@@ -16,13 +14,13 @@
     --text-secondary: #475569;
     --text-muted: #94a3b8;
     
-    /* Сочные градиенты и фирменные цвета */
+
     --brand-primary: #2563eb;
     --brand-gradient: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
     --brand-purple: #7c3aed;
     --brand-cyan: #0284c7;
     
-    /* Цвета статусов */
+
     --status-green: #10b981;
     --status-green-bg: #ecfdf5;
     --status-green-text: #047857;
@@ -66,9 +64,7 @@ body {
     font-family: 'JetBrains Mono', monospace;
 }
 
-/* ==============================================================================
-   БОКОВОЕ МЕНЮ (SIDEBAR)
-   ============================================================================== */
+
 aside.sidebar {
     width: 270px;
     background: var(--bg-sidebar);
@@ -194,9 +190,6 @@ aside.sidebar {
     background: #fafafa;
 }
 
-/* ==============================================================================
-   РАБОЧАЯ ОБЛАСТЬ (APP CANVAS)
-   ============================================================================== */
 .app-canvas {
     flex: 1;
     display: flex;
@@ -279,9 +272,7 @@ main.main-content {
     margin-top: 4px;
 }
 
-/* ==============================================================================
-   ЯРКИЕ ВИДЖЕТЫ МЕТРИК
-   ============================================================================== */
+
 .stats-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -330,9 +321,7 @@ main.main-content {
 .stat-card.alert-yellow .stat-value { color: var(--status-yellow-text); }
 .stat-card.alert-red .stat-value { color: var(--status-red-text); }
 
-/* ==============================================================================
-   ТАБЛИЦА И ПАНЕЛЬ ФИЛЬТРОВ
-   ============================================================================== */
+
 .table-panel {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -454,7 +443,7 @@ table.data-table tr:hover td {
     background: #fbfcfe;
 }
 
-/* Яркие индикаторы срочности */
+
 .urgency-indicator {
     display: inline-flex;
     align-items: center;
@@ -812,5 +801,196 @@ footer.app-footer {
     transform: scale(1.1);
     background: var(--brand-purple);
 }
+
+/* ==============================================================================
+   ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ (TOAST NOTIFICATIONS) & МОДАЛКИ ПОДТВЕРЖДЕНИЯ
+   ============================================================================== */
+#toastContainer {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+    width: calc(100% - 48px);
+    pointer-events: none;
+}
+
+.toast-item {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    background: #ffffff;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+    animation: toastSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.25s ease;
+    font-size: 13.5px;
+    line-height: 1.45;
+}
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(40px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+.toast-item.hide {
+    opacity: 0;
+    transform: translateX(40px) scale(0.96);
+}
+
+.toast-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.toast-body {
+    flex: 1;
+}
+
+.toast-title {
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 2px;
+    font-size: 14px;
+}
+
+.toast-msg {
+    color: var(--text-secondary);
+}
+
+.toast-close-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 2px;
+    line-height: 1;
+    font-size: 16px;
+    transition: color 0.15s ease;
+}
+
+.toast-close-btn:hover {
+    color: var(--text-main);
+}
+
+.toast-success {
+    border-left: 5px solid var(--status-green);
+}
+.toast-success .toast-icon {
+    color: var(--status-green);
+}
+
+.toast-error {
+    border-left: 5px solid var(--status-red);
+}
+.toast-error .toast-icon {
+    color: var(--status-red);
+}
+
+.toast-warning {
+    border-left: 5px solid var(--status-yellow);
+}
+.toast-warning .toast-icon {
+    color: var(--status-yellow);
+}
+
+.toast-info {
+    border-left: 5px solid var(--brand-primary);
+}
+.toast-info .toast-icon {
+    color: var(--brand-primary);
+}
+
+/* ДИАЛОГ ПОДТВЕРЖДЕНИЯ (CUSTOM CONFIRM MODAL) */
+.custom-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+    animation: fadeIn 0.15s ease-out;
+}
+
+.custom-confirm-overlay.active {
+    display: flex;
+}
+
+.custom-confirm-box {
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+    width: 100%;
+    max-width: 440px;
+    padding: 28px;
+    animation: modalScaleUp 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalScaleUp {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.custom-confirm-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.custom-confirm-header .icon-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fee2e2;
+    color: var(--status-red);
+    flex-shrink: 0;
+}
+
+.custom-confirm-header.info .icon-circle {
+    background: #eff6ff;
+    color: var(--brand-primary);
+}
+
+.custom-confirm-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.custom-confirm-message {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 24px;
+    padding-left: 54px;
+}
+
+.custom-confirm-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
 
 

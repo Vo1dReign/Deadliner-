@@ -115,7 +115,6 @@
 </head>
 <body>
 
-    <!-- БОКОВОЕ МЕНЮ (SIDEBAR) -->
     <aside class="sidebar">
         <a href="index.html" class="sidebar-brand">
             <div class="brand-icon">D</div>
@@ -198,7 +197,6 @@
         </div>
     </aside>
 
-    <!-- ОСНОВНОЕ РАБОЧЕЕ ПРОСТРАНСТВО -->
     <div class="app-canvas">
         <header class="topbar">
             <div class="breadcrumbs">
@@ -223,7 +221,6 @@
                 </div>
             </div>
 
-            <!-- Виджеты общей сводки системы -->
             <div class="stats-row" style="margin-bottom: 24px;">
                 <div class="stat-card alert-blue">
                     <div class="stat-label">Сотрудники в штате</div>
@@ -243,7 +240,6 @@
                 </div>
             </div>
 
-            <!-- 4 ПАНЕЛИ ПОЛНОГО КОНТРОЛЯ (ТАБЫ) -->
             <div class="admin-nav-tabs">
                 <button class="admin-nav-tab active" onclick="switchAdminTab('users', this)">Персонал и доступы</button>
                 <button class="admin-nav-tab" onclick="switchAdminTab('orders', this)">Глобальный контроль заказов</button>
@@ -251,7 +247,6 @@
                 <button class="admin-nav-tab" onclick="switchAdminTab('system', this)">Аудит и состояние БД</button>
             </div>
 
-            <!-- РАЗДЕЛ 1: ПОЛЬЗОВАТЕЛИ И РОЛИ -->
             <section id="sectionUsers" class="admin-section active">
                 <div class="table-panel">
                     <div class="panel-toolbar">
@@ -278,7 +273,6 @@
                 </div>
             </section>
 
-            <!-- РАЗДЕЛ 2: ВСЕ ЗАКАЗЫ (АДМИНСКИЙ КОНТРОЛЬ) -->
             <section id="sectionOrders" class="admin-section">
                 <div class="table-panel">
                     <div class="panel-toolbar">
@@ -307,7 +301,6 @@
                 </div>
             </section>
 
-            <!-- РАЗДЕЛ 3: ВСЕ ЗАКАЗЧИКИ -->
             <section id="sectionClients" class="admin-section">
                 <div class="table-panel">
                     <div class="panel-toolbar">
@@ -332,7 +325,6 @@
                 </div>
             </section>
 
-            <!-- РАЗДЕЛ 4: СИСТЕМНЫЙ АУДИТ И БД -->
             <section id="sectionSystem" class="admin-section">
                 <div class="sys-card" style="border-top: 4px solid var(--brand-primary);">
                     <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 12px;">Технический статус инфраструктуры</h3>
@@ -376,7 +368,6 @@
         </footer>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО СОЗДАНИЯ ПОЛЬЗОВАТЕЛЯ -->
     <div class="modal-overlay" id="userModal">
         <div class="modal-box">
             <div class="modal-header">
@@ -418,7 +409,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ПОЛЬЗОВАТЕЛЯ -->
     <div class="modal-overlay" id="editUserModal">
         <div class="modal-box">
             <div class="modal-header">
@@ -462,7 +452,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ЗАКАЗЧИКА -->
+
     <div class="modal-overlay" id="editClientModal">
         <div class="modal-box">
             <div class="modal-header">

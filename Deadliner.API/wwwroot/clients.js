@@ -113,7 +113,7 @@ async function updateClient(event) {
     const adresObekta = document.getElementById('editClientAddress').value.trim();
 
     if (!fioNazvanie) {
-        alert('Заполните ФИО заказчика или название компании!');
+        showToast('Заполните ФИО заказчика или название компании!', 'warning');
         return;
     }
 
@@ -132,14 +132,15 @@ async function updateClient(event) {
         });
 
         if (response.ok) {
+            showToast('Данные заказчика успешно обновлены', 'success');
             closeEditModal();
             loadClients();
         } else {
-            alert('Не удалось обновить данные заказчика');
+            showToast('Не удалось обновить данные заказчика', 'error');
         }
     } catch (err) {
         console.error(err);
-        alert('Ошибка связи с сервером');
+        showToast('Ошибка связи с сервером', 'error');
     }
 }
 
@@ -152,7 +153,7 @@ async function saveClient(event) {
     const adresObekta = document.getElementById('clientAddress').value.trim();
 
     if (!fioNazvanie) {
-        alert('Укажите ФИО или название компании!');
+        showToast('Укажите ФИО или название компании!', 'warning');
         return;
     }
 
@@ -170,20 +171,25 @@ async function saveClient(event) {
         });
 
         if (response.ok) {
+            showToast('Заказчик успешно добавлен в систему!', 'success');
             closeClientModal();
             loadClients();
         } else {
-            alert('Не удалось сохранить заказчика');
+            showToast('Не удалось сохранить заказчика', 'error');
         }
     } catch (err) {
         console.error(err);
-        alert('Ошибка связи с сервером');
+        showToast('Ошибка связи с сервером', 'error');
     }
 }
 
 // Удаление клиента
 async function deleteClient(id) {
-    if (!confirm('Вы действительно хотите удалить данного заказчика? Связанные с ним заказы могут быть затронуты.')) return;
+    const confirmed = await showConfirm(
+        'Удаление заказчика',
+        `Вы действительно хотите удалить заказчика #${id}? Связанные с ним заказы могут быть затронуты.`
+    );
+    if (!confirmed) return;
 
     try {
         const response = await fetch(`${API}/klienty/${id}`, {
@@ -191,11 +197,12 @@ async function deleteClient(id) {
         });
 
         if (response.ok) {
+            showToast(`Заказчик #${id} успешно удалён`, 'success');
             loadClients();
         } else {
-            alert('Не удалось удалить заказчика (возможно, к нему уже привязаны действующие заказы)');
+            showToast('Не удалось удалить заказчика (возможно, к нему уже привязаны действующие заказы)', 'error');
         }
     } catch (err) {
-        alert('Ошибка связи с сервером');
+        showToast('Ошибка связи с сервером', 'error');
     }
 }
