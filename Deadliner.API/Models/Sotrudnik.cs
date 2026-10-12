@@ -19,6 +19,9 @@ public class Sotrudnik
     // Пароль хранится в виде хэша (не открытый текст!)
     public string Parol { get; set; } = string.Empty;
 
+    // Фото профиля (base64 Data URL или URL изображения)
+    public string? Foto { get; set; }
+
     // Навигационное свойство — объект роли
     [System.ComponentModel.DataAnnotations.Schema.ForeignKey("IdRoli")]
     public Rol? Rol { get; set; }

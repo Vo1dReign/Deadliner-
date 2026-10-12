@@ -147,7 +147,23 @@
                 <div>
                     <div class="profile-card">
                         <div class="profile-hero">
-                            <div class="profile-avatar-large" id="profileAvatarLarge">—</div>
+                            <div style="position:relative; width:88px; margin:0 auto 14px;">
+                                <div class="profile-avatar-large" id="profileAvatarLarge" style="margin-bottom:0; overflow:hidden; position:relative; cursor:pointer;" onclick="triggerPhotoUpload()" title="Нажмите, чтобы изменить фото">
+                                    —
+                                </div>
+                                <button type="button" class="avatar-edit-badge" onclick="triggerPhotoUpload()" title="Загрузить новое фото">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                </button>
+                            </div>
+                            <input type="file" id="photoFileInput" accept="image/png, image/jpeg, image/webp" style="display:none;" onchange="handlePhotoSelected(event)">
+                            <div style="display:flex; gap:8px; justify-content:center; margin-bottom:14px;">
+                                <button type="button" class="btn-table-action action-blue" onclick="triggerPhotoUpload()" style="font-size:12px; padding:4px 10px;">
+                                    Выбрать фото
+                                </button>
+                                <button type="button" id="btnDeletePhoto" class="btn-table-action action-rose" onclick="deleteProfilePhoto()" style="font-size:12px; padding:4px 10px; display:none;">
+                                    Удалить
+                                </button>
+                            </div>
                             <div class="profile-hero-name" id="profileHeroName">Загрузка...</div>
                             <div class="profile-role-badge" id="profileHeroRole">Должность</div>
                         </div>

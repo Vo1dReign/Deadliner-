@@ -41,7 +41,16 @@ function renderProfile(p) {
     const roleName = p.rol ? p.rol.nazvanie : (localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).rol : 'Сотрудник');
 
     // Hero-карточка
-    document.getElementById('profileAvatarLarge').textContent = initials;
+    const avatarEl = document.getElementById('profileAvatarLarge');
+    const btnDel = document.getElementById('btnDeletePhoto');
+    if (p.foto) {
+        avatarEl.innerHTML = `<img src="${p.foto}" alt="${initials}" style="width:100%; height:100%; object-fit:cover; border-radius:20px;">`;
+        if (btnDel) btnDel.style.display = 'inline-block';
+    } else {
+        avatarEl.textContent = initials;
+        if (btnDel) btnDel.style.display = 'none';
+    }
+
     document.getElementById('profileHeroName').textContent = p.fio;
     document.getElementById('profileHeroRole').textContent = roleName;
     document.getElementById('topbarUserRole').textContent = `${roleName} • Онлайн`;
@@ -197,3 +206,114 @@ function showCustomAlert(box, text, type) {
     box.className = `alert-box ${type}`;
     box.style.display = 'flex';
 }
+
+// Загрузка и удаление фотографии профиля
+function triggerPhotoUpload() {
+    document.getElementById('photoFileInput').click();
+}
+
+async function handlePhotoSelected(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+        alert('Пожалуйста, выберите файл изображения (PNG, JPG, WEBP).');
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        alert('Размер файла не должен превышать 5 МБ.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        const img = new Image();
+        img.onload = async () => {
+            // Масштабируем до 256x256 для ультра-быстрой загрузки и хранения
+            const canvas = document.createElement('canvas');
+            const size = 256;
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Center-crop кадрирование
+            const minSide = Math.min(img.width, img.height);
+            const sx = (img.width - minSide) / 2;
+            const sy = (img.height - minSide) / 2;
+
+            ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+            const base64Photo = canvas.toDataURL('image/jpeg', 0.88);
+
+            await uploadPhotoToServer(base64Photo);
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+async function uploadPhotoToServer(base64Photo) {
+    if (!currentProfile) return;
+
+    try {
+        const res = await fetch(`${API}/sotrudniki/${currentProfile.id}/foto`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ foto: base64Photo })
+        });
+
+        if (res.ok) {
+            currentProfile.foto = base64Photo;
+
+            // Обновляем текущую сессию в localStorage
+            const localUser = JSON.parse(localStorage.getItem('user')) || {};
+            localUser.foto = base64Photo;
+            localStorage.setItem('user', JSON.stringify(localUser));
+
+            renderProfile(currentProfile);
+            showUserInfo();
+
+            const alertBox = document.getElementById('infoAlert');
+            showCustomAlert(alertBox, 'Фотография профиля успешно установлена!', 'success');
+        } else {
+            alert('Не удалось сохранить фото на сервере');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Ошибка связи с сервером');
+    }
+}
+
+async function deleteProfilePhoto() {
+    if (!confirm('Вы уверены, что хотите удалить фотографию профиля?')) return;
+    if (!currentProfile) return;
+
+    try {
+        const res = await fetch(`${API}/sotrudniki/${currentProfile.id}/foto`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ foto: null })
+        });
+
+        if (res.ok) {
+            currentProfile.foto = null;
+
+            // Обновляем текущую сессию в localStorage
+            const localUser = JSON.parse(localStorage.getItem('user')) || {};
+            delete localUser.foto;
+            localStorage.setItem('user', JSON.stringify(localUser));
+
+            renderProfile(currentProfile);
+            showUserInfo();
+
+            const alertBox = document.getElementById('infoAlert');
+            showCustomAlert(alertBox, 'Фотография профиля удалена.', 'success');
+        } else {
+            alert('Не удалось удалить фото');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Ошибка связи с сервером');
+    }
+}
+

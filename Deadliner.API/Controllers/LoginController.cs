@@ -32,7 +32,8 @@ public class LoginController : ControllerBase
             rol = sotrudnik.Rol?.Nazvanie ?? "Сотрудник",
             login = sotrudnik.Login,
             telefon = sotrudnik.Telefon,
-            idRoli = sotrudnik.IdRoli
+            idRoli = sotrudnik.IdRoli,
+            foto = sotrudnik.Foto
         });
     }
 }

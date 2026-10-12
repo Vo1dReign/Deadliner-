@@ -127,12 +127,20 @@ function renderUsersTable(users) {
             roleOptionsHtml += `<option value="${r.id}" ${selected}>${r.nazvanie}</option>`;
         });
 
+        const initials = u.fio ? u.fio.charAt(0).toUpperCase() : 'U';
+        const userAvatar = u.foto
+            ? `<img src="${u.foto}" style="width:28px; height:28px; border-radius:6px; object-fit:cover; margin-right:8px; vertical-align:middle;">`
+            : `<span class="avatar-box" style="width:28px; height:28px; font-size:11px; display:inline-flex; margin-right:8px; vertical-align:middle;">${initials}</span>`;
+
         const row = document.createElement('tr');
         row.innerHTML = `
             <td class="mono" style="font-weight:700; color:var(--brand-primary);">#${u.id}</td>
             <td style="font-weight:700;">
-                ${u.fio}
-                ${isSelf ? '<span class="btn-table-action action-blue" style="font-size:10px; margin-left:6px;">Вы (Суперадмин)</span>' : ''}
+                <div style="display:flex; align-items:center;">
+                    ${userAvatar}
+                    <span>${u.fio}</span>
+                    ${isSelf ? '<span class="btn-table-action action-blue" style="font-size:10px; margin-left:6px;">Вы (Суперадмин)</span>' : ''}
+                </div>
             </td>
             <td class="mono" style="color:var(--text-secondary);">${u.login}</td>
             <td class="mono">${u.telefon || '—'}</td>

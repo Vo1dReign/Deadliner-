@@ -75,7 +75,23 @@ public class SotrudnikiController : ControllerBase
         {
             existing.Parol = updated.Parol;
         }
+        if (updated.Foto != null)
+        {
+            existing.Foto = updated.Foto;
+        }
 
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    [HttpPut("{id}/foto")]
+    public async Task<IActionResult> UpdatePhoto(int id, [FromBody] PhotoDto dto)
+    {
+        var existing = await _context.Sotrudniki.FindAsync(id);
+        if (existing == null)
+            return NotFound();
+
+        existing.Foto = dto.Foto;
         await _context.SaveChangesAsync();
         return NoContent();
     }
@@ -91,4 +107,9 @@ public class SotrudnikiController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
+}
+
+public class PhotoDto
+{
+    public string? Foto { get; set; }
 }

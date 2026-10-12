@@ -18,10 +18,14 @@ function showUserInfo() {
     const nav = document.getElementById('userInfo');
     if (nav) {
         const initials = user.fio ? user.fio.charAt(0).toUpperCase() : 'U';
+        const avatarContent = user.foto 
+            ? `<img src="${user.foto}" alt="${initials}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">`
+            : initials;
+
         nav.innerHTML = `
             <div class="user-panel">
                 <a href="profile.html" class="user-details" title="Перейти в личный профиль" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
-                    <div class="avatar-box">${initials}</div>
+                    <div class="avatar-box" style="padding:0; overflow:hidden;">${avatarContent}</div>
                     <div style="overflow:hidden;">
                         <div class="user-text-name">${user.fio}</div>
                         <div class="user-text-role">${user.rol}</div>
