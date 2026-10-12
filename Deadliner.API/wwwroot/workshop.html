@@ -10,6 +10,12 @@
             font-family: Arial, sans-serif;
             background: #0f1628;
             color: #fff;
+            transition: cursor 0.2s ease;
+        }
+
+        /* Автоматическое скрытие мышки при простое */
+        body.hide-cursor {
+            cursor: none;
         }
 
         header {
@@ -26,13 +32,18 @@
         #clock {
             font-size: 28px;
             font-weight: bold;
-            color: white;
+            color: #38bdf8;
+            font-family: monospace;
+            background: #0f1628;
+            padding: 4px 14px;
+            border-radius: 6px;
+            border: 1px solid #3d4f7a;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 26px;
+            font-size: 24px;
         }
 
         th {
@@ -44,12 +55,12 @@
         }
 
         td {
-            padding: 20px 24px;
+            padding: 18px 24px;
             border-bottom: 2px solid #1e2846;
             font-weight: bold;
         }
 
-        a.btn {
+        .btn {
             text-decoration: none;
             display: inline-block;
             color: white;
@@ -57,42 +68,65 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 24px;
+            font-size: 15px;
+            background: #3478dc;
         }
 
-        .btn:hover {background: #283763;}
+        .btn:hover { background: #2560b8; }
+        .btn-kiosk { background: #8b5cf6; font-weight: bold; }
+        .btn-kiosk:hover { background: #7c3aed; }
 
         .green { background: #14401e; border-left: 8px solid #22c55e; }
         .yellow { background: #3d3000; border-left: 8px solid #eab308; }
-        .red { background: #3d0f0f; border-left: 8px solid #ef4444; }
+        
+        /* Пульсирующая красная зона тревоги */
+        .red { 
+            background: #3d0f0f; 
+            border-left: 8px solid #ef4444; 
+            animation: pulse-red 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-red {
+            0% { background-color: #3d0f0f; }
+            50% { background-color: #5a1414; box-shadow: inset 0 0 20px rgba(239, 68, 68, 0.4); }
+            100% { background-color: #3d0f0f; }
+        }
 
         .days-left {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: bold;
         }
 
-        .overdue { color: #ef4444; }
+        .overdue { 
+            color: #ef4444; 
+            text-transform: uppercase;
+            font-size: 24px;
+        }
     </style>
 </head>
 <body>
 
     <header>
-    <span>Deadliner - Экран цеха</span>
-    <nav style="display:flex; gap:12px; align-items:center;">
-        <a href="index.html" class="btn manager-only">Заказы</a>
-        <a href="reports.html" class="btn manager-only">Отчёты</a>
-        <span id="clock">00:00:00</span>
-        <div id="userInfo" style="display:flex; align-items:center; margin-left:16px;"></div>
-    </nav>
-</header>
+        <div style="display:flex; align-items:center; gap:16px;">
+            <span>Deadliner - Экран цеха</span>
+            <span id="clock">00:00:00</span>
+        </div>
+        
+        <nav style="display:flex; gap:12px; align-items:center;">
+            <a href="index.html" class="btn manager-only">← Заказы</a>
+            <button class="btn btn-kiosk" onclick="toggleFullScreen()">📺 На весь экран</button>
+            <button class="btn" id="soundBtn" onclick="toggleSound()">🔔 Звук: Выкл</button>
+            <div id="userInfo" style="display:flex; align-items:center; margin-left:12px;"></div>
+        </nav>
+    </header>
 
     <table>
         <thead>
             <tr>
-                <th>#</th>
+                <th style="width: 100px;">Заказ</th>
                 <th>Клиент</th>
                 <th>Плановая отгрузка</th>
-                <th>Осталось дней</th>
+                <th>Осталось времени</th>
                 <th>Статус</th>
             </tr>
         </thead>
