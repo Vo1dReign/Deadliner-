@@ -2,132 +2,191 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Deadliner - Экран цеха</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeadLiner — Цеховое информационное табло</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: Arial, sans-serif;
-            background: #0f1628;
-            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #090d16;
+            color: #ffffff;
+            min-height: 100vh;
             transition: cursor 0.2s ease;
         }
 
-        /* Автоматическое скрытие мышки при простое */
         body.hide-cursor {
             cursor: none;
         }
 
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
         header {
-            background: #1e2846;
-            padding: 12px 32px;
+            background: #0f172a;
+            padding: 14px 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 2px solid #1e293b;
+        }
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .brand-tag {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 800;
+            padding: 6px 12px;
+            border-radius: 6px;
+            letter-spacing: 0.05em;
+        }
+
+        .brand-title {
             font-size: 20px;
-            font-weight: bold;
-            border-bottom: 3px solid #3478dc;
+            font-weight: 800;
+            letter-spacing: -0.4px;
         }
 
         #clock {
-            font-size: 28px;
-            font-weight: bold;
+            font-size: 26px;
+            font-weight: 800;
             color: #38bdf8;
-            font-family: monospace;
-            background: #0f1628;
-            padding: 4px 14px;
-            border-radius: 6px;
-            border: 1px solid #3d4f7a;
+            font-family: 'JetBrains Mono', monospace;
+            background: #020617;
+            padding: 6px 16px;
+            border-radius: 8px;
+            border: 1px solid #1e293b;
+            letter-spacing: 1px;
         }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            font-size: 13.5px;
+            font-weight: 700;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            text-decoration: none;
+            color: #ffffff;
+            font-family: inherit;
+            transition: all 0.15s ease;
+        }
+
+        .btn-kiosk {
+            background: #2563eb;
+        }
+        .btn-kiosk:hover { background: #1d4ed8; }
+
+        .btn-sound {
+            background: #334155;
+            border: 1px solid #475569;
+        }
+
+        .btn-back {
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+        .btn-back:hover { background: #334155; }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 24px;
+            font-size: 22px;
         }
 
         th {
-            background: #1e2846;
-            padding: 16px 24px;
+            background: #0f172a;
+            padding: 16px 28px;
             text-align: left;
-            font-size: 18px;
-            color: #aab4d0;
+            font-size: 13.5px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 800;
+            border-bottom: 2px solid #1e293b;
         }
 
         td {
-            padding: 18px 24px;
-            border-bottom: 2px solid #1e2846;
-            font-weight: bold;
+            padding: 20px 28px;
+            border-bottom: 1px solid #1e293b;
+            font-weight: 700;
+            vertical-align: middle;
         }
 
-        .btn {
-            text-decoration: none;
-            display: inline-block;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 15px;
-            background: #3478dc;
+        .green {
+            background: #082116;
+            border-left: 8px solid #10b981;
         }
 
-        .btn:hover { background: #2560b8; }
-        .btn-kiosk { background: #8b5cf6; font-weight: bold; }
-        .btn-kiosk:hover { background: #7c3aed; }
+        .yellow {
+            background: #241c05;
+            border-left: 8px solid #f59e0b;
+        }
 
-        .green { background: #14401e; border-left: 8px solid #22c55e; }
-        .yellow { background: #3d3000; border-left: 8px solid #eab308; }
-        
-        /* Пульсирующая красная зона тревоги */
-        .red { 
-            background: #3d0f0f; 
-            border-left: 8px solid #ef4444; 
+        .red {
+            background: #2c0b0e;
+            border-left: 8px solid #ef4444;
             animation: pulse-red 2s infinite ease-in-out;
         }
 
         @keyframes pulse-red {
-            0% { background-color: #3d0f0f; }
-            50% { background-color: #5a1414; box-shadow: inset 0 0 20px rgba(239, 68, 68, 0.4); }
-            100% { background-color: #3d0f0f; }
+            0% { background-color: #2c0b0e; }
+            50% { background-color: #451014; box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.5); }
+            100% { background-color: #2c0b0e; }
         }
 
         .days-left {
-            font-size: 28px;
-            font-weight: bold;
+            font-size: 26px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        .overdue { 
-            color: #ef4444; 
+        .overdue {
+            color: #ef4444;
             text-transform: uppercase;
-            font-size: 24px;
+            font-weight: 800;
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div style="display:flex; align-items:center; gap:16px;">
-            <span>Deadliner - Экран цеха</span>
+        <div class="brand-box">
+            <span class="brand-tag">ЦЕХ</span>
+            <span class="brand-title">DeadLiner — Оперативное табло</span>
             <span id="clock">00:00:00</span>
         </div>
         
-        <nav style="display:flex; gap:12px; align-items:center;">
-            <a href="index.html" class="btn manager-only">← Заказы</a>
-            <button class="btn btn-kiosk" onclick="toggleFullScreen()">📺 На весь экран</button>
-            <button class="btn" id="soundBtn" onclick="toggleSound()">🔔 Звук: Выкл</button>
-            <div id="userInfo" style="display:flex; align-items:center; margin-left:12px;"></div>
+        <nav style="display:flex; gap:10px; align-items:center;">
+            <a href="index.html" class="btn btn-back manager-only">← К заказам</a>
+            <button class="btn btn-kiosk" onclick="toggleFullScreen()">На весь экран</button>
+            <button class="btn btn-sound" id="soundBtn" onclick="toggleSound()">Звук: Выкл</button>
+            <div id="userInfo" style="display:flex; align-items:center; margin-left:10px;"></div>
         </nav>
     </header>
 
     <table>
         <thead>
             <tr>
-                <th style="width: 100px;">Заказ</th>
-                <th>Клиент</th>
-                <th>Плановая отгрузка</th>
-                <th>Осталось времени</th>
-                <th>Статус</th>
+                <th style="width: 110px;">Заказ</th>
+                <th>Контрагент</th>
+                <th style="width: 220px;">План отгрузки</th>
+                <th style="width: 240px;">Остаток срока</th>
+                <th style="width: 200px;">Текущий статус</th>
             </tr>
         </thead>
         <tbody id="workshopTable"></tbody>

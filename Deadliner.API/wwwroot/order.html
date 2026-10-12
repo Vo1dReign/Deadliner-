@@ -1,113 +1,146 @@
 <!DOCTYPE html>
-<html lang="ru" >
-    <head>
-        <meta charset="UTF-8">
-        <title> Deadliner - новый заказ</title>
-        <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: Arial, sans-serif;
-            background: #1e2846;
-            color: #fff;
-        }
-        header {
-            background: #3478dc;
-            padding: 16px 32px;
-            font-size: 24px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .back-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 6px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        main {
-            padding: 32px;
-            max-width: 600px;
-        }
-        h2 { margin-bottom: 24px; }
-        .form-group {
-            margin-bottom: 16px;
-        }
-        label {
-            display: block;
-            margin-bottom: 6px;
-            color: #aab4d0;
-            font-size: 14px;
-        }
-        input, select {
-            width: 100%;
-            padding: 10px 14px;
-            background: #2a3555;
-            border: 1px solid #3d4f7a;
-            border-radius: 6px;
-            color: #fff;
-            font-size: 15px;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #3478dc;
-        }
-        .btn {
-            padding: 12px 28px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 15px;
-            background: #3478dc;
-            color: white;
-            margin-top: 8px;
-        }
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeadLiner — Оформление нового заказа</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-        .btn:hover { background: #2560b8; }
-        </style>
-    </head>
-    <body>
-        
-        <header>
-            <button class="back-btn" onclick="history.back()"> ← Назад </button>
-            <span> Новый заказ</span>
+    <!-- БОКОВОЕ МЕНЮ (SIDEBAR) -->
+    <aside class="sidebar">
+        <a href="index.html" class="sidebar-brand">
+            <div class="brand-icon">D</div>
+            <div class="brand-info">
+                <span class="brand-title">DeadLiner</span>
+                <span class="brand-subtitle">Система диспетчеризации</span>
+            </div>
+        </a>
+
+        <div class="sidebar-nav">
+            <div>
+                <div class="nav-group-label">Производство</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="index.html" class="nav-link active">
+                            <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            <span>Реестр заказов</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="workshop.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+                            <span>Экран цеха</span>
+                        </a>
+                    </li>
+                    <li class="manager-only">
+                        <a href="catalog.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                            <span>Справочник операций</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="manager-only">
+                <div class="nav-group-label">Аналитика</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="reports.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                            <span>Сводные отчёты</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="manager-only">
+                <div class="nav-group-label">Конфигурация</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="settings.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                            <span>Пороги срочности</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div id="userInfo"></div>
+        </div>
+    </aside>
+
+    <!-- ОСНОВНОЕ РАБОЧЕЕ ПРОСТРАНСТВО -->
+    <div class="app-canvas">
+        <header class="topbar">
+            <div class="breadcrumbs">
+                <span>Диспетчеризация</span>
+                <span>/</span>
+                <a href="index.html" style="color:var(--text-muted); text-decoration:none;">Заказы</a>
+                <span>/</span>
+                <span class="current">Оформление нового заказа</span>
+            </div>
+
+            <div class="topbar-actions">
+                <a href="index.html" class="btn-modern btn-ghost">← К списку заказов</a>
+            </div>
         </header>
 
-        <main>
-            <h2>Данные заказа</h2>
-
-            <div class="form-group">
-                <label> Клиент </label>
-                <select id="clientId">
-                    <option value=""> Выбрите клиента </option>
-                </select>
+        <main class="main-content">
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>Новый производственный заказ</h1>
+                    <p>Регистрация наряда и расчет нормативного дедлайна отгрузки мебели</p>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>Менеджер</label>
-                <select id="managerId">
-                    <option value=""> Выберите менеджера</option>
-                </select>
+            <div class="form-card" style="border-top: 4px solid var(--brand-primary);">
+                <div class="form-group">
+                    <label for="clientId">Заказчик мебели (Контрагент)</label>
+                    <select id="clientId" class="form-control">
+                        <option value="">Выберите клиента из базы...</option>
+                    </select>
+                </div>
 
+                <div class="form-group">
+                    <label for="managerId">Ответственный менеджер проекта</label>
+                    <select id="managerId" class="form-control">
+                        <option value="">Выберите менеджера...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="prepayment">Сумма внесённой предоплаты (BYN)</label>
+                    <input type="number" id="prepayment" class="form-control mono" placeholder="0.00" min="0" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label for="shipDate">Плановый дедлайн отгрузки (дата готовности)</label>
+                    <input type="date" id="shipDate" class="form-control mono">
+                </div>
+
+                <div style="display:flex; gap:12px; margin-top: 30px;">
+                    <button class="btn-modern btn-primary" onclick="createOrder()" style="flex:2; justify-content:center; padding:12px;">Создать заказ и открыть спецификацию</button>
+                    <a href="index.html" class="btn-modern btn-ghost" style="flex:1; justify-content:center;">Отмена</a>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label>Сумма предоплаты (Бел.Руб.)</label>
-                <input type="number" id="prepayment" placeholder="0" min="0">
-            </div>
-
-            <div class="form-group">
-                <label>Плановая дата отгрузки</label>
-                <input type="date" id="shipDate">
-            </div>
-
-            <button class="btn" onclick="createOrder()">Создать заказ</button>
         </main>
 
-        <script src="auth.js"></script>
-        <script src="order.js"></script>
-    </body>
+        <footer class="app-footer">
+            <div class="footer-left">
+                <span>DeadLiner Manufacturing Execution System</span>
+                <span class="footer-tag">v2.4.0 Release</span>
+            </div>
+            <div>
+                <span>Минский колледж предпринимательства • Ревенко Е.А. (ПО-2409)</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="order.js"></script>
+</body>
 </html>

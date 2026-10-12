@@ -25,7 +25,7 @@ async function loadItems() {
             <td>${item.kolichestvo}</td>
             <td>${item.harakteristiki || '—'}</td>
             <td>
-                <button class="btn btn-danger" onclick="deleteItem(${item.id})">Удалить</button>
+                <button class="btn-table-action action-rose" onclick="deleteItem(${item.id})">Удалить</button>
             </td>
         `;
         tbody.appendChild(tr);

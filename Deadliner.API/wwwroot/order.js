@@ -17,6 +17,12 @@ async function loadClient() {
         option.textContent = c.fioNazvanie;
         select.appendChild(option);
     });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const preselected = urlParams.get('clientId');
+    if (preselected) {
+        select.value = preselected;
+    }
 }
 
 async function loadManager() {

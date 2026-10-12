@@ -16,6 +16,16 @@ public class ZhurnalIzmeneniiController : ControllerBase
         _context = context;
     }
 
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<ZhurnalIzmenenii>>> GetAll()
+    {
+        return await _context.ZhurnalIzmenenii
+            .Include(z => z.Sotrudnik)
+            .OrderByDescending(z => z.DataIzmenenia)
+            .Take(100)
+            .ToListAsync();
+    }
+
     [HttpGet("zakaz/{zakazId}")]
     public async Task<ActionResult<IEnumerable<ZhurnalIzmenenii>>> GetByZakaz(int zakazId)
     {

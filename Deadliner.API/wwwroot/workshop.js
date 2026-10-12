@@ -57,7 +57,7 @@ async function loadWorkshop() {
             }
 
             const daysText = daysLeft < 0
-                ? `<span class="overdue">⚠ ПРОСРОЧЕН на ${Math.abs(daysLeft)} дн.</span>`
+                ? `<span class="overdue">ПРОСРОЧЕН на ${Math.abs(daysLeft)} дн.</span>`
                 : `${daysLeft} дн.`;
 
             const row = document.createElement('tr');
@@ -100,16 +100,16 @@ function toggleSound() {
     const btn = document.getElementById('soundBtn');
 
     if (soundEnabled) {
-        btn.textContent = '🔔 Звук: ВКЛ';
-        btn.style.background = '#22c55e';
+        btn.textContent = 'Звук: ВКЛ';
+        btn.style.background = '#10b981';
         // Инициализируем AudioContext по клику пользователя
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
         playAlertBeep(); // Тестовый пик
     } else {
-        btn.textContent = '🔔 Звук: Выкл';
-        btn.style.background = '#3478dc';
+        btn.textContent = 'Звук: Выкл';
+        btn.style.background = '#334155';
     }
 }
 

@@ -3,180 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeadLiner - Технологические этапы</title>
+    <title>DeadLiner — Технологический маршрут заказа</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: Arial, sans-serif;
-            background: #1e2846;
-            color: #fff;
-        }
-
-        header {
-            background: #3478dc;
-            padding: 16px 32px;
-            font-size: 22px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        main {
-            padding: 24px 32px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        h2 { font-size: 22px; }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            background: #3478dc;
-            color: white;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn:hover { background: #2560b8; }
-        .btn-success { background: #22c55e; }
-        .btn-success:hover { background: #16a34a; }
-        .btn-danger { background: #ef4444; }
-
-        /* Прогресс-бар этапов */
         .progress-box {
-            background: #2a3555;
-            padding: 20px;
-            border-radius: 8px;
+            background: var(--bg-card);
+            padding: 24px 28px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-card);
             margin-bottom: 24px;
+            border-top: 4px solid var(--brand-primary);
         }
 
-        .progress-title {
-            font-size: 16px;
-            color: #aab4d0;
-            margin-bottom: 12px;
+        .progress-header {
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .progress-header h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .progress-percent-badge {
+            background: var(--brand-gradient);
+            color: #ffffff;
+            padding: 5px 12px;
+            border-radius: 9999px;
+            font-size: 12.5px;
+            font-weight: 700;
         }
 
         .progress-track {
             display: flex;
-            gap: 8px;
-            background: #1e2846;
-            padding: 8px;
-            border-radius: 6px;
+            gap: 10px;
+            background: var(--bg-subtle);
+            padding: 10px;
+            border-radius: var(--radius-md);
+            overflow-x: auto;
         }
 
         .progress-step {
             flex: 1;
-            padding: 10px 8px;
+            min-width: 130px;
+            padding: 12px 10px;
             text-align: center;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             font-size: 13px;
-            font-weight: bold;
-            background: #3d4f7a;
-            color: #ccc;
+            font-weight: 700;
+            background: #ffffff;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
         }
 
         .progress-step.done {
-            background: #22c55e;
-            color: white;
+            background: var(--status-green-bg);
+            border-color: var(--status-green-border);
+            color: var(--status-green-text);
         }
 
         .progress-step.current {
-            background: #eab308;
-            color: #1e2846;
+            background: var(--status-yellow-bg);
+            border-color: var(--status-yellow-border);
+            color: var(--status-yellow-text);
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
         }
-
-        /* Таблица этапов */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #2a3555;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        th {
-            background: #3478dc;
-            padding: 12px 16px;
-            text-align: left;
-            font-size: 15px;
-        }
-
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #1e2846;
-            font-size: 15px;
-        }
-
-        .badge {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            display: inline-block;
-        }
-
-        .badge-green { background: #14401e; color: #22c55e; border: 1px solid #22c55e; }
-        .badge-yellow { background: #3d3000; color: #eab308; border: 1px solid #eab308; }
-        .badge-gray { background: #1e2846; color: #94a3b8; border: 1px solid #3d4f7a; }
     </style>
 </head>
 <body>
 
-    <header>
-        <span>DeadLiner - Технологическая карта</span>
-        <div id="userInfo" style="display:flex; align-items:center;"></div>
-    </header>
+    <!-- БОКОВОЕ МЕНЮ (SIDEBAR) -->
+    <aside class="sidebar">
+        <a href="index.html" class="sidebar-brand">
+            <div class="brand-icon">D</div>
+            <div class="brand-info">
+                <span class="brand-title">DeadLiner</span>
+                <span class="brand-subtitle">Система диспетчеризации</span>
+            </div>
+        </a>
 
-    <main>
-        <div class="top-bar">
-            <a href="index.html" class="btn">← Назад к заказам</a>
-            <h2 id="orderTitle">Загрузка данных заказа...</h2>
-            <div></div>
+        <div class="sidebar-nav">
+            <div>
+                <div class="nav-group-label">Производство</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="index.html" class="nav-link active">
+                            <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            <span>Реестр заказов</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="workshop.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+                            <span>Экран цеха</span>
+                        </a>
+                    </li>
+                    <li class="manager-only">
+                        <a href="catalog.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                            <span>Справочник операций</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="manager-only">
+                <div class="nav-group-label">Аналитика</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="reports.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                            <span>Сводные отчёты</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="manager-only">
+                <div class="nav-group-label">Конфигурация</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="settings.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                            <span>Пороги срочности</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
 
-
-        <div class="progress-box">
-            <div class="progress-title">
-                <span>Прогресс выполнения технологического маршрута</span>
-                <span id="progressPercent">0%</span>
-            </div>
-            <div class="progress-track" id="progressTrack">
-
-            </div>
+        <div class="sidebar-footer">
+            <div id="userInfo"></div>
         </div>
+    </aside>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>№</th>
-                    <th>Операция (этап)</th>
-                    <th>Тип</th>
-                    <th>План. срок</th>
-                    <th>Факт. завершение</th>
-                    <th>Статус</th>
-                    <th>Действие</th>
-                </tr>
-            </thead>
-            <tbody id="stagesTable">
-                <tr><td colspan="7" style="text-align:center;">Загрузка этапов...</td></tr>
-            </tbody>
-        </table>
-    </main>
+    <!-- ОСНОВНОЕ РАБОЧЕЕ ПРОСТРАНСТВО -->
+    <div class="app-canvas">
+        <header class="topbar">
+            <div class="breadcrumbs">
+                <span>Диспетчеризация</span>
+                <span>/</span>
+                <a href="index.html" style="color:var(--text-muted); text-decoration:none;">Заказы</a>
+                <span>/</span>
+                <span class="current">Маршрут прохождения цеха</span>
+            </div>
+
+            <div class="topbar-actions">
+                <a href="index.html" class="btn-modern btn-ghost">← К списку заказов</a>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div class="page-title">
+                    <h1 id="orderTitle">Технологический маршрут заказа</h1>
+                    <p>Контроль исполнения переделов мебельного производства по технологической карте</p>
+                </div>
+            </div>
+
+            <!-- Визуальный трек прогресса -->
+            <div class="progress-box">
+                <div class="progress-header">
+                    <h3>Прогресс выполнения производственного цикла</h3>
+                    <span id="progressPercent" class="progress-percent-badge">0%</span>
+                </div>
+                <div class="progress-track" id="progressTrack"></div>
+            </div>
+
+            <!-- Таблица технологических этапов -->
+            <div class="table-panel">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">№</th>
+                            <th>Технологическая операция (этап)</th>
+                            <th style="width: 140px;">Тип операции</th>
+                            <th style="width: 140px;">План. срок</th>
+                            <th style="width: 160px;">Факт. завершение</th>
+                            <th style="width: 150px;">Статус</th>
+                            <th style="width: 170px;" class="no-sort">Управление</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stagesTable"></tbody>
+                </table>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <div class="footer-left">
+                <span>DeadLiner Manufacturing Execution System</span>
+                <span class="footer-tag">v2.4.0 Release</span>
+            </div>
+            <div>
+                <span>Минский колледж предпринимательства • Ревенко Е.А. (ПО-2409)</span>
+            </div>
+        </footer>
+    </div>
 
     <script src="auth.js"></script>
     <script src="stages.js"></script>

@@ -1,8 +1,8 @@
 const API = 'http://localhost:5216/api';
 
-let allOrders = [];
-let sortColumn = null; 
-let sortAsc = true;      
+let allOrders = [];       // Все загруженные заказы
+let sortColumn = null;    // Текущая колонка сортировки
+let sortAsc = true;       // Направление сортировки
 
 document.addEventListener('DOMContentLoaded', () => {
     const user = showUserInfo();
@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadOrders();
 });
 
+// Загрузка всех заказов с сервера
 async function loadOrders() {
     try {
         const response = await fetch(`${API}/zakazy`);
@@ -37,19 +38,51 @@ async function loadOrders() {
             };
         });
 
+        // Обновляем виджеты оперативной статистики
+        updateMetrics(allOrders);
+
         applyFilters();
     } catch (err) {
         console.error(err);
         document.getElementById('ordersTable').innerHTML = 
-            '<tr><td colspan="7" style="text-align:center; color:#ef4444;">Ошибка соединения с сервером</td></tr>';
+            '<tr><td colspan="7" style="text-align:center; color:#ef4444; padding:32px;">Ошибка соединения с сервером базы данных</td></tr>';
     }
 }
 
+// Расчет оперативных показателей в карточках
+function updateMetrics(orders) {
+    const statTotal = document.getElementById('statTotal');
+    const statGreen = document.getElementById('statGreen');
+    const statYellow = document.getElementById('statYellow');
+    const statRed = document.getElementById('statRed');
+
+    if (!statTotal) return;
+
+    statTotal.textContent = orders.length;
+    statGreen.textContent = orders.filter(o => o.colorClass === 'green' && o.status !== 'завершён').length;
+    statYellow.textContent = orders.filter(o => o.colorClass === 'yellow' && o.status !== 'завершён').length;
+    statRed.textContent = orders.filter(o => o.colorClass === 'red' || o.status === 'просрочен').length;
+}
+
+// Быстрое переключение по вкладкам (Все / В работе / Просроченные / Завершённые)
+function setQuickTab(status, tabBtn) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    tabBtn.classList.add('active');
+
+    const statusFilter = document.getElementById('statusFilter');
+    if (statusFilter) {
+        statusFilter.value = status === 'all' ? '' : status;
+    }
+    applyFilters();
+}
+
+// Применение фильтрации, поиска и сортировки
 function applyFilters() {
     const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
-    const statusVal = document.getElementById('statusFilter').value;
-    const urgencyVal = document.getElementById('urgencyFilter').value;
+    const statusVal = document.getElementById('statusFilter')?.value ?? '';
+    const urgencyVal = document.getElementById('urgencyFilter')?.value ?? '';
 
+    // 1. Фильтрация
     let filtered = allOrders.filter(order => {
         const clientName = (order.klient?.fioNazvanie ?? '').toLowerCase();
         const orderIdStr = order.id.toString();
@@ -61,6 +94,7 @@ function applyFilters() {
         return matchesSearch && matchesStatus && matchesUrgency;
     });
 
+    // 2. Сортировка
     if (sortColumn) {
         filtered.sort((a, b) => {
             let valA, valB;
@@ -79,36 +113,48 @@ function applyFilters() {
         });
     }
 
-    document.getElementById('ordersCount').textContent = `Показано: ${filtered.length} из ${allOrders.length} заказов`;
-
+    // 3. Отрисовка таблицы
     renderTable(filtered);
 }
 
+// Отрисовка строк в таблице
 function renderTable(orders) {
     const tbody = document.getElementById('ordersTable');
     tbody.innerHTML = '';
 
     if (orders.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#aab4d0; padding:24px;">Заказов по заданным критериям не найдено</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-secondary); padding:40px; font-weight:500;">Заказов по заданным критериям не найдено</td></tr>';
         return;
     }
 
     orders.forEach(order => {
+        const daysText = order.daysLeft < 0 
+            ? `Просрочен на ${Math.abs(order.daysLeft)} дн.` 
+            : `${order.daysLeft} дн.`;
+
         const row = document.createElement('tr');
-        row.className = order.colorClass;
         row.innerHTML = `
-            <td><strong>#${order.id}</strong></td>
-            <td>${order.klient?.fioNazvanie ?? '-'}</td>
-            <td>${order.dataPriema}</td>
-            <td>${order.planDataOtgruzki}</td>
-            <td style="font-weight:bold;">${order.daysLeft} дн.</td>
-            <td>${order.status}</td>
-            <td style="display:flex; gap:8px;">
-                <a class="btn" href="items.html?zakazId=${order.id}">Изделия</a>
-                <a class="btn" href="stages.html?zakazId=${order.id}">Этапы</a>
-                <a class="btn" href="audit.html?zakazId=${order.id}">История</a>
-                <a class="btn" href="print-order.html?zakazId=${order.id}" target="_blank">Наряд</a>
-                <button class="btn btn-danger manager-only" onclick="deleteOrder(${order.id})">Удалить</button>
+            <td class="mono" style="font-weight:600; color:var(--text-main);">#${order.id}</td>
+            <td style="font-weight:600;">${order.klient?.fioNazvanie ?? '—'}</td>
+            <td class="mono" style="color:var(--text-secondary); font-size:13px;">${order.dataPriema}</td>
+            <td class="mono" style="font-weight:600; font-size:13px;">${order.planDataOtgruzki}</td>
+            <td>
+                <span class="urgency-indicator urgency-${order.colorClass}">
+                    <span class="dot"></span>
+                    <span>${daysText}</span>
+                </span>
+            </td>
+            <td>
+                <span style="font-size:13px; font-weight:500; color:var(--text-secondary);">${order.status}</span>
+            </td>
+            <td>
+                <div class="action-row">
+                    <a class="btn-table-action action-purple" href="items.html?zakazId=${order.id}">Изделия</a>
+                    <a class="btn-table-action action-blue" href="stages.html?zakazId=${order.id}">Маршрут</a>
+                    <a class="btn-table-action action-slate" href="audit.html?zakazId=${order.id}">Аудит</a>
+                    <a class="btn-table-action action-emerald" href="print-order.html?zakazId=${order.id}" target="_blank">Бланк</a>
+                    <button class="btn-table-action action-rose manager-only" onclick="deleteOrder(${order.id})">Удалить</button>
+                </div>
             </td>
         `;
         tbody.appendChild(row);
@@ -118,6 +164,7 @@ function renderTable(orders) {
     applyRoleRules(user);
 }
 
+// Сортировка по столбцам
 function sortTable(column) {
     if (sortColumn === column) {
         sortAsc = !sortAsc;
@@ -128,16 +175,9 @@ function sortTable(column) {
     applyFilters();
 }
 
-function resetFilters() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('statusFilter').value = '';
-    document.getElementById('urgencyFilter').value = '';
-    sortColumn = null;
-    applyFilters();
-}
-
+// Удаление заказа
 async function deleteOrder(id) {
-    if (!confirm('Вы уверены, что хотите удалить заказ?')) return;
+    if (!confirm('Вы действительно хотите удалить данный заказ?')) return;
     try {
         const res = await fetch(`${API}/zakazy/${id}`, { method: 'DELETE' });
         if (res.ok) {
@@ -154,6 +194,7 @@ function openCreate() {
     window.location.href = 'order.html';
 }
 
+// Экспорт в CSV без эмодзи
 function exportToCSV() {
     if (!allOrders || allOrders.length === 0) {
         alert('Нет данных для выгрузки');
@@ -171,6 +212,6 @@ function exportToCSV() {
     const link = document.createElement("a");
     const dateStr = new Date().toISOString().slice(0, 10);
     link.href = URL.createObjectURL(blob);
-    link.download = `Реестр_заказов_Deadliner_${dateStr}.csv`;
+    link.download = `DeadLiner_Orders_${dateStr}.csv`;
     link.click();
 }

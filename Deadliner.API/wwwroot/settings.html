@@ -3,194 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeadLiner - Настройки порогов срочности</title>
+    <title>DeadLiner — Конфигурация порогов срочности</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: Arial, sans-serif;
-            background: #1e2846;
-            color: #fff;
-        }
-
-        header {
-            background: #3478dc;
-            padding: 16px 32px;
-            font-size: 22px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        main {
-            padding: 32px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        h2 { font-size: 22px; }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            background: #3478dc;
-            color: white;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn:hover { background: #2560b8; }
-        .btn-success { background: #22c55e; font-size: 16px; padding: 12px 28px; }
-        .btn-success:hover { background: #16a34a; }
-
-        .card {
-            background: #2a3555;
-            padding: 24px;
-            border-radius: 8px;
+        .zone-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            padding: 24px 28px;
             margin-bottom: 20px;
-            border-left: 6px solid #3d4f7a;
+            box-shadow: var(--shadow-card);
+            border-left: 6px solid var(--border);
+            transition: transform 0.15s ease;
         }
 
-        .card.green { border-left-color: #22c55e; }
-        .card.yellow { border-left-color: #eab308; }
-        .card.red { border-left-color: #ef4444; }
+        .zone-card:hover {
+            transform: translateX(4px);
+        }
 
-        .card-title {
-            font-size: 17px;
-            font-weight: bold;
-            margin-bottom: 8px;
+        .zone-card.green { border-left-color: var(--status-green); }
+        .zone-card.yellow { border-left-color: var(--status-yellow); }
+        .zone-card.red { border-left-color: var(--status-red); }
+
+        .zone-title {
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-
-        .card-desc {
-            font-size: 13px;
-            color: #aab4d0;
-            margin-bottom: 16px;
-        }
-
-        .inputs-row {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        label {
-            font-size: 14px;
-            color: #ddd;
-        }
-
-        input[type="number"] {
-            width: 90px;
-            padding: 8px 12px;
-            background: #1e2846;
-            border: 1px solid #3d4f7a;
-            border-radius: 6px;
-            color: #fff;
+            gap: 10px;
             font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .zone-desc {
+            font-size: 13.5px;
+            color: var(--text-secondary);
+            margin-bottom: 18px;
+        }
+
+        .zone-inputs {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .zone-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .zone-field label {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .input-number-pill {
+            width: 80px;
+            padding: 8px 12px;
+            font-size: 16px;
+            font-weight: 800;
             text-align: center;
-            font-weight: bold;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--bg-subtle);
+            color: var(--text-main);
         }
 
-        input[type="number"]:focus {
+        .input-number-pill:focus {
             outline: none;
-            border-color: #3478dc;
-        }
-
-        .notice-box {
-            background: rgba(52, 120, 220, 0.15);
-            border: 1px solid #3478dc;
-            padding: 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            line-height: 1.5;
-            color: #cbd5e1;
-            margin-bottom: 24px;
+            border-color: var(--brand-primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <span>DeadLiner - Конфигурация дедлайнов</span>
-        <div id="userInfo" style="display:flex; align-items:center;"></div>
-    </header>
+    <!-- БОКОВОЕ МЕНЮ (SIDEBAR) -->
+    <aside class="sidebar">
+        <a href="index.html" class="sidebar-brand">
+            <div class="brand-icon">D</div>
+            <div class="brand-info">
+                <span class="brand-title">DeadLiner</span>
+                <span class="brand-subtitle">Система диспетчеризации</span>
+            </div>
+        </a>
 
-    <main>
-        <div class="top-bar">
-            <a href="index.html" class="btn">← Назад к заказам</a>
-            <h2>Управление пороговыми значениями срочности</h2>
-            <div></div>
+        <div class="sidebar-nav">
+            <div>
+                <div class="nav-group-label">Производство</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="index.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            <span>Реестр заказов</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="workshop.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+                            <span>Экран цеха</span>
+                        </a>
+                    </li>
+                    <li class="manager-only">
+                        <a href="catalog.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                            <span>Справочник операций</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="manager-only">
+                <div class="nav-group-label">Аналитика</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="reports.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                            <span>Сводные отчёты</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="manager-only">
+                <div class="nav-group-label">Конфигурация</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="settings.html" class="nav-link active">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                            <span>Пороги срочности</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
 
-        <div class="notice-box">
-            💡 <strong>Как это работает:</strong> Система ежедневно сопоставляет плановую дату отгрузки заказа с текущей датой. Изменение чисел ниже сразу перенастроит цветовую сигнализацию на экране цеха и в реестре заказов.
+        <div class="sidebar-footer">
+            <div id="userInfo"></div>
         </div>
+    </aside>
 
-        <form id="settingsForm" onsubmit="saveSettings(event)">
-            <!-- Зеленая зона -->
-            <div class="card green">
-                <div class="card-title">🟢 Зелёная зона — Запас времени (штатный режим)</div>
-                <div class="card-desc">Заказ считается спокойным и безопасным по срокам.</div>
-                <div class="inputs-row">
-                    <div class="input-group">
-                        <label>Осталось более (дней):</label>
-                        <input type="number" id="greenDays" min="1" required>
-                    </div>
+    <!-- ОСНОВНОЕ РАБОЧЕЕ ПРОСТРАНСТВО -->
+    <div class="app-canvas">
+        <header class="topbar">
+            <div class="breadcrumbs">
+                <span>Диспетчеризация</span>
+                <span>/</span>
+                <span>Конфигурация</span>
+                <span>/</span>
+                <span class="current">Пороги срочности</span>
+            </div>
+
+            <div class="topbar-actions">
+                <a href="index.html" class="btn-modern btn-ghost">← К списку заказов</a>
+            </div>
+        </header>
+
+        <main class="main-content" style="max-width: 960px;">
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>Динамические пороги дедлайнов</h1>
+                    <p>Настройка математических интервалов световой сигнализации цехового экрана и реестра</p>
                 </div>
             </div>
 
-            <!-- Желтая зона -->
-            <div class="card yellow">
-                <div class="card-title">🟡 Жёлтая зона — Сигнал внимания (приближение срока)</div>
-                <div class="card-desc">Требуется повышенный контроль мастера смены.</div>
-                <div class="inputs-row">
-                    <div class="input-group">
-                        <label>От (дней):</label>
-                        <input type="number" id="yellowFrom" min="0" required>
+            <form id="settingsForm" onsubmit="saveSettings(event)">
+                <!-- Зеленая зона -->
+                <div class="zone-card green">
+                    <div class="zone-title" style="color: var(--status-green-text);">
+                        <span class="dot" style="background:var(--status-green);"></span>
+                        <span>Зелёная зона — Штатный производственный график</span>
                     </div>
-                    <div class="input-group">
-                        <label>До (дней):</label>
-                        <input type="number" id="yellowTo" min="1" required>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Красная зона -->
-            <div class="card red">
-                <div class="card-title">🔴 Красная зона — Критический дедлайн / Просрочка</div>
-                <div class="card-desc">Наивысший приоритет исполнения в цехе.</div>
-                <div class="inputs-row">
-                    <div class="input-group">
-                        <label>Осталось дней и менее (включая просрочку):</label>
-                        <input type="number" id="redDays" min="0" required>
+                    <div class="zone-desc">Заказ считается безопасным по срокам исполнения, запас времени достаточен.</div>
+                    <div class="zone-inputs">
+                        <div class="zone-field">
+                            <label for="greenDays">Осталось дней более чем:</label>
+                            <input type="number" id="greenDays" class="input-number-pill mono" min="1" required>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div style="text-align: right; margin-top: 24px;">
-                <button type="submit" class="btn btn-success manager-only">💾 Сохранить параметры</button>
+                <!-- Желтая зона -->
+                <div class="zone-card yellow">
+                    <div class="zone-title" style="color: var(--status-yellow-text);">
+                        <span class="dot" style="background:var(--status-yellow);"></span>
+                        <span>Жёлтая зона — Приближение контрольного дедлайна</span>
+                    </div>
+                    <div class="zone-desc">Требует усиленного контроля мастера смены и ускорения межоперационной логистики.</div>
+                    <div class="zone-inputs">
+                        <div class="zone-field">
+                            <label for="yellowFrom">От (дней):</label>
+                            <input type="number" id="yellowFrom" class="input-number-pill mono" min="0" required>
+                        </div>
+                        <div class="zone-field">
+                            <label for="yellowTo">До (дней):</label>
+                            <input type="number" id="yellowTo" class="input-number-pill mono" min="1" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Красная зона -->
+                <div class="zone-card red">
+                    <div class="zone-title" style="color: var(--status-red-text);">
+                        <span class="dot" style="background:var(--status-red);"></span>
+                        <span>Красная зона — Критический дедлайн / Просрочка</span>
+                    </div>
+                    <div class="zone-desc">Наивысший приоритет переделов в цехе. Включает световую и звуковую тревогу на табло.</div>
+                    <div class="zone-inputs">
+                        <div class="zone-field">
+                            <label for="redDays">Осталось дней и менее (включая просрочку):</label>
+                            <input type="number" id="redDays" class="input-number-pill mono" min="0" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: right; margin-top: 28px;">
+                    <button type="submit" class="btn-modern btn-primary manager-only" style="padding: 12px 28px; font-size: 14.5px;">Сохранить параметры системы</button>
+                </div>
+            </form>
+        </main>
+
+       <footer class="app-footer">
+            <div class="footer-left">
+                <span>DeadLiner Manufacturing Execution System</span>
+                <span class="footer-tag">v2.4.0 Beta</span>
             </div>
-        </form>
-    </main>
+            <div>
+                <span>Частное Лицо • Ревенко Е.А. VoidReign 2026</span>
+            </div>
+        </footer>
+    </div>
 
     <script src="auth.js"></script>
     <script src="settings.js"></script>

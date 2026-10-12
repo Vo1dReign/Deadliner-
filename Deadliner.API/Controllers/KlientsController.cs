@@ -45,10 +45,17 @@ public class KlientyController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, Klient Klient)
     {
-        if(id != Klient.Id)
+        if (id != Klient.Id)
             return BadRequest();
 
-        _context.Entry(Klient).State = EntityState.Modified;
+        var existing = await _context.Klienty.FindAsync(id);
+        if (existing == null)
+            return NotFound();
+
+        existing.FioNazvanie = Klient.FioNazvanie;
+        existing.Telefon = Klient.Telefon;
+        existing.AdresObekta = Klient.AdresObekta;
+
         await _context.SaveChangesAsync();
 
         return NoContent();

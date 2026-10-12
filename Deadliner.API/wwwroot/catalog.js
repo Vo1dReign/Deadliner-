@@ -23,18 +23,17 @@ async function loadCatalog() {
             return;
         }
 
-        data.forEach(item => {
-            const badgeClass = item.tipEtapa === 'базовый' ? 'badge-base' : 'badge-sub';
+            const isBase = item.tipEtapa === 'базовый';
             const roleName = item.rolOtvetstvennogo?.nazvanie ?? getRoleNameById(item.idRoliOtvetstvennogo);
 
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td style="font-weight:bold; color:#aab4d0;">№ ${item.poryadkovyNomer}</td>
-                <td style="font-weight:bold; font-size:15px;">${item.nazvanie}</td>
-                <td><span class="badge ${badgeClass}">${item.tipEtapa}</span></td>
-                <td>👤 ${roleName}</td>
+                <td class="mono" style="font-weight:700; color:var(--brand-primary);">№ ${item.poryadkovyNomer}</td>
+                <td style="font-weight:700;">${item.nazvanie}</td>
+                <td><span class="btn-table-action ${isBase ? 'action-blue' : 'action-purple'}" style="font-size:11px;">${item.tipEtapa}</span></td>
+                <td style="font-weight:500; color:var(--text-secondary);">${roleName}</td>
                 <td>
-                    <button class="btn btn-danger manager-only" onclick="deleteStage(${item.id})">Удалить</button>
+                    <button class="btn-table-action action-rose manager-only" onclick="deleteStage(${item.id})">Удалить</button>
                 </td>
             `;
             tbody.appendChild(row);

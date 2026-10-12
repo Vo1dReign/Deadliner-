@@ -29,7 +29,10 @@ public class LoginController : ControllerBase
         {
             id = sotrudnik.Id,
             fio = sotrudnik.Fio,
-            rol = sotrudnik.Rol.Nazvanie
+            rol = sotrudnik.Rol?.Nazvanie ?? "Сотрудник",
+            login = sotrudnik.Login,
+            telefon = sotrudnik.Telefon,
+            idRoli = sotrudnik.IdRoli
         });
     }
 }

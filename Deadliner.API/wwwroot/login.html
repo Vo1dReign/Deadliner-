@@ -3,77 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeadLiner - Вход</title>
+    <title>DeadLiner — Вход в систему</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: Arial, sans-serif;
-            background: #1e2846;
-            color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
+            background: radial-gradient(circle at 10% 20%, #eff6ff 0%, #f8fafc 90%);
+            padding: 24px;
         }
 
-        .card {
-            background: #2a3555;
-            padding: 40px;
-            border-radius: 12px;
-            width: 360px;
+        .login-card {
+            background: #ffffff;
+            padding: 44px 40px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 40px -15px rgba(37, 99, 235, 0.15), 0 1px 3px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 420px;
+            border-top: 5px solid var(--brand-primary);
         }
 
-        h2 {
-            margin-bottom: 24px;
-            font-size: 22px;
+        .login-header {
             text-align: center;
+            margin-bottom: 30px;
         }
 
-        input {
+        .login-header .brand-icon {
+            width: 48px;
+            height: 48px;
+            font-size: 22px;
+            margin: 0 auto 16px auto;
+        }
+
+        .login-header h2 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .login-header p {
+            font-size: 13.5px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
             width: 100%;
-            padding: 10px 14px;
-            margin-bottom: 16px;
-            border-radius: 6px;
-            border: none;
-            background: #1e2846;
-            color: #fff;
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--bg-subtle);
+            color: var(--text-main);
+            font-size: 14.5px;
+            font-family: inherit;
+            transition: all 0.15s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            background: #ffffff;
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
             font-size: 15px;
+            font-weight: 700;
+            margin-top: 10px;
         }
-
-        input::placeholder { color: #aaa; }
-
-        .btn {
-            width: 100%;
-            padding: 10px;
-            background: #3478dc;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .btn:hover { background: #2560b8; }
 
         #error {
-            color: #ef4444;
-            margin-top: 12px;
+            color: var(--status-red-text);
+            background: var(--status-red-bg);
+            border: 1px solid var(--status-red-border);
+            padding: 11px;
+            border-radius: var(--radius-sm);
+            margin-top: 18px;
             text-align: center;
-            font-size: 14px;
+            font-size: 13.5px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .register-link {
+            display: block;
+            text-align: center;
+            margin-top: 22px;
+            color: var(--brand-primary);
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+        }
+
+        .register-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>🔐 DeadLiner</h2>
-        <input id="login" placeholder="Логин" type="text">
-        <input id="parol" placeholder="Пароль" type="password">
-        <button class="btn" onclick="doLogin()">Войти</button>
+    <div class="login-card">
+        <div class="login-header">
+            <div class="brand-icon">D</div>
+            <h2>DeadLiner MES</h2>
+            <p>Авторизация в системе производственной диспетчеризации</p>
+        </div>
+
+        <div class="form-group">
+            <label for="login">Имя пользователя (логин)</label>
+            <input id="login" placeholder="Например: admin" type="text" autocomplete="username">
+        </div>
+
+        <div class="form-group">
+            <label for="parol">Пароль доступа</label>
+            <input id="parol" placeholder="••••••••" type="password" autocomplete="current-password">
+        </div>
+
+        <button class="btn-modern btn-primary btn-submit" onclick="doLogin()">Войти в систему</button>
+        
         <div id="error"></div>
-        <a href="register.html" style="display: block; text-align: center; margin-top: 16px; color: #3478dc; text-decoration: none; font-size: 14px;">Новый сотрудник? Зарегистрируйтесь</a>
+        
+        <a href="register.html" class="register-link">Новый сотрудник? Зарегистрироваться</a>
     </div>
 
     <script src="login.js"></script>
+    <script>
+        const errEl = document.getElementById('error');
+        const observer = new MutationObserver(() => {
+            if (errEl.textContent.trim()) {
+                errEl.style.display = 'block';
+            } else {
+                errEl.style.display = 'none';
+            }
+        });
+        observer.observe(errEl, { childList: true, characterData: true, subtree: true });
+    </script>
 </body>
 </html>

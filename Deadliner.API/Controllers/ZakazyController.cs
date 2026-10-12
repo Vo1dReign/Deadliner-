@@ -74,6 +74,18 @@ public class ZakazyController : ControllerBase
         return NoContent();
     }
 
+    [HttpPut("{id}/status")]
+    public async Task<IActionResult> UpdateStatus(int id, [FromBody] StatusUpdateRequest req)
+    {
+        var zakaz = await _context.Zakazy.FindAsync(id);
+        if (zakaz == null)
+            return NotFound();
+
+        zakaz.Status = req.Status;
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -87,4 +99,9 @@ public class ZakazyController : ControllerBase
 
         return NoContent();
     }
+}
+
+public class StatusUpdateRequest
+{
+    public string Status { get; set; } = string.Empty;
 }

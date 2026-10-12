@@ -29,12 +29,17 @@ async function loadReport() {
 
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${order.id}</td>
-            <td>${order.klient?.fioNazvanie ?? '-'}</td>
-            <td>${order.dataPriema}</td>
-            <td>${order.planDataOtgruzki}</td>
-            <td>${daysLeft} дн.</td>
-            <td><span class="badge ${badgeClass}">${order.status}</span></td>
+            <td class="mono" style="font-weight:700;">#${order.id}</td>
+            <td style="font-weight:600;">${order.klient?.fioNazvanie ?? '—'}</td>
+            <td class="mono" style="color:var(--text-secondary);">${order.dataPriema}</td>
+            <td class="mono" style="font-weight:600;">${order.planDataOtgruzki}</td>
+            <td>
+                <span class="urgency-indicator urgency-${badgeClass}">
+                    <span class="dot"></span>
+                    <span>${daysLeft} дн.</span>
+                </span>
+            </td>
+            <td><span style="font-weight: 500; color:var(--text-secondary);">${order.status}</span></td>
         `;
         tbody.appendChild(row);
     });

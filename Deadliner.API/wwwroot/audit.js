@@ -48,8 +48,8 @@ async function loadAudit() {
             item.innerHTML = `
                 <div class="timeline-content">
                     <div class="timeline-header">
-                        <span class="timeline-author">👤 ${author}</span>
-                        <span>🕒 ${formattedDate}</span>
+                        <span class="timeline-author">${author}</span>
+                        <span class="mono" style="font-size:12px;">${formattedDate}</span>
                     </div>
                     <div class="timeline-desc">${log.opisanieIzmenenia}</div>
                 </div>

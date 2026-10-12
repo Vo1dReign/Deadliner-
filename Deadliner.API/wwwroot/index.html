@@ -1,192 +1,212 @@
 <!DOCTYPE html>
 <html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>DeadLiner - Заказы</title>
-        <style>
-            * {margin: 0; padding: 0; box-sizing: border-box;}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeadLiner — Система управления производственными дедлайнами</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-            body {
-                font-family: Arial, sans-serif;
-                background: #1e2846;
-                color: #fff;
-            }
+    <!-- БОКОВОЕ МЕНЮ (SIDEBAR) -->
+    <aside class="sidebar">
+        <a href="index.html" class="sidebar-brand">
+            <div class="brand-icon">D</div>
+            <div class="brand-info">
+                <span class="brand-title">DeadLiner</span>
+                <span class="brand-subtitle">Система диспетчеризации</span>
+            </div>
+        </a>
 
-            header {
-                background: #3478dc;
-                padding: 16px 32px;
-                font-size: 24px;
-                font-weight: bold;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
+        <div class="sidebar-nav">
+            <div>
+                <div class="nav-group-label">Производство</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="index.html" class="nav-link active">
+                            <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            <span>Реестр заказов</span>
+                        </a>
+                    </li>
+                    <li class="manager-only">
+                        <a href="clients.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                            <span>Заказчики (клиенты)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="workshop.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+                            <span>Экран цеха</span>
+                        </a>
+                    </li>
+                    <li class="manager-only">
+                        <a href="catalog.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                            <span>Справочник операций</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
-            main {
-                padding: 24px 32px;
-            }
+            <div class="manager-only">
+                <div class="nav-group-label">Аналитика</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="reports.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                            <span>Сводные отчёты</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
-            .header-bar {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 16px;
-            }
+            <div>
+                <div class="nav-group-label">Конфигурация</div>
+                <ul class="nav-list">
+                    <li class="manager-only">
+                        <a href="settings.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                            <span>Пороги срочности</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="profile.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <span>Мой профиль</span>
+                        </a>
+                    </li>
+                    <li class="admin-only">
+                        <a href="admin.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v3a5 5 0 01-10 0V7a5 5 0 015-5zM4 22v-2a7 7 0 0114 0v2H4z"/><path d="M18 8l4 2-4 2"/></svg>
+                            <span>Администрирование</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
-            h2 { font-size: 20px; }
+        <div class="sidebar-footer">
+            <div id="userInfo">
+                <!-- Заполняется auth.js -->
+            </div>
+        </div>
+    </aside>
 
-            /* Панель фильтров и поиска */
-            .filters-panel {
-                display: flex;
-                gap: 12px;
-                margin-bottom: 20px;
-                background: #2a3555;
-                padding: 16px 20px;
-                border-radius: 8px;
-                align-items: center;
-                flex-wrap: wrap;
-            }
-
-            .filters-panel input, .filters-panel select {
-                padding: 9px 14px;
-                background: #1e2846;
-                border: 1px solid #3d4f7a;
-                border-radius: 6px;
-                color: #fff;
-                font-size: 14px;
-            }
-
-            .filters-panel input {
-                flex: 1;
-                min-width: 260px;
-            }
-
-            .filters-panel input:focus, .filters-panel select:focus {
-                outline: none;
-                border-color: #3478dc;
-            }
-
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                background: #2a3555;
-                border-radius: 8px;
-                overflow: hidden;
-            }
-
-            th {
-                background: #3478dc;
-                padding: 12px 16px;
-                text-align: left;
-                user-select: none;
-                cursor: pointer;
-            }
-
-            th:hover {
-                background: #2b67be;
-            }
-
-            th.no-sort {
-                cursor: default;
-            }
-            th.no-sort:hover {
-                background: #3478dc;
-            }
-
-            td {
-                padding: 12px 16px;
-                border-bottom: 1px solid #1e2846;
-            }
-
-            .btn {
-                padding: 8px 16px;
-                border: none;
-                border-radius: 6px;
-                cursor: pointer;
-                font-size: 14px;
-                background: #3478dc;
-                color: white;
-                text-decoration: none;
-                display: inline-block;
-            }
-
-            .btn:hover {background: #2560b8;}
-
-            .btn-secondary { background: #475569; }
-            .btn-secondary:hover { background: #334155; }
-
-            .btn-danger { background: #ef4444; }
-            .btn-danger:hover { background: #b91c1c; }
-
-            .green {border-left: 5px solid #22c55e;}
-            .yellow {border-left: 5px solid #eab308;}
-            .red {border-left: 5px solid #ef4444;}
-
-            .counter-text {
-                font-size: 14px;
-                color: #aab4d0;
-            }
-        </style>
-    </head>
-
-    <body>
+    <!-- ОСНОВНОЕ РАБОЧЕЕ ПРОСТРАНСТВО -->
+    <div class="app-canvas">
         
-        <header>
-            <span> DeadLiner</span>
-            <nav style="display:flex; gap:12px; align-items:center;">
-                <a href="workshop.html" class="btn">Экран цеха</a>
-                <a href="reports.html" class="btn manager-only">Отчёты</a>
-                <a href="catalog.html" class="btn manager-only">Справочник цеха</a>
-                <a href="settings.html" class="btn manager-only">Настройки</a>
-                <button class="btn manager-only" onclick="openCreate()">+ Новый заказ</button>
-                <div id="userInfo" style="display:flex; align-items:center; margin-left:16px;"></div>
-            </nav>
+        <header class="topbar">
+            <div class="breadcrumbs">
+                <span>Диспетчеризация</span>
+                <span>/</span>
+                <span class="current">Заказы в производстве</span>
+            </div>
+
+            <div class="topbar-actions">
+                <div class="status-badge">
+                    <span class="ping"></span>
+                    <span>База данных подключена</span>
+                </div>
+            </div>
         </header>
 
-        <main>
-            <div class="header-bar">
-                <h2> Список производственных заказов </h2>
-                <div id="ordersCount" class="counter-text">Загрузка...</div>
+        <main class="main-content">
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>Производственные заказы</h1>
+                    <p id="ordersSubtitle">Мониторинг соблюдения регламентных сроков изготовления мебели</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-modern btn-ghost manager-only" onclick="exportToCSV()">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                        <span>Экспорт CSV</span>
+                    </button>
+                    <button class="btn-modern btn-primary manager-only" onclick="openCreate()">
+                        <span>+ Новый заказ</span>
+                    </button>
+                </div>
             </div>
 
-            <div class="filters-panel">
-                <input type="text" id="searchInput" placeholder="🔍 Быстрый поиск по номеру или клиенту..." oninput="applyFilters()">
-                
-                <select id="statusFilter" onchange="applyFilters()">
-                    <option value="">Все статусы</option>
-                    <option value="в работе">В работе</option>
-                    <option value="просрочен">Просрочен</option>
-                    <option value="завершён">Завершён</option>
-                </select>
-
-                <select id="urgencyFilter" onchange="applyFilters()">
-                    <option value="">Все зоны срочности</option>
-                    <option value="green">🟢 Зеленая (штатный срок)</option>
-                    <option value="yellow">🟡 Желтая (внимание)</option>
-                    <option value="red">🔴 Красная (критично / просрочен)</option>
-                </select>
-
-                <button class="btn btn-secondary" onclick="resetFilters()">✕ Сброс</button>
+            <!-- Оперативные виджеты метрик -->
+            <div class="stats-row">
+                <div class="stat-card alert-blue">
+                    <div class="stat-label">Всего заказов</div>
+                    <div class="stat-value" id="statTotal">—</div>
+                </div>
+                <div class="stat-card alert-green">
+                    <div class="stat-label">В графике (запас дней)</div>
+                    <div class="stat-value" id="statGreen">—</div>
+                </div>
+                <div class="stat-card alert-yellow">
+                    <div class="stat-label">Требуют внимания</div>
+                    <div class="stat-value" id="statYellow">—</div>
+                </div>
+                <div class="stat-card alert-red">
+                    <div class="stat-label">Критический срок / Просрочка</div>
+                    <div class="stat-value" id="statRed">—</div>
+                </div>
             </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th onclick="sortTable('id')"># ⬍</th>
-                        <th onclick="sortTable('klient')">Клиент ⬍</th>
-                        <th onclick="sortTable('dataPriema')">Дата приёма ⬍</th>
-                        <th onclick="sortTable('planDataOtgruzki')">Плановая отгрузка ⬍</th>
-                        <th onclick="sortTable('daysLeft')">Осталось дней ⬍</th>
-                        <th onclick="sortTable('status')">Статус ⬍</th>
-                        <th class="no-sort">Действия</th>
-                    </tr>
-                </thead>
-                <tbody id="ordersTable"></tbody>
-            </table>
+            <!-- Табличная панель с фильтрацией -->
+            <div class="table-panel">
+                <div class="panel-toolbar">
+                    <div class="tab-group">
+                        <button class="tab-btn active" onclick="setQuickTab('all', this)">Все заказы</button>
+                        <button class="tab-btn" onclick="setQuickTab('в работе', this)">В работе</button>
+                        <button class="tab-btn" onclick="setQuickTab('просрочен', this)">Просроченные</button>
+                        <button class="tab-btn" onclick="setQuickTab('завершён', this)">Завершённые</button>
+                    </div>
+
+                    <div class="search-box">
+                        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Поиск по клиенту или номеру..." oninput="applyFilters()">
+                    </div>
+
+                    <select id="statusFilter" style="display:none;" onchange="applyFilters()">
+                        <option value="">Все статусы</option>
+                        <option value="в работе">В работе</option>
+                        <option value="просрочен">Просрочен</option>
+                        <option value="завершён">Завершён</option>
+                    </select>
+
+                    <select id="urgencyFilter" style="display:none;" onchange="applyFilters()">
+                        <option value="">Все зоны срочности</option>
+                        <option value="green">Зеленая</option>
+                        <option value="yellow">Желтая</option>
+                        <option value="red">Красная</option>
+                    </select>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('id')" style="width: 80px;">Номер</th>
+                            <th onclick="sortTable('klient')">Контрагент (клиент)</th>
+                            <th onclick="sortTable('dataPriema')" style="width: 140px;">Дата приёма</th>
+                            <th onclick="sortTable('planDataOtgruzki')" style="width: 150px;">Срок отгрузки</th>
+                            <th onclick="sortTable('daysLeft')" style="width: 160px;">Остаток срока</th>
+                            <th onclick="sortTable('status')" style="width: 130px;">Статус</th>
+                            <th class="no-sort" style="width: 290px;">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTable"></tbody>
+                </table>
+            </div>
         </main>
-        
-        <script src="auth.js"></script>
-        <script src="app.js"></script>
-    </body>
+
+        <footer class="app-footer">
+            <div class="footer-left">
+                <span>DeadLiner Manufacturing Execution System</span>
+                <span class="footer-tag">v2.4.0 Beta</span>
+            </div>
+            <div>
+                <span>Частное Лицо • Ревенко Е.А. VoidReign 2026</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
+</body>
 </html>

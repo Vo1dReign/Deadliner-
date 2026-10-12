@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeadLiner — Центр администрирования предприятия</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-nav-tabs {
+            display: flex;
+            gap: 6px;
+            background: var(--bg-subtle);
+            padding: 4px;
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .admin-nav-tab {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: center;
+        }
+
+        .admin-nav-tab:hover {
+            color: var(--text-main);
+        }
+
+        .admin-nav-tab.active {
+            background: #ffffff;
+            color: var(--brand-primary);
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .admin-section {
+            display: none;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(3px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #ffffff;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+            width: 100%;
+            max-width: 520px;
+            padding: 32px;
+            border-top: 5px solid var(--brand-purple);
+            animation: modalFade 0.15s ease-out;
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+            padding: 4px;
+        }
+
+        .sys-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            padding: 22px;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- БОКОВОЕ МЕНЮ (SIDEBAR) -->
+    <aside class="sidebar">
+        <a href="index.html" class="sidebar-brand">
+            <div class="brand-icon">D</div>
+            <div class="brand-info">
+                <span class="brand-title">DeadLiner</span>
+                <span class="brand-subtitle">Система диспетчеризации</span>
+            </div>
+        </a>
+
+        <div class="sidebar-nav">
+            <div>
+                <div class="nav-group-label">Производство</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="index.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            <span>Реестр заказов</span>
+                        </a>
+                    </li>
+                    <li class="manager-only">
+                        <a href="clients.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                            <span>Заказчики (клиенты)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="workshop.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+                            <span>Экран цеха</span>
+                        </a>
+                    </li>
+                    <li class="manager-only">
+                        <a href="catalog.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                            <span>Справочник операций</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="manager-only">
+                <div class="nav-group-label">Аналитика</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="reports.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                            <span>Сводные отчёты</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="nav-group-label">Конфигурация</div>
+                <ul class="nav-list">
+                    <li class="manager-only">
+                        <a href="settings.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                            <span>Пороги срочности</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="profile.html" class="nav-link">
+                            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <span>Мой профиль</span>
+                        </a>
+                    </li>
+                    <li class="admin-only">
+                        <a href="admin.html" class="nav-link active">
+                            <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 015 5v3a5 5 0 01-10 0V7a5 5 0 015-5zM4 22v-2a7 7 0 0114 0v2H4z"/><path d="M18 8l4 2-4 2"/></svg>
+                            <span>Администрирование</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div id="userInfo"></div>
+        </div>
+    </aside>
+
+    <!-- ОСНОВНОЕ РАБОЧЕЕ ПРОСТРАНСТВО -->
+    <div class="app-canvas">
+        <header class="topbar">
+            <div class="breadcrumbs">
+                <span>Система</span>
+                <span>/</span>
+                <span class="current">Центр управления SuperAdmin</span>
+            </div>
+
+            <div class="topbar-actions">
+                <span class="status-badge">
+                    <span class="ping"></span>
+                    <span>Полный root-доступ активен</span>
+                </span>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>Центр администрирования предприятия</h1>
+                    <p>Полный контроль над персоналом, производственными заказами, заказчиками и базой данных</p>
+                </div>
+            </div>
+
+            <!-- Виджеты общей сводки системы -->
+            <div class="stats-row" style="margin-bottom: 24px;">
+                <div class="stat-card alert-blue">
+                    <div class="stat-label">Сотрудники в штате</div>
+                    <div class="stat-value" id="statUsersCount">—</div>
+                </div>
+                <div class="stat-card alert-green">
+                    <div class="stat-label">Заказов в производстве</div>
+                    <div class="stat-value" id="statOrdersCount">—</div>
+                </div>
+                <div class="stat-card alert-yellow">
+                    <div class="stat-label">Клиентская база</div>
+                    <div class="stat-value" id="statClientsCount">—</div>
+                </div>
+                <div class="stat-card alert-red">
+                    <div class="stat-label">Статус SQL Server</div>
+                    <div class="stat-value" style="font-size:22px; color:var(--status-green-text);" id="statDbStatus">Online (1433)</div>
+                </div>
+            </div>
+
+            <!-- 4 ПАНЕЛИ ПОЛНОГО КОНТРОЛЯ (ТАБЫ) -->
+            <div class="admin-nav-tabs">
+                <button class="admin-nav-tab active" onclick="switchAdminTab('users', this)">Персонал и доступы</button>
+                <button class="admin-nav-tab" onclick="switchAdminTab('orders', this)">Глобальный контроль заказов</button>
+                <button class="admin-nav-tab" onclick="switchAdminTab('clients', this)">База заказчиков</button>
+                <button class="admin-nav-tab" onclick="switchAdminTab('system', this)">Аудит и состояние БД</button>
+            </div>
+
+            <!-- РАЗДЕЛ 1: ПОЛЬЗОВАТЕЛИ И РОЛИ -->
+            <section id="sectionUsers" class="admin-section active">
+                <div class="table-panel">
+                    <div class="panel-toolbar">
+                        <div class="search-box">
+                            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                            <input type="text" id="userSearch" class="search-input" placeholder="Поиск по ФИО, логину или роли..." oninput="filterUsers()">
+                        </div>
+                        <button class="btn-modern btn-primary" onclick="openUserModal()">+ Новый сотрудник</button>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 70px;">ID</th>
+                                <th>ФИО сотрудника</th>
+                                <th style="width: 140px;">Логин</th>
+                                <th style="width: 170px;">Телефон</th>
+                                <th style="width: 220px;">Назначенная должность</th>
+                                <th style="width: 220px;" class="no-sort">Управление</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- РАЗДЕЛ 2: ВСЕ ЗАКАЗЫ (АДМИНСКИЙ КОНТРОЛЬ) -->
+            <section id="sectionOrders" class="admin-section">
+                <div class="table-panel">
+                    <div class="panel-toolbar">
+                        <div class="search-box">
+                            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                            <input type="text" id="adminOrderSearch" class="search-input" placeholder="Поиск по номеру заказа или клиенту..." oninput="filterAdminOrders()">
+                        </div>
+                        <div style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">
+                            Прямая смена статусов и удаление заказов
+                        </div>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 70px;">№</th>
+                                <th>Клиент</th>
+                                <th style="width: 130px;">Принят</th>
+                                <th style="width: 130px;">Дедлайн</th>
+                                <th style="width: 200px;">Статус (редактируемый)</th>
+                                <th style="width: 300px;" class="no-sort">Действия администратора</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminOrdersTable"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- РАЗДЕЛ 3: ВСЕ ЗАКАЗЧИКИ -->
+            <section id="sectionClients" class="admin-section">
+                <div class="table-panel">
+                    <div class="panel-toolbar">
+                        <div class="search-box">
+                            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                            <input type="text" id="adminClientSearch" class="search-input" placeholder="Поиск заказчика..." oninput="filterAdminClients()">
+                        </div>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 70px;">Код</th>
+                                <th>Контрагент</th>
+                                <th style="width: 180px;">Телефон</th>
+                                <th>Адрес объекта</th>
+                                <th style="width: 260px;" class="no-sort">Управление</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminClientsTable"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- РАЗДЕЛ 4: СИСТЕМНЫЙ АУДИТ И БД -->
+            <section id="sectionSystem" class="admin-section">
+                <div class="sys-card" style="border-top: 4px solid var(--brand-primary);">
+                    <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 12px;">Технический статус инфраструктуры</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; font-size: 13.5px;">
+                        <div><strong>СУБД:</strong> Microsoft SQL Server 2022 (Docker)</div>
+                        <div><strong>Хост / Порт:</strong> localhost:1433</div>
+                        <div><strong>Бэкенд:</strong> ASP.NET Core 10.0 Web API</div>
+                        <div><strong>Контекст данных:</strong> DeadLinerContext (EF Core)</div>
+                        <div><strong>Текущая сессия:</strong> Администратор (Ревенко Е.А.)</div>
+                        <div><strong>Сборка:</strong> 2.4.0 SuperAdmin Enterprise</div>
+                    </div>
+                </div>
+
+                <div class="table-panel">
+                    <div class="panel-toolbar">
+                        <div style="font-weight: 700; font-size: 14px;">Глобальный журнал системного аудита (все заказы)</div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">Заказ</th>
+                                <th style="width: 170px;">Время события</th>
+                                <th style="width: 200px;">Автор изменения</th>
+                                <th>Содержание операции</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminAuditTable"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <div class="footer-left">
+                <span>DeadLiner Manufacturing Execution System</span>
+                <span class="footer-tag">v2.4.0 Release</span>
+            </div>
+            <div>
+                <span>Минский колледж предпринимательства • Ревенко Е.А. (ПО-2409)</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО СОЗДАНИЯ ПОЛЬЗОВАТЕЛЯ -->
+    <div class="modal-overlay" id="userModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Создание нового пользователя</h3>
+                <button class="modal-close-btn" onclick="closeUserModal()">✕</button>
+            </div>
+
+            <form onsubmit="saveUser(event)">
+                <div class="form-group">
+                    <label for="newFio">ФИО сотрудника *</label>
+                    <input type="text" id="newFio" class="form-control" placeholder="Иванов Алексей Петрович" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="newPhone">Контактный телефон</label>
+                    <input type="text" id="newPhone" class="form-control mono" placeholder="+375 (29) 000-00-00">
+                </div>
+
+                <div class="form-group">
+                    <label for="newRole">Должность / Производственная роль *</label>
+                    <select id="newRole" class="form-control" required></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="newLogin">Логин для входа в систему *</label>
+                    <input type="text" id="newLogin" class="form-control mono" placeholder="ivanov_ap" autocomplete="off" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="newPassword">Пароль учётной записи *</label>
+                    <input type="password" id="newPassword" class="form-control mono" placeholder="Минимум 6 символов" required>
+                </div>
+
+                <div style="display:flex; gap:12px; margin-top: 28px;">
+                    <button type="submit" class="btn-modern btn-primary" style="flex:2; justify-content:center; padding:11px;">Создать аккаунт</button>
+                    <button type="button" class="btn-modern btn-ghost" onclick="closeUserModal()" style="flex:1; justify-content:center;">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ПОЛЬЗОВАТЕЛЯ -->
+    <div class="modal-overlay" id="editUserModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Редактирование профиля сотрудника</h3>
+                <button class="modal-close-btn" onclick="closeEditUserModal()">✕</button>
+            </div>
+
+            <form onsubmit="updateUser(event)">
+                <input type="hidden" id="editUserId">
+
+                <div class="form-group">
+                    <label for="editFio">ФИО сотрудника *</label>
+                    <input type="text" id="editFio" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editPhone">Контактный телефон</label>
+                    <input type="text" id="editPhone" class="form-control mono" placeholder="+375 (29) 000-00-00">
+                </div>
+
+                <div class="form-group">
+                    <label for="editRole">Должность / Производственная роль *</label>
+                    <select id="editRole" class="form-control" required></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editLogin">Логин пользователя *</label>
+                    <input type="text" id="editLogin" class="form-control mono" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editPassword">Новый пароль (оставьте пустым, чтобы не менять)</label>
+                    <input type="password" id="editPassword" class="form-control mono" placeholder="••••••••">
+                </div>
+
+                <div style="display:flex; gap:12px; margin-top: 28px;">
+                    <button type="submit" class="btn-modern btn-primary" style="flex:2; justify-content:center; padding:11px;">Сохранить изменения</button>
+                    <button type="button" class="btn-modern btn-ghost" onclick="closeEditUserModal()" style="flex:1; justify-content:center;">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ЗАКАЗЧИКА -->
+    <div class="modal-overlay" id="editClientModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Редактирование данных заказчика</h3>
+                <button class="modal-close-btn" onclick="closeEditClientModal()">✕</button>
+            </div>
+
+            <form onsubmit="updateAdminClient(event)">
+                <input type="hidden" id="editClientId">
+
+                <div class="form-group">
+                    <label for="editClientName">ФИО заказчика или название компании *</label>
+                    <input type="text" id="editClientName" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editClientPhone">Контактный телефон</label>
+                    <input type="text" id="editClientPhone" class="form-control mono" placeholder="+375 (29) 123-45-67">
+                </div>
+
+                <div class="form-group">
+                    <label for="editClientAddress">Адрес объекта (доставки / установки)</label>
+                    <input type="text" id="editClientAddress" class="form-control">
+                </div>
+
+                <div style="display:flex; gap:12px; margin-top: 28px;">
+                    <button type="submit" class="btn-modern btn-primary" style="flex:2; justify-content:center; padding:11px;">Сохранить данные</button>
+                    <button type="button" class="btn-modern btn-ghost" onclick="closeEditClientModal()" style="flex:1; justify-content:center;">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

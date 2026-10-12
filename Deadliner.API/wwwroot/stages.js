@@ -70,23 +70,27 @@ function renderTable(stages) {
         return;
     }
 
-    stages.forEach((item, index) => {
-        let badgeClass = 'badge-gray';
-        if (item.status === 'завершён') badgeClass = 'badge-green';
-        else if (item.status === 'в работе') badgeClass = 'badge-yellow';
+        const isDone = item.status === 'завершён';
+        const isCurrent = item.status === 'в работе';
+        const colorType = isDone ? 'green' : (isCurrent ? 'yellow' : 'slate');
 
-        const actionCell = item.status === 'завершён'
-            ? '<span style="color:#22c55e; font-weight:bold;">✔ Выполнено</span>'
-            : `<button class="btn btn-success" onclick="completeStage(${item.id})">Завершить этап</button>`;
+        const actionCell = isDone
+            ? '<span style="color:var(--status-green-text); font-weight:700;">Готово</span>'
+            : `<button class="btn-table-action action-emerald" onclick="completeStage(${item.id})">Завершить этап</button>`;
 
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${index + 1}</td>
-            <td style="font-weight:bold;">${item.etap?.nazvanie ?? '—'}</td>
-            <td>${item.etap?.tipEtapa ?? 'базовый'}</td>
-            <td>${item.planData}</td>
-            <td>${item.factData ?? '—'}</td>
-            <td><span class="badge ${badgeClass}">${item.status}</span></td>
+            <td class="mono" style="font-weight:600;">${index + 1}</td>
+            <td style="font-weight:700;">${item.etap?.nazvanie ?? '—'}</td>
+            <td><span class="btn-table-action action-purple" style="font-size:11px;">${item.etap?.tipEtapa ?? 'базовый'}</span></td>
+            <td class="mono" style="color:var(--text-secondary);">${item.planData}</td>
+            <td class="mono" style="font-weight:600;">${item.factData ?? '—'}</td>
+            <td>
+                <span class="urgency-indicator urgency-${colorType}">
+                    <span class="dot"></span>
+                    <span>${item.status}</span>
+                </span>
+            </td>
             <td>${actionCell}</td>
         `;
         tbody.appendChild(row);
