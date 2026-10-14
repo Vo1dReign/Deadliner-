@@ -112,7 +112,7 @@
                 </ul>
             </div>
 
-            <div class="manager-only">
+            <div>
                 <div class="nav-group-label">Аналитика</div>
                 <ul class="nav-list">
                     <li>
@@ -180,13 +180,14 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th style="width: 60px;">№</th>
+                            <th style="width: 50px;">№</th>
                             <th>Технологическая операция (этап)</th>
-                            <th style="width: 140px;">Тип операции</th>
-                            <th style="width: 140px;">План. срок</th>
-                            <th style="width: 160px;">Факт. завершение</th>
-                            <th style="width: 150px;">Статус</th>
-                            <th style="width: 170px;" class="no-sort">Управление</th>
+                            <th style="width: 140px;">Ответственная роль</th>
+                            <th style="width: 160px;">Исполнитель</th>
+                            <th style="width: 130px;">Мини-дедлайн</th>
+                            <th style="width: 130px;">Факт. завершение</th>
+                            <th style="width: 130px;">Статус</th>
+                            <th style="width: 220px;" class="no-sort">Управление</th>
                         </tr>
                     </thead>
                     <tbody id="stagesTable"></tbody>
@@ -194,7 +195,34 @@
             </div>
         </main>
 
-        <<footer class="app-footer">
+        <!-- Модальное окно назначения исполнителя и мини-дедлайна -->
+        <div class="custom-confirm-overlay" id="assignModalOverlay" style="display:none;">
+            <div class="custom-confirm-box" style="max-width: 480px;">
+                <div class="custom-confirm-header info">
+                    <div class="icon-circle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+                    </div>
+                    <div class="custom-confirm-title" id="assignModalTitle">Назначение на этап</div>
+                </div>
+                <div style="padding: 10px 0 20px 0;">
+                    <input type="hidden" id="assignStageId">
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label for="assignEmployeeSelect" style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Назначенный сотрудник (исполнитель)</label>
+                        <select id="assignEmployeeSelect" class="form-control" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13.5px;"></select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 6px;">
+                        <label for="assignPlanDateInput" style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Мини-дедлайн этапа (плановая дата)</label>
+                        <input type="date" id="assignPlanDateInput" class="form-control" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13.5px;">
+                    </div>
+                </div>
+                <div class="custom-confirm-actions">
+                    <button type="button" class="btn-modern btn-ghost" onclick="closeAssignModal()">Отмена</button>
+                    <button type="button" class="btn-modern btn-primary" onclick="saveStageAssignment()">Сохранить параметры</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="app-footer">
             <div class="footer-left">
                 <span>DeadLiner Manufacturing Execution System</span>
                 <span class="footer-tag">v2.4.0 Beta</span>

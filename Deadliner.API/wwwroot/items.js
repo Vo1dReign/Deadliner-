@@ -38,28 +38,51 @@ async function addItem() {
     const harakteristiki = document.getElementById('harakteristiki').value.trim();
 
     if (!naimenovanie) {
-        alert('Введите наименование!');
+        showToast('Введите наименование изделия!', 'warning', 'Внимание');
         return;
     }
 
-    await fetch('/api/izdeliya', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idZakaza: zakazId, naimenovanie, kolichestvo, harakteristiki })
-    });
+    try {
+        const res = await fetch('/api/izdeliya', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idZakaza: zakazId, naimenovanie, kolichestvo, harakteristiki })
+        });
 
-    document.getElementById('naimenovanie').value = '';
-    document.getElementById('kolichestvo').value = '1';
-    document.getElementById('harakteristiki').value = '';
-
-    loadItems();
+        if (res.ok) {
+            document.getElementById('naimenovanie').value = '';
+            document.getElementById('kolichestvo').value = '1';
+            document.getElementById('harakteristiki').value = '';
+            showToast('Изделие успешно добавлено в заказ', 'success');
+            loadItems();
+        } else {
+            showToast('Не удалось сохранить изделие', 'error', 'Ошибка');
+        }
+    } catch (err) {
+        showToast('Ошибка связи с сервером', 'error', 'Сеть');
+    }
 }
 
 
 async function deleteItem(id) {
-    if (!confirm('Удалить изделие?')) return;
-    await fetch(`/api/izdeliya/${id}`, { method: 'DELETE' });
-    loadItems();
+    const confirmed = await showConfirm(
+        'Удаление изделия',
+        'Вы действительно хотите удалить это изделие из спецификации заказа?',
+        { confirmText: 'Удалить', danger: true }
+    );
+    if (!confirmed) return;
+
+    try {
+        const res = await fetch(`/api/izdeliya/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            showToast('Изделие успешно удалено', 'success');
+            loadItems();
+        } else {
+            showToast('Не удалось удалить изделие', 'error', 'Ошибка');
+        }
+    } catch (err) {
+        showToast('Ошибка связи с сервером', 'error', 'Сеть');
+    }
 }
 
 loadItems();

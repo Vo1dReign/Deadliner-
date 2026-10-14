@@ -992,5 +992,359 @@ footer.app-footer {
     justify-content: flex-end;
 }
 
+/* ==========================================================================
+   WIDGET: ПЕРСОНАЛЬНЫЕ МИНИ-ДЕДЛАЙНЫ И ТЕХНОЛОГИЧЕСКИЕ ЗАДАЧИ
+   ========================================================================== */
+.tasks-widget {
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -2px rgba(0,0,0,0.02);
+    margin-bottom: 24px;
+    overflow: hidden;
+    transition: var(--transition);
+}
 
+.tasks-widget-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: linear-gradient(180deg, #fafbff 0%, #ffffff 100%);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 12px;
+}
 
+.tasks-widget-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tasks-widget-title h2 {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.3px;
+    margin: 0;
+}
+
+.tasks-count-badge {
+    background: #eef2ff;
+    color: var(--brand-primary);
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    border: 1px solid rgba(79, 70, 229, 0.2);
+}
+
+.tasks-filter-toggle {
+    display: inline-flex;
+    background: #f1f5f9;
+    padding: 3px;
+    border-radius: var(--radius-sm);
+    gap: 2px;
+}
+
+.tasks-filter-btn {
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.tasks-filter-btn.active {
+    background: #ffffff;
+    color: var(--text-main);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+    padding: 18px 20px;
+    max-height: 440px;
+    overflow-y: auto;
+}
+
+.tasks-empty {
+    padding: 36px 20px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    grid-column: 1 / -1;
+}
+
+.tasks-empty svg {
+    width: 44px;
+    height: 44px;
+    color: #cbd5e1;
+    margin-bottom: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.task-card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+    position: relative;
+    border-left: 4px solid var(--border);
+    transition: var(--transition);
+}
+
+.task-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    transform: translateY(-1px);
+}
+
+.task-card.urgency-green { border-left-color: var(--status-green); }
+.task-card.urgency-yellow { border-left-color: var(--status-yellow); }
+.task-card.urgency-red { border-left-color: var(--status-red); }
+
+.task-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.task-order-pill {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--brand-primary);
+    background: #eef2ff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-family: var(--font-mono);
+}
+
+.task-order-pill:hover {
+    background: #e0e7ff;
+}
+
+.task-deadline-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 12px;
+}
+
+.task-deadline-badge.green {
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+.task-deadline-badge.yellow {
+    background: #fffbeb;
+    color: #92400e;
+}
+
+.task-deadline-badge.red {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.task-stage-name {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.3;
+}
+
+.task-meta-row {
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.task-meta-row span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.task-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.btn-task-complete {
+    flex: 1;
+    padding: 7px 12px;
+    background: var(--status-green);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-task-complete:hover {
+    background: #16a34a;
+}
+
+.btn-task-complete:disabled {
+    background: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.btn-task-link {
+    padding: 7px 10px;
+    background: #f1f5f9;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.btn-task-link:hover {
+    background: #e2e8f0;
+    color: var(--text-main);
+}
+
+/* ==========================================================================
+   СРАВНИТЕЛЬНАЯ АНАЛИТИКА (ТЕКУЩИЙ VS ПРОШЛЫЙ МЕСЯЦ)
+   ========================================================================== */
+.comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.kpi-card {
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.kpi-card.current {
+    border-top: 4px solid var(--brand-primary);
+}
+
+.kpi-card.previous {
+    border-top: 4px solid #64748b;
+}
+
+.kpi-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.kpi-month-title {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+
+.kpi-adherence-rate {
+    font-size: 32px;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    color: var(--text-main);
+    line-height: 1;
+}
+
+.kpi-adherence-rate.good { color: var(--status-green); }
+.kpi-adherence-rate.warning { color: var(--status-yellow); }
+.kpi-adherence-rate.danger { color: var(--status-red); }
+
+.kpi-metrics-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.kpi-submetric {
+    display: flex;
+    flex-direction: column;
+}
+
+.kpi-submetric-label {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+}
+
+.kpi-submetric-val {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    margin-top: 2px;
+}
+
+/* ==========================================================================
+   ОФИЦИАЛЬНЫЙ СИМВОЛ БЕЛОРУССКОГО РУБЛЯ (НАЦБАНК РБ, БУКВА "Б")
+   ========================================================================== */
+.bel-ruble-icon {
+    display: inline-block;
+    width: 0.92em;
+    height: 0.92em;
+    vertical-align: -0.1em;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.bel-ruble-badge {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    white-space: nowrap;
+}
+
+.currency-symbol-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}

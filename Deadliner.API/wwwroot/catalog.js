@@ -56,7 +56,7 @@ async function addStage(event) {
     const rolId = parseInt(document.getElementById('rolSelect').value);
 
     if (!nazvanie || isNaN(poryadok)) {
-        alert('Заполните все обязательные поля!');
+        showToast('Заполните все обязательные поля!', 'warning', 'Внимание');
         return;
     }
 
@@ -76,18 +76,24 @@ async function addStage(event) {
 
         if (res.ok) {
             document.getElementById('addStageForm').reset();
+            showToast('Этап успешно добавлен в справочник', 'success');
             loadCatalog();
         } else {
-            alert('Ошибка при сохранении этапа в базу данных');
+            showToast('Ошибка при сохранении этапа в базу данных', 'error', 'Ошибка');
         }
     } catch (err) {
-        alert('Ошибка связи с сервером');
+        showToast('Ошибка связи с сервером', 'error', 'Сеть');
     }
 }
 
 // Удаление этапа
 async function deleteStage(id) {
-    if (!confirm('Вы уверены, что хотите удалить этот этап из общего справочника цеха?')) return;
+    const confirmed = await showConfirm(
+        'Удаление этапа',
+        'Вы уверены, что хотите удалить этот этап из общего справочника цеха?',
+        { confirmText: 'Удалить', danger: true }
+    );
+    if (!confirmed) return;
 
     try {
         const res = await fetch(`${API}/etapproizvodstva/${id}`, {
@@ -95,12 +101,13 @@ async function deleteStage(id) {
         });
 
         if (res.ok) {
+            showToast('Этап успешно удален', 'success');
             loadCatalog();
         } else {
-            alert('Не удалось удалить этап');
+            showToast('Не удалось удалить этап', 'error', 'Ошибка');
         }
     } catch (err) {
-        alert('Ошибка связи с сервером');
+        showToast('Ошибка связи с сервером', 'error', 'Сеть');
     }
 }
 

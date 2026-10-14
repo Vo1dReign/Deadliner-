@@ -43,7 +43,7 @@
                 </ul>
             </div>
 
-            <div class="manager-only">
+            <div>
                 <div class="nav-group-label">Аналитика</div>
                 <ul class="nav-list">
                     <li>
@@ -93,36 +93,84 @@
             <div class="page-header">
                 <div class="page-title">
                     <h1>Аналитика выполнения производственного плана</h1>
-                    <p>Ключевые показатели эффективности (KPI) фабрики за отчетный период</p>
+                    <p>Ключевые показатели эффективности (KPI) фабрики за текущий и предшествующий периоды</p>
                 </div>
             </div>
 
-            <!-- Карточки аналитики -->
-            <div class="stats-row" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 32px;">
-                <div class="stat-card alert-blue" style="padding: 24px;">
+            <!-- Карточки оперативной аналитики -->
+            <div class="stats-row" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 24px;">
+                <div class="stat-card alert-blue" style="padding: 22px;">
                     <div class="stat-label">Всего заказов в системе</div>
-                    <div class="stat-value" id="totalCount" style="font-size: 38px;">—</div>
+                    <div class="stat-value" id="totalCount" style="font-size: 36px;">—</div>
                 </div>
-                <div class="stat-card alert-green" style="padding: 24px;">
-                    <div class="stat-label">Успешно закрыто и отгружено</div>
-                    <div class="stat-value" id="doneCount" style="font-size: 38px;">—</div>
+                <div class="stat-card alert-green" style="padding: 22px;">
+                    <div class="stat-label">Успешно отгружено / закрыто</div>
+                    <div class="stat-value" id="doneCount" style="font-size: 36px;">—</div>
                 </div>
-                <div class="stat-card alert-red" style="padding: 24px;">
+                <div class="stat-card alert-red" style="padding: 22px;">
                     <div class="stat-label">Критический срок / Просрочено</div>
-                    <div class="stat-value" id="overdueCount" style="font-size: 38px;">—</div>
+                    <div class="stat-value" id="overdueCount" style="font-size: 36px;">—</div>
                 </div>
             </div>
 
-            <div class="page-header" style="margin-bottom: 16px;">
-                <div class="page-title">
-                    <h2 style="font-size: 18px; font-weight: 700;">Реестр заказов в отчете</h2>
+            <!-- Сравнительный анализ: Текущий месяц vs Предыдущий месяц -->
+            <div class="comparison-grid" id="comparisonGrid">
+                <div class="kpi-card current">
+                    <div class="kpi-card-header">
+                        <span class="kpi-month-title" id="curMonthTitle">Текущий месяц</span>
+                        <span class="kpi-adherence-rate good" id="curAdherenceRate">—</span>
+                    </div>
+                    <div style="font-size:12px; color:var(--text-secondary);">Соблюдение регламентных сроков производства</div>
+                    <div class="kpi-metrics-list">
+                        <div class="kpi-submetric">
+                            <span class="kpi-submetric-label">Всего заказов</span>
+                            <span class="kpi-submetric-val" id="curTotal">—</span>
+                        </div>
+                        <div class="kpi-submetric">
+                            <span class="kpi-submetric-label">В графике / в срок</span>
+                            <span class="kpi-submetric-val" style="color:var(--status-green);" id="curOnTime">—</span>
+                        </div>
+                        <div class="kpi-submetric">
+                            <span class="kpi-submetric-label">Просрочек</span>
+                            <span class="kpi-submetric-val" style="color:var(--status-red);" id="curOverdue">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="kpi-card previous">
+                    <div class="kpi-card-header">
+                        <span class="kpi-month-title" id="prevMonthTitle">Прошлый месяц</span>
+                        <span class="kpi-adherence-rate" id="prevAdherenceRate">—</span>
+                    </div>
+                    <div style="font-size:12px; color:var(--text-secondary);">Соблюдение регламентных сроков производства</div>
+                    <div class="kpi-metrics-list">
+                        <div class="kpi-submetric">
+                            <span class="kpi-submetric-label">Всего заказов</span>
+                            <span class="kpi-submetric-val" id="prevTotal">—</span>
+                        </div>
+                        <div class="kpi-submetric">
+                            <span class="kpi-submetric-label">В графике / в срок</span>
+                            <span class="kpi-submetric-val" style="color:var(--status-green);" id="prevOnTime">—</span>
+                        </div>
+                        <div class="kpi-submetric">
+                            <span class="kpi-submetric-label">Просрочек</span>
+                            <span class="kpi-submetric-val" style="color:var(--status-red);" id="prevOverdue">—</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Таблица детальной статистики -->
+            <!-- Табличная панель с переключением между текущим срезом и архивом -->
             <div class="table-panel">
+                <div class="panel-toolbar">
+                    <div class="tab-group">
+                        <button class="tab-btn active" id="tabActiveOrders" onclick="switchReportTab('active')">Текущие заказы фабрики</button>
+                        <button class="tab-btn" id="tabArchiveOrders" onclick="switchReportTab('archive')">Архив отгруженной продукции</button>
+                    </div>
+                </div>
+
                 <table class="data-table">
-                    <thead>
+                    <thead id="reportsTableHead">
                         <tr>
                             <th style="width: 80px;">Номер</th>
                             <th>Контрагент (клиент)</th>

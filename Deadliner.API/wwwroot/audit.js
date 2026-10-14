@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     applyRoleRules(user);
 
     if (!zakazId) {
-        alert('Заказ не выбран!');
-        window.location.href = 'index.html';
+        showToast('Заказ не выбран!', 'warning', 'Предупреждение');
+        setTimeout(() => { window.location.href = 'index.html'; }, 1200);
         return;
     }
 
@@ -87,11 +87,12 @@ async function addAuditNote(event) {
 
         if (res.ok) {
             textInput.value = '';
+            showToast('Запись успешно добавлена в журнал аудита', 'success');
             loadAudit();
         } else {
-            alert('Ошибка при сохранении записи аудита');
+            showToast('Ошибка при сохранении записи аудита', 'error', 'Ошибка');
         }
     } catch (err) {
-        alert('Ошибка связи с сервером');
+        showToast('Ошибка связи с сервером', 'error', 'Сеть');
     }
 }

@@ -5,8 +5,8 @@ const zakazId = urlParams.get('zakazId');
 
 document.addEventListener('DOMContentLoaded', () => {
     if (!zakazId) {
-        alert('Заказ не выбран!');
-        window.location.href = 'index.html';
+        showToast('Заказ не выбран!', 'warning', 'Предупреждение');
+        setTimeout(() => { window.location.href = 'index.html'; }, 1200);
         return;
     }
 
@@ -27,6 +27,8 @@ async function loadOrderData() {
         document.getElementById('dateReceive').textContent = order.dataPriema;
         document.getElementById('dateShip').textContent = order.planDataOtgruzki;
         document.getElementById('managerName').textContent = order.menedzher?.fio ?? 'Ревенко Е.А.';
+        const prepEl = document.getElementById('prepaymentVal');
+        if (prepEl) prepEl.innerHTML = formatByn(order.summaPredoplaty);
 
         const itemsBody = document.getElementById('itemsBody');
         itemsBody.innerHTML = '';
@@ -69,6 +71,6 @@ async function loadOrderData() {
         }
     } catch (err) {
         console.error(err);
-        alert('Не удалось сформировать печатную форму наряда');
+        showToast('Не удалось сформировать печатную форму наряда', 'error', 'Ошибка');
     }
 }

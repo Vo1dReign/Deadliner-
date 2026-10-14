@@ -6,7 +6,7 @@ async function registerUser() {
     const parol = document.getElementById('parol').value.trim();
 
     if (!fio || !login || !parol) {
-        alert('Заполните обязательные поля (ФИО, Логин, Пароль)!');
+        showToast('Заполните обязательные поля (ФИО, Логин, Пароль)!', 'warning', 'Внимание');
         return;
     }
 
@@ -19,16 +19,22 @@ async function registerUser() {
         parol: parol
     };
 
-    const res = await fetch('/api/sotrudniki', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newSotrudnik)
-    });
+    try {
+        const res = await fetch('/api/sotrudniki', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newSotrudnik)
+        });
 
-    if (res.ok) {
-        alert('Сотрудник успешно зарегистрирован!');
-        window.location.href = 'login.html';
-    } else {
-        alert('Ошибка при регистрации. Возможно, такой логин уже занят или введены неверные данные.');
+        if (res.ok) {
+            showToast('Сотрудник успешно зарегистрирован!', 'success', 'Успех');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1200);
+        } else {
+            showToast('Ошибка при регистрации. Возможно, такой логин уже занят или введены неверные данные.', 'error', 'Ошибка');
+        }
+    } catch (err) {
+        showToast('Ошибка связи с сервером', 'error', 'Сеть');
     }
 }

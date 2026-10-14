@@ -49,7 +49,7 @@
                 </ul>
             </div>
 
-            <div class="manager-only">
+            <div>
                 <div class="nav-group-label">Аналитика</div>
                 <ul class="nav-list">
                     <li>
@@ -145,6 +145,31 @@
                 <div class="stat-card alert-red">
                     <div class="stat-label">Критический срок / Просрочка</div>
                     <div class="stat-value" id="statRed">—</div>
+                </div>
+            </div>
+
+            <!-- Виджет персональных технологических задач и мини-дедлайнов -->
+            <div class="tasks-widget" id="tasksWidget">
+                <div class="tasks-widget-header">
+                    <div class="tasks-widget-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2.2">
+                            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h2 id="tasksWidgetTitle">Мои задачи и мини-дедлайны</h2>
+                        <span class="tasks-count-badge" id="tasksCountBadge">0 задач</span>
+                    </div>
+                    <div class="tasks-filter-toggle" id="supervisorToggleGroup" style="display: none;">
+                        <button class="tasks-filter-btn active" id="btnMyTasks" onclick="switchTaskScope(false)">Мои задачи</button>
+                        <button class="tasks-filter-btn" id="btnAllTasks" onclick="switchTaskScope(true)">Весь цех (все этапы)</button>
+                    </div>
+                </div>
+                <div class="tasks-grid" id="tasksGrid">
+                    <div class="tasks-empty">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Загрузка персональных задач...
+                    </div>
                 </div>
             </div>
 

@@ -32,7 +32,7 @@ async function loadThresholds() {
 
     } catch (err) {
         console.error(err);
-        alert('Не удалось загрузить текущие настройки с сервера');
+        showToast('Не удалось загрузить текущие настройки с сервера', 'error', 'Ошибка');
     }
 }
 
@@ -84,10 +84,12 @@ async function saveSettings(event) {
             redDays: redDays
         }));
 
-        alert('Параметры срочности успешно сохранены!');
-        window.location.href = 'index.html';
+        showToast('Параметры срочности успешно сохранены!', 'success', 'Сохранено');
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1200);
     } catch (err) {
         console.error(err);
-        alert('Ошибка при сохранении настроек');
+        showToast('Ошибка при сохранении настроек', 'error', 'Ошибка');
     }
 }

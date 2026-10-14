@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Наряд-заказ на производство мебели</title>
+    <link rel="stylesheet" href="style.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -109,7 +110,7 @@
 
         @media print {
             body { background: #fff; padding: 0; }
-            .controls-bar { display: none; }
+            .controls-bar, #toastContainer, .custom-confirm-overlay { display: none !important; }
             .page { box-shadow: none; padding: 0; margin: 0; max-width: 100%; }
         }
     </style>
@@ -136,6 +137,7 @@
             <div class="meta-item"><strong>Срок отгрузки:</strong> <span id="dateShip">—</span></div>
             <div class="meta-item"><strong>Адрес монтажа:</strong> <span id="clientAddress">—</span></div>
             <div class="meta-item"><strong>Ответств. менеджер:</strong> <span id="managerName">—</span></div>
+            <div class="meta-item"><strong>Предоплата:</strong> <span id="prepaymentVal">—</span></div>
         </div>
 
         <h3>1. Спецификация изделий</h3>
@@ -181,6 +183,7 @@
         </div>
     </div>
 
+    <script src="auth.js"></script>
     <script src="print-order.js"></script>
 </body>
 </html>

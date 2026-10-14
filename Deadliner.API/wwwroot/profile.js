@@ -217,12 +217,12 @@ async function handlePhotoSelected(event) {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-        alert('Пожалуйста, выберите файл изображения (PNG, JPG, WEBP).');
+        showToast('Пожалуйста, выберите файл изображения (PNG, JPG, WEBP).', 'warning', 'Формат файла');
         return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-        alert('Размер файла не должен превышать 5 МБ.');
+        showToast('Размер файла не должен превышать 5 МБ.', 'warning', 'Размер файла');
         return;
     }
 
@@ -275,17 +275,23 @@ async function uploadPhotoToServer(base64Photo) {
 
             const alertBox = document.getElementById('infoAlert');
             showCustomAlert(alertBox, 'Фотография профиля успешно установлена!', 'success');
+            showToast('Фотография профиля успешно обновлена!', 'success');
         } else {
-            alert('Не удалось сохранить фото на сервере');
+            showToast('Не удалось сохранить фото на сервере', 'error', 'Ошибка');
         }
     } catch (err) {
         console.error(err);
-        alert('Ошибка связи с сервером');
+        showToast('Ошибка связи с сервером', 'error', 'Сеть');
     }
 }
 
 async function deleteProfilePhoto() {
-    if (!confirm('Вы уверены, что хотите удалить фотографию профиля?')) return;
+    const confirmed = await showConfirm(
+        'Удаление фотографии',
+        'Вы уверены, что хотите удалить фотографию профиля?',
+        { confirmText: 'Удалить', danger: true }
+    );
+    if (!confirmed) return;
     if (!currentProfile) return;
 
     try {
@@ -308,12 +314,13 @@ async function deleteProfilePhoto() {
 
             const alertBox = document.getElementById('infoAlert');
             showCustomAlert(alertBox, 'Фотография профиля удалена.', 'success');
+            showToast('Фотография профиля удалена', 'info');
         } else {
-            alert('Не удалось удалить фото');
+            showToast('Не удалось удалить фото', 'error', 'Ошибка');
         }
     } catch (err) {
         console.error(err);
-        alert('Ошибка связи с сервером');
+        showToast('Ошибка связи с сервером', 'error', 'Сеть');
     }
 }
 

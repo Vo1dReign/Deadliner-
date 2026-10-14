@@ -46,8 +46,10 @@ function requireAdmin() {
     const user = requireAuth();
     if (!user) return null;
     if (user.rol !== 'Администратор') {
-        alert('Доступ ограничен. Панель администрирования доступна только Администратору.');
-        window.location.href = 'index.html';
+        showToast('Доступ ограничен. Панель администрирования доступна только Администратору.', 'error');
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1500);
         return null;
     }
     return user;
@@ -177,4 +179,21 @@ function showConfirm(title, message, options = {}) {
             if (e.target === overlay) cleanUp(false);
         };
     });
+}
+
+// Глобальный предохранитель: если где-то вызовется системный alert, он станет стильным тостом
+window.alert = function(msg) {
+    showToast(msg, 'info', 'Уведомление');
+};
+
+// ==========================================================================
+// ОФИЦИАЛЬНЫЙ ГРАФИЧЕСКИЙ ЗНАК БЕЛОРУССКОГО РУБЛЯ (НАЦБАНК РБ, БУКВА "Б")
+// ==========================================================================
+const BEL_RUBLE_SVG = `<svg class="bel-ruble-icon" viewBox="0 0 2.65 2.65" width="1em" height="1em" aria-label="Белорусский рубль" role="img"><path d="m.540018-.00017v1.76423h-.428397v.24908h.428397v.63252h1.03611c.28397 0 .48463-.03667.60255-.11007s.20665-.16768.26561-.28318c.06017-.11671.08992-.24213.08992-.37569 0-.16364-.04151-.30671-.12454-.42943-.08302-.12392-.19339-.2082-.33176-.2527-.13717-.0445-.32261-.06666-.55604-.06666h-.631486v-.81597h1.36633v-.31213h-1.71669zm.350366 1.42937h.467156c.23223 0 .39673.01207.49299.03617.09626.02406.17116.07285.22531.14625.05415.07339.08113.1649.08113.2744 0 .154-.04705.26923-.14211.34623-.09385.07701-.23535.11576-.42426.11576h-.700216v-.33487h.621156v-.24908h-.621156v-.33486z" fill="currentColor"/></svg>`;
+
+function formatByn(amount) {
+    if (amount === null || amount === undefined || isNaN(Number(amount))) return '—';
+    const num = Number(amount);
+    const formatted = num.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return `<span class="bel-ruble-badge">${formatted}&nbsp;${BEL_RUBLE_SVG}</span>`;
 }

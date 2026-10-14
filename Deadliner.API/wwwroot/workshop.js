@@ -85,7 +85,7 @@ async function loadWorkshop() {
 function toggleFullScreen() {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(err => {
-            alert('Не удалось включить полноэкранный режим');
+            showToast('Не удалось включить полноэкранный режим', 'warning', 'Режим экрана');
         });
     } else {
         if (document.exitFullscreen) {
@@ -100,7 +100,13 @@ function toggleSound() {
     const btn = document.getElementById('soundBtn');
 
     if (soundEnabled) {
-        btn.textContent = 'Звук: ВКЛ';
+        btn.innerHTML = `
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>
+            </svg>
+            <span>Звук: ВКЛ</span>
+        `;
         btn.style.background = '#10b981';
         // Инициализируем AudioContext по клику пользователя
         if (!audioCtx) {
@@ -108,7 +114,13 @@ function toggleSound() {
         }
         playAlertBeep(); // Тестовый пик
     } else {
-        btn.textContent = 'Звук: Выкл';
+        btn.innerHTML = `
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+            </svg>
+            <span>Звук: Выкл</span>
+        `;
         btn.style.background = '#334155';
     }
 }
