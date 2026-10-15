@@ -1,7 +1,9 @@
 const API = 'http://localhost:5216/api';
 
-document.addEventListener('DOMContentLoaded', async ()=>
-{
+document.addEventListener('DOMContentLoaded', async () => {
+    const user = showUserInfo();
+    applyRoleRules(user);
+
     await loadClient();
     await loadManager();
 });

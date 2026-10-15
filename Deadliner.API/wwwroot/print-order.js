@@ -39,9 +39,9 @@ async function loadOrderData() {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td style="text-align:center;">${idx + 1}</td>
-                    <td><strong>${item.nazvanie}</strong></td>
+                    <td><strong>${item.naimenovanie || item.nazvanie || 'Изделие'}</strong></td>
                     <td style="text-align:center;">${item.kolichestvo} шт.</td>
-                    <td>${item.gabarity ?? 'По чертежу'}</td>
+                    <td>${item.harakteristiki || item.gabarity || 'По чертежу'}</td>
                 `;
                 itemsBody.appendChild(row);
             });

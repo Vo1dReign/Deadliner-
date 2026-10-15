@@ -35,7 +35,7 @@ async function loadWorkshop() {
         if (!response.ok) return;
 
         const orders = await response.json();
-        const active = orders.filter(o => o.status !== 'завершён');
+        const active = orders.filter(o => o.status !== 'завершён' && o.status !== 'отгружен');
 
         const tbody = document.getElementById('workshopTable');
         tbody.innerHTML = '';

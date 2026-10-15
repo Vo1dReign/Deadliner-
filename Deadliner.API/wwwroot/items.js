@@ -2,11 +2,22 @@
 const params = new URLSearchParams(window.location.search);
 const zakazId = parseInt(params.get('zakazId'));
 
-if (!zakazId) {
-    document.getElementById('title').textContent = 'Ошибка: не указан номер заказа';
-}
+document.addEventListener('DOMContentLoaded', () => {
+    const user = showUserInfo();
+    applyRoleRules(user);
 
-document.getElementById('title').textContent = `Изделия заказа №${zakazId}`;
+    if (!zakazId || isNaN(zakazId)) {
+        const titleEl = document.getElementById('title');
+        if (titleEl) titleEl.textContent = 'Ошибка: не указан номер заказа';
+        showToast('Заказ не выбран!', 'warning', 'Предупреждение');
+        setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+        return;
+    }
+
+    const titleEl = document.getElementById('title');
+    if (titleEl) titleEl.textContent = `Изделия заказа №${zakazId}`;
+    loadItems();
+});
 
 async function loadItems() {
     const res = await fetch(`/api/izdeliya?zakazId=${zakazId}`);
@@ -84,5 +95,3 @@ async function deleteItem(id) {
         showToast('Ошибка связи с сервером', 'error', 'Сеть');
     }
 }
-
-loadItems();

@@ -22,9 +22,9 @@ public class DeadlineCalculatorService
     public string GetStatus(Zakaz zakaz)
     {
         if (zakaz.FactDataOtgruzki.HasValue)
-            return "завершен";
+            return "отгружен";
 
-        if (DateOnly.FromDateTime(DateTime.Today)> zakaz.PlanDataOtgruzki)
+        if (DateOnly.FromDateTime(DateTime.Today) > zakaz.PlanDataOtgruzki)
             return "просрочен";
 
         return "в работе";
