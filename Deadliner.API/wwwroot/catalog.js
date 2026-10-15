@@ -23,6 +23,7 @@ async function loadCatalog() {
             return;
         }
 
+        data.forEach(item => {
             const isBase = item.tipEtapa === 'базовый';
             const roleName = item.rolOtvetstvennogo?.nazvanie ?? getRoleNameById(item.idRoliOtvetstvennogo);
 
