@@ -231,6 +231,40 @@
         </footer>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО СМЕНЫ СТАТУСА ЗАКАЗА (ДЛЯ МЕНЕДЖЕРА) -->
+    <div class="modal-overlay" id="statusModal">
+        <div class="modal-box" style="border-top-color: var(--brand-cyan);">
+            <div class="modal-header">
+                <h3 id="statusModalTitle">Управление статусом заказа</h3>
+                <button class="modal-close-btn" onclick="closeStatusModal()">✕</button>
+            </div>
+            <form onsubmit="submitStatusChange(event)">
+                <input type="hidden" id="statusOrderId">
+                
+                <div class="form-group">
+                    <label for="selectStatusValue">Выберите новый статус:</label>
+                    <select id="selectStatusValue" class="form-control" style="font-weight:600;">
+                        <option value="в работе">В работе (производственный цикл)</option>
+                        <option value="готов к отгрузке">Готов к отгрузке (на складе готовой продукции)</option>
+                        <option value="отгружен">Отгружен (заказ передан клиенту)</option>
+                        <option value="завершён">Завершён (заказ закрыт, расчёты произведены)</option>
+                        <option value="просрочен">Просрочен (нарушение дедлайна)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="statusNote">Примечание для журнала аудита (опционально):</label>
+                    <input type="text" id="statusNote" class="form-control" placeholder="Например: Заказ передан клиенту / перенос сроков...">
+                </div>
+
+                <div style="display:flex; gap:12px; margin-top: 24px;">
+                    <button type="submit" class="btn-modern btn-primary" style="flex:2; justify-content:center;">Применить статус</button>
+                    <button type="button" class="btn-modern btn-ghost" onclick="closeStatusModal()" style="flex:1; justify-content:center;">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="auth.js"></script>
     <script src="app.js"></script>
 </body>

@@ -81,7 +81,7 @@
                 <span>/</span>
                 <a href="index.html" style="color:var(--text-muted); text-decoration:none;">Заказы</a>
                 <span>/</span>
-                <span class="current">Оформление нового заказа</span>
+                <span class="current" id="breadcrumbAction">Оформление нового заказа</span>
             </div>
 
             <div class="topbar-actions">
@@ -92,8 +92,8 @@
         <main class="main-content">
             <div class="page-header">
                 <div class="page-title">
-                    <h1>Новый производственный заказ</h1>
-                    <p>Регистрация наряда и расчет нормативного дедлайна отгрузки мебели</p>
+                    <h1 id="pageHeading">Новый производственный заказ</h1>
+                    <p id="pageSubheading">Регистрация наряда и расчет нормативного дедлайна отгрузки мебели</p>
                 </div>
             </div>
 
@@ -132,8 +132,24 @@
                     <input type="date" id="shipDate" class="form-control mono">
                 </div>
 
+                <div class="form-group" id="statusGroup" style="display:none;">
+                    <label for="orderStatus">Текущий статус заказа</label>
+                    <select id="orderStatus" class="form-control">
+                        <option value="в работе">В работе (производство)</option>
+                        <option value="готов к отгрузке">Готов к отгрузке</option>
+                        <option value="отгружен">Отгружен клиенту</option>
+                        <option value="завершён">Завершён (закрыт)</option>
+                        <option value="просрочен">Просрочен</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="noteGroup" style="display:none;">
+                    <label for="auditNote">Причина изменения / Примечание для журнала аудита</label>
+                    <input type="text" id="auditNote" class="form-control" placeholder="Например: Срок перенесён по согласованию с заказчиком...">
+                </div>
+
                 <div style="display:flex; gap:12px; margin-top: 30px;">
-                    <button class="btn-modern btn-primary" onclick="createOrder()" style="flex:2; justify-content:center; padding:12px;">Создать заказ и открыть спецификацию</button>
+                    <button class="btn-modern btn-primary" id="submitOrderBtn" onclick="saveOrder()" style="flex:2; justify-content:center; padding:12px;">Создать заказ и открыть спецификацию</button>
                     <a href="index.html" class="btn-modern btn-ghost" style="flex:1; justify-content:center;">Отмена</a>
                 </div>
             </div>

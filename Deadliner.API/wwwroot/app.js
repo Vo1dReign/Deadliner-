@@ -331,10 +331,12 @@ function renderTable(orders) {
                     <a class="btn-table-action action-blue" href="stages.html?zakazId=${order.id}">Маршрут</a>
                     <a class="btn-table-action action-slate" href="audit.html?zakazId=${order.id}">Аудит</a>
                     <a class="btn-table-action action-emerald" href="print-order.html?zakazId=${order.id}" target="_blank">Бланк</a>
+                    <a class="btn-table-action action-blue manager-only" href="order.html?id=${order.id}">Изменить</a>
+                    <button class="btn-table-action action-amber manager-only" onclick="openStatusModal(${order.id}, '${escapeHtml(order.status)}')">Статус</button>
                     ${(order.status === 'готов к отгрузке' || order.status === 'в работе') ? `
-                        <button class="btn-table-action action-emerald" onclick="shipOrder(${order.id}, '${escapeHtml(order.klient?.fioNazvanie ?? '')}')">Отгрузить</button>
+                        <button class="btn-table-action action-emerald manager-only" onclick="shipOrder(${order.id}, '${escapeHtml(order.klient?.fioNazvanie ?? '')}')">Отгрузить</button>
                     ` : ''}
-                    <button class="btn-table-action action-rose admin-only" onclick="deleteOrder(${order.id})">Удалить</button>
+                    <button class="btn-table-action action-rose manager-only" onclick="deleteOrder(${order.id})">Удалить</button>
                 </div>
             </td>
         `;
@@ -370,6 +372,55 @@ async function shipOrder(orderId, clientName) {
 
         if (res.ok) {
             showToast(`Заказ #${orderId} успешно отгружен клиенту!`, 'success');
+            loadOrders();
+            loadMyTasks(isSupervisorScope);
+        } else {
+            showToast('Не удалось обновить статус заказа', 'error');
+        }
+    } catch (err) {
+        showToast('Ошибка связи с сервером', 'error');
+    }
+}
+
+function openStatusModal(orderId, currentStatus) {
+    const modal = document.getElementById('statusModal');
+    if (!modal) return;
+
+    document.getElementById('statusOrderId').value = orderId;
+    document.getElementById('statusModalTitle').textContent = `Управление статусом заказа #${orderId}`;
+    document.getElementById('selectStatusValue').value = currentStatus || 'в работе';
+    document.getElementById('statusNote').value = '';
+
+    modal.classList.add('active');
+}
+
+function closeStatusModal() {
+    const modal = document.getElementById('statusModal');
+    if (modal) modal.classList.remove('active');
+}
+
+async function submitStatusChange(event) {
+    event.preventDefault();
+
+    const orderId = document.getElementById('statusOrderId').value;
+    const newStatus = document.getElementById('selectStatusValue').value;
+    const note = document.getElementById('statusNote').value.trim();
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    try {
+        const res = await fetch(`${API}/zakazy/${orderId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                status: newStatus,
+                sotrudnikId: user?.id ?? 1,
+                note: note
+            })
+        });
+
+        if (res.ok) {
+            closeStatusModal();
+            showToast(`Статус заказа #${orderId} изменён на «${newStatus}»`, 'success');
             loadOrders();
             loadMyTasks(isSupervisorScope);
         } else {

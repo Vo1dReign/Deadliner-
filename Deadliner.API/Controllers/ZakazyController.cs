@@ -55,25 +55,85 @@ public class ZakazyController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Zakaz zakaz)
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateZakazDto dto)
     {
-        if (id != zakaz.Id)
-            return BadRequest();
+        var existing = await _context.Zakazy
+            .Include(z => z.Klient)
+            .Include(z => z.Menedzher)
+            .FirstOrDefaultAsync(z => z.Id == id);
 
-        _context.Entry(zakaz).State = EntityState.Modified;
+        if (existing == null)
+            return NotFound(new { message = "Заказ не найден" });
 
-        try
+        var changes = new List<string>();
+
+        int? newClientId = dto.IdKlienta ?? dto.KlientId;
+        if (newClientId.HasValue && newClientId.Value != existing.IdKlienta)
         {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!_context.Zakazy.Any(z => z.Id == id))
-                return NotFound();
-            throw;
+            var oldClient = existing.Klient?.FioNazvanie ?? $"#{existing.IdKlienta}";
+            var newClient = await _context.Klienty.FindAsync(newClientId.Value);
+            existing.IdKlienta = newClientId.Value;
+            existing.Klient = newClient;
+            changes.Add($"клиент: «{oldClient}» → «{newClient?.FioNazvanie ?? $"#{newClientId.Value}"}»");
         }
 
-        return NoContent();
+        int? newManagerId = dto.IdMenedzhera ?? dto.MenedzherId;
+        if (newManagerId.HasValue && newManagerId.Value != existing.IdMenedzhera)
+        {
+            var oldMgr = existing.Menedzher?.Fio ?? $"#{existing.IdMenedzhera}";
+            var newMgr = await _context.Sotrudniki.FindAsync(newManagerId.Value);
+            existing.IdMenedzhera = newManagerId.Value;
+            existing.Menedzher = newMgr;
+            changes.Add($"менеджер: «{oldMgr}» → «{newMgr?.Fio ?? $"#{newManagerId.Value}"}»");
+        }
+
+        if (dto.SummaPredoplaty.HasValue && dto.SummaPredoplaty.Value != existing.SummaPredoplaty)
+        {
+            changes.Add($"предоплата: {existing.SummaPredoplaty:N2} → {dto.SummaPredoplaty.Value:N2}");
+            existing.SummaPredoplaty = dto.SummaPredoplaty.Value;
+        }
+
+        if (dto.PlanDataOtgruzki.HasValue && dto.PlanDataOtgruzki.Value != existing.PlanDataOtgruzki)
+        {
+            changes.Add($"дедлайн отгрузки: {existing.PlanDataOtgruzki:dd.MM.yyyy} → {dto.PlanDataOtgruzki.Value:dd.MM.yyyy}");
+            existing.PlanDataOtgruzki = dto.PlanDataOtgruzki.Value;
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.Status) && dto.Status != existing.Status)
+        {
+            changes.Add($"статус: «{existing.Status}» → «{dto.Status}»");
+            existing.Status = dto.Status;
+            if ((dto.Status == "отгружен" || dto.Status == "завершён") && !existing.FactDataOtgruzki.HasValue)
+            {
+                existing.FactDataOtgruzki = DateOnly.FromDateTime(DateTime.Today);
+            }
+            else if (dto.Status == "в работе")
+            {
+                existing.FactDataOtgruzki = null;
+            }
+        }
+
+        if (changes.Count > 0 || !string.IsNullOrWhiteSpace(dto.Note))
+        {
+            string desc = changes.Count > 0 
+                ? $"Корректировка параметров заказа менеджером: {string.Join("; ", changes)}."
+                : "Параметры заказа сохранены без изменений.";
+            if (!string.IsNullOrWhiteSpace(dto.Note))
+            {
+                desc += $" Примечание: {dto.Note.Trim()}";
+            }
+
+            _context.ZhurnalIzmenenii.Add(new ZhurnalIzmenenii
+            {
+                IdZakaza = existing.Id,
+                IdSotrudnika = dto.SotrudnikId ?? 1,
+                DataIzmenenia = DateTime.Now,
+                OpisanieIzmenenia = desc
+            });
+        }
+
+        await _context.SaveChangesAsync();
+        return Ok(existing);
     }
 
     [HttpPut("{id}/status")]
@@ -93,6 +153,16 @@ public class ZakazyController : ControllerBase
         {
             zakaz.FactDataOtgruzki = DateOnly.FromDateTime(DateTime.Today);
         }
+        else if (req.Status == "в работе")
+        {
+            zakaz.FactDataOtgruzki = null;
+        }
+
+        string logText = $"Статус заказа изменён менеджером с «{oldStatus}» на «{req.Status}».";
+        if (!string.IsNullOrWhiteSpace(req.Note))
+        {
+            logText += $" Комментарий: {req.Note.Trim()}";
+        }
 
         // Фиксация в журнале аудита
         _context.ZhurnalIzmenenii.Add(new ZhurnalIzmenenii
@@ -100,7 +170,7 @@ public class ZakazyController : ControllerBase
             IdZakaza = zakaz.Id,
             IdSotrudnika = req.SotrudnikId ?? 1,
             DataIzmenenia = DateTime.Now,
-            OpisanieIzmenenia = $"Статус заказа изменён с «{oldStatus}» на «{req.Status}»."
+            OpisanieIzmenenia = logText
         });
 
         await _context.SaveChangesAsync();
@@ -110,12 +180,20 @@ public class ZakazyController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var zakaz = await _context.Zakazy.FindAsync(id);
+        var zakaz = await _context.Zakazy
+            .Include(z => z.Izdeliya)
+            .Include(z => z.EtapyZakaza)
+            .Include(z => z.ZhurnalIzmenenii)
+            .FirstOrDefaultAsync(z => z.Id == id);
 
         if (zakaz == null)
             return NotFound();
 
+        _context.ZhurnalIzmenenii.RemoveRange(zakaz.ZhurnalIzmenenii);
+        _context.EtapyZakazov.RemoveRange(zakaz.EtapyZakaza);
+        _context.Izdeliya.RemoveRange(zakaz.Izdeliya);
         _context.Zakazy.Remove(zakaz);
+
         await _context.SaveChangesAsync();
 
         return NoContent();
@@ -246,4 +324,18 @@ public class StatusUpdateRequest
 {
     public string Status { get; set; } = string.Empty;
     public int? SotrudnikId { get; set; }
+    public string? Note { get; set; }
+}
+
+public class UpdateZakazDto
+{
+    public int? IdKlienta { get; set; }
+    public int? KlientId { get; set; }
+    public int? IdMenedzhera { get; set; }
+    public int? MenedzherId { get; set; }
+    public decimal? SummaPredoplaty { get; set; }
+    public DateOnly? PlanDataOtgruzki { get; set; }
+    public string? Status { get; set; }
+    public int? SotrudnikId { get; set; }
+    public string? Note { get; set; }
 }
