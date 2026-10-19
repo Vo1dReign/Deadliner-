@@ -117,7 +117,11 @@
                     <h1>Производственные заказы</h1>
                     <p id="ordersSubtitle">Мониторинг соблюдения регламентных сроков изготовления мебели</p>
                 </div>
-                <div style="display: flex; gap: 10px;">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn-modern btn-ghost manager-only" onclick="openImport1CModal()" style="border-color: var(--brand-cyan); color: var(--brand-cyan);">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                        <span>📥 Загрузить из 1С</span>
+                    </button>
                     <button class="btn-modern btn-ghost manager-only" onclick="exportToCSV()">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                         <span>Экспорт CSV</span>
@@ -262,6 +266,85 @@
                     <button type="button" class="btn-modern btn-ghost" onclick="closeStatusModal()" style="flex:1; justify-content:center;">Отмена</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ИМПОРТА ВЫГРУЗКИ ИЗ 1С (EXCEL) -->
+    <div class="modal-overlay" id="import1CModal">
+        <div class="modal-box" style="max-width: 960px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; padding: 26px; border-top-color: var(--status-green);">
+            <div class="modal-header" style="margin-bottom: 12px;">
+                <div>
+                    <h3 style="display:flex; align-items:center; gap:8px;">
+                        <span>📥</span>
+                        <span>Загрузка заказов из 1С (Excel / .xls / .xlsx)</span>
+                    </h3>
+                    <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
+                        Автоматическое распознавание нарядов, контрагентов, сумм и расчёт производственных дедлайнов
+                    </p>
+                </div>
+                <button class="modal-close-btn" onclick="closeImport1CModal()">✕</button>
+            </div>
+
+            <!-- Шаг 1: Выбор файла и параметров -->
+            <div id="importStepUpload" style="margin-bottom: 14px;">
+                <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 14px; align-items: end;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="excelFileInput" style="font-weight: 600;">Файл выгрузки заказов из 1С (.xls, .xlsx):</label>
+                        <input type="file" id="excelFileInput" class="form-control" accept=".xls,.xlsx">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="importProdDays" style="font-weight: 600;">Срок изготовления (дней):</label>
+                        <input type="number" id="importProdDays" class="form-control mono" value="14" min="1" max="180">
+                    </div>
+                    <div>
+                        <button type="button" class="btn-modern btn-primary" id="btnParse1C" onclick="parse1CFile()" style="padding: 10px 22px;">
+                            <span>Распознать</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Шаг 2: Таблица предпросмотра (появляется после парсинга) -->
+            <div id="importStepPreview" style="display: none; flex: 1; flex-direction: column; min-height: 0; overflow: hidden;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border);">
+                    <div style="display: flex; gap: 18px; font-size: 13.5px;">
+                        <div>Найдено нарядов: <strong id="previewTotalCount" style="color:var(--brand-primary);">0</strong></div>
+                        <div>Новых клиентов: <strong id="previewNewClientsCount" style="color:var(--status-green);">0</strong></div>
+                        <div>К импорту: <strong id="previewSelectedCount" style="color:var(--text-main);">0</strong></div>
+                    </div>
+                    <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; user-select: none;">
+                        <input type="checkbox" id="masterCheckbox1C" checked onchange="toggleSelectAll1C(this.checked)">
+                        <span>Выбрать все</span>
+                    </label>
+                </div>
+
+                <div style="flex: 1; overflow-y: auto; max-height: 380px; border: 1px solid var(--border); border-radius: 8px;">
+                    <table class="data-table" style="margin-bottom: 0;">
+                        <thead style="position: sticky; top: 0; background: #ffffff; z-index: 2;">
+                            <tr>
+                                <th style="width: 40px; text-align: center;">✔</th>
+                                <th style="width: 100px;">№ Наряда</th>
+                                <th>Контрагент</th>
+                                <th style="width: 110px;">Дата приёма</th>
+                                <th style="width: 140px;">Срок отгрузки</th>
+                                <th style="width: 120px;">Сумма</th>
+                                <th>Договор / Примечание</th>
+                            </tr>
+                        </thead>
+                        <tbody id="importPreviewTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+                    <button type="button" class="btn-modern btn-ghost" onclick="reset1CImport()">← Выбрать другой файл</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" class="btn-modern btn-ghost" onclick="closeImport1CModal()">Отмена</button>
+                        <button type="button" class="btn-modern btn-primary" id="btnConfirmImport1C" onclick="execute1CImport()" style="padding: 10px 24px;">
+                            <span>📥 Импортировать выбранные (<span id="btnSelectedCount">0</span>)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

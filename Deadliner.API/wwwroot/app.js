@@ -515,3 +515,242 @@ function getNoun(number, one, two, five) {
     if (n >= 2 && n <= 4) return two;
     return five;
 }
+
+// ==========================================================================
+// 8. ИНТЕГРАЦИЯ С 1С: ИМПОРТ ИЗ EXCEL (.XLS / .XLSX)
+// ==========================================================================
+
+let parsed1CItems = [];
+
+function openImport1CModal() {
+    const modal = document.getElementById('import1CModal');
+    if (!modal) return;
+
+    reset1CImport();
+    const fileInput = document.getElementById('excelFileInput');
+    if (fileInput) fileInput.value = '';
+
+    modal.classList.add('active');
+}
+
+function closeImport1CModal() {
+    const modal = document.getElementById('import1CModal');
+    if (modal) modal.classList.remove('active');
+}
+
+function reset1CImport() {
+    parsed1CItems = [];
+    const stepUpload = document.getElementById('importStepUpload');
+    const stepPreview = document.getElementById('importStepPreview');
+    if (stepUpload) stepUpload.style.display = 'block';
+    if (stepPreview) stepPreview.style.display = 'none';
+
+    const btnParse = document.getElementById('btnParse1C');
+    if (btnParse) {
+        btnParse.disabled = false;
+        btnParse.innerHTML = '<span>Распознать</span>';
+    }
+}
+
+async function parse1CFile() {
+    const fileInput = document.getElementById('excelFileInput');
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        showToast('Пожалуйста, выберите файл выгрузки из 1С (.xls или .xlsx)', 'warning');
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const defaultDays = document.getElementById('importProdDays')?.value || 14;
+
+    const btnParse = document.getElementById('btnParse1C');
+    if (btnParse) {
+        btnParse.disabled = true;
+        btnParse.innerHTML = '<span>Обработка...</span>';
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await fetch(`${API}/import1c/preview?defaultProdDays=${defaultDays}`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.message || 'Ошибка обработки файла 1С');
+        }
+
+        parsed1CItems = await response.json();
+        if (!parsed1CItems || parsed1CItems.length === 0) {
+            showToast('В файле не найдено строк с производственными заказами', 'warning');
+            reset1CImport();
+            return;
+        }
+
+        showToast(`Файл успешно прочитан! Найдено ${parsed1CItems.length} нарядов.`, 'success');
+
+        // Переключаем отображение на предпросмотр
+        document.getElementById('importStepUpload').style.display = 'none';
+        document.getElementById('importStepPreview').style.display = 'flex';
+
+        render1CPreviewTable();
+    } catch (err) {
+        console.error(err);
+        showToast(err.message || 'Ошибка связи с сервером', 'error', 'Ошибка 1С');
+        if (btnParse) {
+            btnParse.disabled = false;
+            btnParse.innerHTML = '<span>Распознать</span>';
+        }
+    }
+}
+
+function render1CPreviewTable() {
+    const tbody = document.getElementById('importPreviewTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+    const newClientsCount = parsed1CItems.filter(i => !i.isExistingClient).length;
+
+    document.getElementById('previewTotalCount').textContent = parsed1CItems.length;
+    document.getElementById('previewNewClientsCount').textContent = newClientsCount;
+
+    parsed1CItems.forEach((item, index) => {
+        const tr = document.createElement('tr');
+
+        const clientBadge = item.isExistingClient
+            ? `<span style="display:inline-block; font-size:11px; font-weight:600; padding:2px 6px; border-radius:4px; background:#eff6ff; color:#2563eb; margin-left:6px;" title="Контрагент уже есть в базе">В базе</span>`
+            : `<span style="display:inline-block; font-size:11px; font-weight:600; padding:2px 6px; border-radius:4px; background:#ecfdf5; color:#059669; margin-left:6px;" title="Будет автоматически создан новый контрагент">+ Новый</span>`;
+
+        const amountFormatted = Number(item.amount).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const currencyBadge = item.currency === 'BYN' ? BEL_RUBLE_SVG : `<span class="mono" style="font-size:11px;">${item.currency}</span>`;
+
+        const noteText = item.address || item.contract || item.comment || '—';
+
+        tr.innerHTML = `
+            <td style="text-align: center;">
+                <input type="checkbox" class="row-checkbox-1c" data-index="${index}" ${item.selected ? 'checked' : ''} onchange="update1CItemSelected(${index}, this.checked)">
+            </td>
+            <td class="mono" style="font-weight: 700; color: var(--text-main);">
+                ${escapeHtml(item.docNumber || '—')}
+            </td>
+            <td>
+                <span style="font-weight: 600;">${escapeHtml(item.clientName)}</span>
+                ${clientBadge}
+            </td>
+            <td class="mono" style="font-size: 13px; color: var(--text-secondary);">
+                ${item.orderDate}
+            </td>
+            <td>
+                <input type="date" class="form-control mono" style="padding: 4px 8px; font-size: 12px; height: 32px; width: 130px;" 
+                       value="${item.planShipDate}" onchange="update1CItemPlanDate(${index}, this.value)">
+            </td>
+            <td class="mono" style="font-weight: 600; font-size: 13px;">
+                ${amountFormatted}&nbsp;${currencyBadge}
+            </td>
+            <td style="font-size: 12.5px; color: var(--text-secondary); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(noteText)}">
+                ${escapeHtml(noteText)}
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+
+    update1CSelectedCounter();
+}
+
+function update1CItemSelected(index, isChecked) {
+    if (parsed1CItems[index]) {
+        parsed1CItems[index].selected = isChecked;
+    }
+
+    const masterCheckbox = document.getElementById('masterCheckbox1C');
+    if (masterCheckbox) {
+        masterCheckbox.checked = parsed1CItems.length > 0 && parsed1CItems.every(i => i.selected);
+    }
+
+    update1CSelectedCounter();
+}
+
+function update1CItemPlanDate(index, newDate) {
+    if (parsed1CItems[index] && newDate) {
+        parsed1CItems[index].planShipDate = newDate;
+    }
+}
+
+function toggleSelectAll1C(masterChecked) {
+    parsed1CItems.forEach(i => i.selected = masterChecked);
+
+    document.querySelectorAll('.row-checkbox-1c').forEach(cb => {
+        cb.checked = masterChecked;
+    });
+
+    update1CSelectedCounter();
+}
+
+function update1CSelectedCounter() {
+    const selectedCount = parsed1CItems.filter(i => i.selected).length;
+    const countEl = document.getElementById('previewSelectedCount');
+    const btnCountEl = document.getElementById('btnSelectedCount');
+    const btnConfirm = document.getElementById('btnConfirmImport1C');
+
+    if (countEl) countEl.textContent = selectedCount;
+    if (btnCountEl) btnCountEl.textContent = selectedCount;
+    if (btnConfirm) btnConfirm.disabled = selectedCount === 0;
+}
+
+async function execute1CImport() {
+    const selected = parsed1CItems.filter(i => i.selected);
+    if (selected.length === 0) {
+        showToast('Выберите хотя бы один заказ для импорта', 'warning');
+        return;
+    }
+
+    const confirmed = await showConfirm(
+        'Импорт заказов из 1С',
+        `Запустить импорт выбранных нарядов (${selected.length} шт.) в производственную базу? Для каждого заказа будет автоматически сгенерирована технологическая цепочка этапов цеха.`,
+        { confirmText: 'Импортировать', isInfo: true }
+    );
+    if (!confirmed) return;
+
+    const btnConfirm = document.getElementById('btnConfirmImport1C');
+    if (btnConfirm) {
+        btnConfirm.disabled = true;
+        btnConfirm.innerHTML = '<span>Импорт данных...</span>';
+    }
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    const payload = {
+        items: selected,
+        defaultManagerId: user?.id ?? 1
+    };
+
+    try {
+        const response = await fetch(`${API}/import1c/confirm`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.message || 'Ошибка импорта');
+        }
+
+        const result = await response.json();
+        closeImport1CModal();
+        showToast(result.message || `Успешно импортировано ${result.totalImported} заказов!`, 'success', 'Импорт из 1С завершён');
+
+        // Перезагружаем реестр и персональные виджеты
+        loadOrders();
+        loadMyTasks(isSupervisorScope);
+    } catch (err) {
+        console.error(err);
+        showToast(err.message || 'Ошибка связи с сервером', 'error', 'Ошибка импорта');
+        if (btnConfirm) {
+            btnConfirm.disabled = false;
+            btnConfirm.innerHTML = `<span>📥 Импортировать выбранные (<span id="btnSelectedCount">${selected.length}</span>)</span>`;
+        }
+    }
+}
