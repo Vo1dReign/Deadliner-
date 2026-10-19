@@ -4,7 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DeadLiner — Система управления производственными дедлайнами</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=2.5.2">
+    <style>
+        .modal-overlay {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: rgba(15, 23, 42, 0.6) !important;
+            backdrop-filter: blur(4px) !important;
+            display: none;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 9999 !important;
+            padding: 16px !important;
+        }
+        .modal-overlay.active {
+            display: flex !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -236,7 +255,7 @@
     </div>
 
     <!-- МОДАЛЬНОЕ ОКНО СМЕНЫ СТАТУСА ЗАКАЗА (ДЛЯ МЕНЕДЖЕРА) -->
-    <div class="modal-overlay" id="statusModal">
+    <div class="modal-overlay" id="statusModal" style="display: none;">
         <div class="modal-box" style="border-top-color: var(--brand-cyan);">
             <div class="modal-header">
                 <h3 id="statusModalTitle">Управление статусом заказа</h3>
@@ -270,7 +289,7 @@
     </div>
 
     <!-- МОДАЛЬНОЕ ОКНО ИМПОРТА ВЫГРУЗКИ ИЗ 1С (EXCEL) -->
-    <div class="modal-overlay" id="import1CModal">
+    <div class="modal-overlay" id="import1CModal" style="display: none;">
         <div class="modal-box" style="max-width: 960px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; padding: 26px; border-top-color: var(--status-green);">
             <div class="modal-header" style="margin-bottom: 12px;">
                 <div>
@@ -349,6 +368,6 @@
     </div>
 
     <script src="auth.js"></script>
-    <script src="app.js"></script>
+    <script src="app.js?v=2.5.2"></script>
 </body>
 </html>

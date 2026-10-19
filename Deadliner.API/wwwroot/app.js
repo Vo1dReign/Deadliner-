@@ -391,12 +391,16 @@ function openStatusModal(orderId, currentStatus) {
     document.getElementById('selectStatusValue').value = currentStatus || 'в работе';
     document.getElementById('statusNote').value = '';
 
+    modal.style.display = 'flex';
     modal.classList.add('active');
 }
 
 function closeStatusModal() {
     const modal = document.getElementById('statusModal');
-    if (modal) modal.classList.remove('active');
+    if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+    }
 }
 
 async function submitStatusChange(event) {
@@ -530,12 +534,16 @@ function openImport1CModal() {
     const fileInput = document.getElementById('excelFileInput');
     if (fileInput) fileInput.value = '';
 
+    modal.style.display = 'flex';
     modal.classList.add('active');
 }
 
 function closeImport1CModal() {
     const modal = document.getElementById('import1CModal');
-    if (modal) modal.classList.remove('active');
+    if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+    }
 }
 
 function reset1CImport() {
