@@ -139,7 +139,7 @@
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <button class="btn-modern btn-ghost manager-only" onclick="openImport1CModal()" style="border-color: var(--brand-cyan); color: var(--brand-cyan);">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-                        <span>📥 Загрузить из 1С</span>
+                        <span> Загрузить из 1С</span>
                     </button>
                     <button class="btn-modern btn-ghost manager-only" onclick="exportToCSV()">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
@@ -337,17 +337,23 @@
                     </label>
                 </div>
 
+                <div style="font-size: 12px; color: var(--text-secondary); background: #f8fafc; border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 16px;">💡</span>
+                    <span><strong>Умное распознавание 1С:</strong> Спецификации отделены от адресов объектов. Если в файле нет даты отгрузки — применён производственный норматив цеха (дату можно изменить прямо в таблице).</span>
+                </div>
+
                 <div style="flex: 1; overflow-y: auto; max-height: 380px; border: 1px solid var(--border); border-radius: 8px;">
                     <table class="data-table" style="margin-bottom: 0;">
                         <thead style="position: sticky; top: 0; background: #ffffff; z-index: 2;">
                             <tr>
                                 <th style="width: 40px; text-align: center;">✔</th>
-                                <th style="width: 100px;">№ Наряда</th>
+                                <th style="width: 95px;">№ Наряда</th>
                                 <th>Контрагент</th>
-                                <th style="width: 110px;">Дата приёма</th>
-                                <th style="width: 140px;">Срок отгрузки</th>
-                                <th style="width: 120px;">Сумма</th>
-                                <th>Договор / Примечание</th>
+                                <th style="width: 105px;">Дата приёма</th>
+                                <th style="width: 150px;">Срок отгрузки</th>
+                                <th style="width: 115px;">Сумма</th>
+                                <th>Основание / Изделие</th>
+                                <th style="width: 180px;">Адрес объекта</th>
                             </tr>
                         </thead>
                         <tbody id="importPreviewTableBody"></tbody>

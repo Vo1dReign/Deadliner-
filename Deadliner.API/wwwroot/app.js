@@ -634,7 +634,21 @@ function render1CPreviewTable() {
         const amountFormatted = Number(item.amount).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         const currencyBadge = item.currency === 'BYN' ? BEL_RUBLE_SVG : `<span class="mono" style="font-size:11px;">${item.currency}</span>`;
 
-        const noteText = item.address || item.contract || item.comment || '—';
+        const shipDateBadge = item.hasExplicitShipDate
+            ? `<div style="font-size: 10px; font-weight: 600; color: var(--status-green); margin-top: 2px;">✔ из файла 1С</div>`
+            : `<div style="font-size: 10px; font-weight: 600; color: #d97706; margin-top: 2px;">⏱ норматив (+14дн)</div>`;
+
+        const productHtml = item.productName
+            ? `<div style="font-weight: 700; color: var(--brand-primary); font-size: 12px; margin-bottom: 2px;">📦 ${escapeHtml(item.productName)}</div>`
+            : '';
+
+        const contractHtml = item.contract
+            ? `<div style="font-size: 11.5px; color: var(--text-secondary); max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(item.contract)}">${escapeHtml(item.contract)}</div>`
+            : '<span style="color:var(--text-muted); font-size:11px;">—</span>';
+
+        const addressHtml = item.address
+            ? `<div style="font-size: 12px; color: var(--text-main); font-weight: 500; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(item.address)}">📍 ${escapeHtml(item.address)}</div>`
+            : `<span style="color: var(--text-muted); font-size: 12px;">—</span>`;
 
         tr.innerHTML = `
             <td style="text-align: center;">
@@ -651,14 +665,19 @@ function render1CPreviewTable() {
                 ${item.orderDate}
             </td>
             <td>
-                <input type="date" class="form-control mono" style="padding: 4px 8px; font-size: 12px; height: 32px; width: 130px;" 
+                <input type="date" class="form-control mono" style="padding: 4px 8px; font-size: 12px; height: 30px; width: 130px;" 
                        value="${item.planShipDate}" onchange="update1CItemPlanDate(${index}, this.value)">
+                ${shipDateBadge}
             </td>
             <td class="mono" style="font-weight: 600; font-size: 13px;">
                 ${amountFormatted}&nbsp;${currencyBadge}
             </td>
-            <td style="font-size: 12.5px; color: var(--text-secondary); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(noteText)}">
-                ${escapeHtml(noteText)}
+            <td>
+                ${productHtml}
+                ${contractHtml}
+            </td>
+            <td>
+                ${addressHtml}
             </td>
         `;
 

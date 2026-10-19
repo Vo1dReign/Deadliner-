@@ -18,6 +18,8 @@ public class Import1CPreviewItemDto
     public string? Address { get; set; }
     public string? Comment { get; set; }
     public string? Contract { get; set; }
+    public string? ProductName { get; set; }
+    public bool HasExplicitShipDate { get; set; }
     public bool Selected { get; set; } = true;
 }
 
