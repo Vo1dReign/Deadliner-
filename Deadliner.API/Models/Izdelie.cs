@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Deadliner.API.Models;
 
@@ -15,5 +16,6 @@ public class Izdelie
 
     // Навигационное свойство
     [ForeignKey("ZakazId")]
-    public Zakaz Zakaz { get; set; } = null!;
+    [JsonIgnore]
+    public Zakaz? Zakaz { get; set; }
 }
