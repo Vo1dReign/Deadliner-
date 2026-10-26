@@ -114,7 +114,11 @@ async function deleteStage(id) {
 
 function getRoleNameById(id) {
     if (id === 1) return 'Администратор';
-    if (id === 2) return 'Менеджер';
     if (id === 3) return 'Сотрудник цеха';
+    if (id === 1002) return 'Дизайнер';
+    if (id === 1003) return 'Конструктор';
+    if (id === 1004) return 'Бухгалтер';
+    if (id === 1005) return 'Начальник производства';
+    if (id === 1006) return 'Логист';
     return 'Не назначено';
 }

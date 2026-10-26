@@ -167,13 +167,37 @@ public class EtapyZakazaController : ControllerBase
         if (etap == null)
             return NotFound(new { message = "Этап заказа не найден" });
 
+        if (dto.RequesterId.HasValue)
+        {
+            var requester = await _context.Sotrudniki.Include(s => s.Rol).FirstOrDefaultAsync(s => s.Id == dto.RequesterId.Value);
+            bool isSupervisor = requester != null && (requester.IdRoli == 1 || (requester.Rol != null && requester.Rol.Nazvanie.ToLower().Contains("начальник")));
+            bool isProjectManager = etap.Zakaz != null && etap.Zakaz.IdMenedzhera == dto.RequesterId.Value;
+            if (!isSupervisor && !isProjectManager)
+            {
+                return StatusCode(403, new { message = "Назначать исполнителей и изменять мини-дедлайны этапов может только менеджер проекта этого заказа или администратор." });
+            }
+        }
+
         bool changed = false;
         var changeParts = new List<string>();
 
         if (dto.IdSotrudnika.HasValue && etap.IdSotrudnika != dto.IdSotrudnika.Value)
         {
+            var emp = await _context.Sotrudniki.Include(s => s.Rol).FirstOrDefaultAsync(s => s.Id == dto.IdSotrudnika.Value);
+            if (emp != null)
+            {
+                int reqRole = etap.Etap?.IdRoliOtvetstvennogo ?? 3;
+                bool isWorkshopOperation = reqRole == 3;
+                bool isOfficeWorker = emp.IdRoli != 3 && emp.IdRoli != 1;
+                if (isWorkshopOperation && isOfficeWorker)
+                {
+                    return BadRequest(new { 
+                        message = $"На производственную операцию цеха «{etap.Etap?.Nazvanie}» нельзя назначить офисного сотрудника ({emp.Fio}, {emp.Rol?.Nazvanie ?? "Офис"}). На операции цеха назначаются только сотрудники цеха." 
+                    });
+                }
+            }
+
             etap.IdSotrudnika = dto.IdSotrudnika.Value;
-            var emp = await _context.Sotrudniki.FindAsync(dto.IdSotrudnika.Value);
             etap.Sotrudnik = emp;
             changeParts.Add($"назначен исполнитель {emp?.Fio ?? $"#{dto.IdSotrudnika.Value}"}");
             changed = true;
@@ -198,9 +222,9 @@ public class EtapyZakazaController : ControllerBase
             _context.ZhurnalIzmenenii.Add(new ZhurnalIzmenenii
             {
                 IdZakaza = etap.IdZakaza,
-                IdSotrudnika = dto.IdSotrudnika ?? 1,
+                IdSotrudnika = dto.RequesterId ?? dto.IdSotrudnika ?? 1,
                 DataIzmenenia = DateTime.Now,
-                OpisanieIzmenenia = $"Этап «{etap.Etap.Nazvanie}»: {string.Join(", ", changeParts)}."
+                OpisanieIzmenenia = $"Этап «{etap.Etap?.Nazvanie}»: {string.Join(", ", changeParts)}."
             });
         }
 
@@ -318,6 +342,7 @@ public class UpdateEtapDto
     public int? IdSotrudnika { get; set; }
     public DateOnly? PlanData { get; set; }
     public string? Status { get; set; }
+    public int? RequesterId { get; set; }
 }
 
 public class CompleteEtapDto

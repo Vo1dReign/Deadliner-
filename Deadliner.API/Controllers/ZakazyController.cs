@@ -21,6 +21,8 @@ public class ZakazyController : ControllerBase
     {
         return await _context.Zakazy
             .Include(z => z.Klient)
+            .Include(z => z.Menedzher)
+                .ThenInclude(m => m!.Rol)
             .Include(z => z.EtapyZakaza)
             .OrderByDescending(z => z.Id)
             .ToListAsync();
@@ -32,6 +34,7 @@ public class ZakazyController : ControllerBase
         var zakaz = await _context.Zakazy
             .Include(z => z.Klient)
             .Include(z => z.Menedzher)
+                .ThenInclude(m => m!.Rol)
             .Include(z => z.EtapyZakaza)
             .Include(z => z.Izdeliya)
             .FirstOrDefaultAsync(z => z.Id == id);
@@ -65,6 +68,17 @@ public class ZakazyController : ControllerBase
         if (existing == null)
             return NotFound(new { message = "Заказ не найден" });
 
+        if (dto.SotrudnikId.HasValue)
+        {
+            var user = await _context.Sotrudniki.Include(s => s.Rol).FirstOrDefaultAsync(s => s.Id == dto.SotrudnikId.Value);
+            bool isSupervisor = user != null && (user.IdRoli == 1 || (user.Rol != null && user.Rol.Nazvanie.ToLower().Contains("начальник")));
+            bool isProjectManager = existing.IdMenedzhera == dto.SotrudnikId.Value;
+            if (!isSupervisor && !isProjectManager)
+            {
+                return StatusCode(403, new { message = "Редактировать заказ может только назначенный менеджер проекта или администратор." });
+            }
+        }
+
         var changes = new List<string>();
 
         int? newClientId = dto.IdKlienta ?? dto.KlientId;
@@ -84,7 +98,7 @@ public class ZakazyController : ControllerBase
             var newMgr = await _context.Sotrudniki.FindAsync(newManagerId.Value);
             existing.IdMenedzhera = newManagerId.Value;
             existing.Menedzher = newMgr;
-            changes.Add($"менеджер: «{oldMgr}» → «{newMgr?.Fio ?? $"#{newManagerId.Value}"}»");
+            changes.Add($"менеджер проекта: «{oldMgr}» → «{newMgr?.Fio ?? $"#{newManagerId.Value}"}»");
         }
 
         if (dto.SummaPredoplaty.HasValue && dto.SummaPredoplaty.Value != existing.SummaPredoplaty)
@@ -146,6 +160,17 @@ public class ZakazyController : ControllerBase
         if (zakaz == null)
             return NotFound();
 
+        if (req.SotrudnikId.HasValue)
+        {
+            var user = await _context.Sotrudniki.Include(s => s.Rol).FirstOrDefaultAsync(s => s.Id == req.SotrudnikId.Value);
+            bool isSupervisor = user != null && (user.IdRoli == 1 || (user.Rol != null && user.Rol.Nazvanie.ToLower().Contains("начальник")));
+            bool isProjectManager = zakaz.IdMenedzhera == req.SotrudnikId.Value;
+            if (!isSupervisor && !isProjectManager)
+            {
+                return StatusCode(403, new { message = "Изменять статус заказа может только назначенный менеджер проекта или администратор." });
+            }
+        }
+
         string oldStatus = zakaz.Status;
         zakaz.Status = req.Status;
 
@@ -178,7 +203,7 @@ public class ZakazyController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int id, [FromQuery] int? sotrudnikId = null)
     {
         var zakaz = await _context.Zakazy
             .Include(z => z.Izdeliya)
@@ -188,6 +213,17 @@ public class ZakazyController : ControllerBase
 
         if (zakaz == null)
             return NotFound();
+
+        if (sotrudnikId.HasValue)
+        {
+            var user = await _context.Sotrudniki.Include(s => s.Rol).FirstOrDefaultAsync(s => s.Id == sotrudnikId.Value);
+            bool isSupervisor = user != null && (user.IdRoli == 1 || (user.Rol != null && user.Rol.Nazvanie.ToLower().Contains("начальник")));
+            bool isProjectManager = zakaz.IdMenedzhera == sotrudnikId.Value;
+            if (!isSupervisor && !isProjectManager)
+            {
+                return StatusCode(403, new { message = "Удалить заказ может только назначенный менеджер проекта или администратор." });
+            }
+        }
 
         _context.ZhurnalIzmenenii.RemoveRange(zakaz.ZhurnalIzmenenii);
         _context.EtapyZakazov.RemoveRange(zakaz.EtapyZakaza);

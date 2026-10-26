@@ -48,7 +48,9 @@ public class SotrudnikiController : ControllerBase
     [HttpGet("roli")]
     public async Task<ActionResult<IEnumerable<Rol>>> GetRoles()
     {
-        return await _context.Roli.ToListAsync();
+        return await _context.Roli
+            .Where(r => r.Id != 2 && r.Nazvanie != "Менеджер")
+            .ToListAsync();
     }
 
     [HttpPut("{id}")]

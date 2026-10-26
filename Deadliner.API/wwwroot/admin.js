@@ -37,13 +37,13 @@ async function loadRoles() {
     try {
         const res = await fetch(`${API}/sotrudniki/roli`);
         if (res.ok) {
-            allRoles = await res.json();
+            const data = await res.json();
+            allRoles = data.filter(r => r.id !== 2 && r.nazvanie !== 'Менеджер');
         }
     } catch (e) {
         console.warn('Fallback списки ролей');
         allRoles = [
             { id: 1, nazvanie: 'Администратор' },
-            { id: 2, nazvanie: 'Менеджер' },
             { id: 3, nazvanie: 'Сотрудник цеха' },
             { id: 1002, nazvanie: 'Дизайнер' },
             { id: 1003, nazvanie: 'Конструктор' },
@@ -59,7 +59,8 @@ function populateRoleDropdown(roles) {
     const select = document.getElementById('newRole');
     if (!select) return;
     select.innerHTML = '';
-    roles.forEach(r => {
+    const filtered = roles.filter(r => r.id !== 2 && r.nazvanie !== 'Менеджер');
+    filtered.forEach(r => {
         const opt = document.createElement('option');
         opt.value = r.id;
         opt.textContent = r.nazvanie;
@@ -202,26 +203,31 @@ function filterUsers() {
     renderUsersTable(filtered);
 }
 
-function openUserModal() {
-    document.getElementById('userModal').classList.add('active');
-    document.getElementById('newFio').focus();
-}
-
-function closeUserModal() {
-    document.getElementById('userModal').classList.remove('active');
+function openCreateUserModal() {
+    document.getElementById('createUserModal').classList.add('active');
     document.getElementById('newFio').value = '';
     document.getElementById('newPhone').value = '';
     document.getElementById('newLogin').value = '';
     document.getElementById('newPassword').value = '';
+    document.getElementById('newFio').focus();
 }
 
-async function saveUser(event) {
+function closeUserModal() {
+    document.getElementById('createUserModal').classList.remove('active');
+}
+
+async function createAdminUser(event) {
     event.preventDefault();
     const fio = document.getElementById('newFio').value.trim();
     const phone = document.getElementById('newPhone').value.trim();
     const roleId = parseInt(document.getElementById('newRole').value);
     const login = document.getElementById('newLogin').value.trim();
     const password = document.getElementById('newPassword').value.trim();
+
+    if (!fio || !login || !password) {
+        showToast('Заполните обязательные поля: ФИО, логин и пароль!', 'warning');
+        return;
+    }
 
     try {
         const res = await fetch(`${API}/sotrudniki`, {
@@ -308,10 +314,12 @@ async function updateUser(event) {
         id,
         fio,
         telefon: telefon || null,
-        idRoli,
-        login,
-        parol: parol || null
+        idRoli: idRoli,
+        login: login
     };
+    if (parol) {
+        payload.parol = parol;
+    }
 
     try {
         const res = await fetch(`${API}/sotrudniki/${id}`, {
@@ -319,24 +327,12 @@ async function updateUser(event) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-
         if (res.ok) {
-            const loggedIn = JSON.parse(localStorage.getItem('user'));
-            if (loggedIn && loggedIn.id === id) {
-                loggedIn.fio = fio;
-                loggedIn.login = login;
-                loggedIn.idRoli = idRoli;
-                const matchedRole = allRoles.find(r => r.id === idRoli);
-                if (matchedRole) loggedIn.rol = matchedRole;
-                localStorage.setItem('user', JSON.stringify(loggedIn));
-                showUserInfo();
-            }
-
-            showToast('Данные сотрудника успешно обновлены!', 'success');
+            showToast('Данные сотрудника обновлены!', 'success');
             closeEditUserModal();
             loadAdminDashboard();
         } else {
-            showToast('Не удалось сохранить изменения профиля сотрудника', 'error');
+            showToast('Не удалось обновить профиль сотрудника', 'error');
         }
     } catch (e) {
         showToast('Ошибка связи с сервером', 'error');
@@ -374,7 +370,6 @@ function renderAdminOrdersTable(orders) {
                 <div class="action-row">
                     <a class="btn-table-action action-purple" href="items.html?zakazId=${o.id}">Изделия</a>
                     <a class="btn-table-action action-blue" href="stages.html?zakazId=${o.id}">Маршрут</a>
-                    <a class="btn-table-action action-emerald" href="print-order.html?zakazId=${o.id}" target="_blank">Бланк</a>
                     <button class="btn-table-action action-rose" onclick="deleteAdminOrder(${o.id})">Удалить</button>
                 </div>
             </td>
@@ -385,10 +380,11 @@ function renderAdminOrdersTable(orders) {
 
 async function changeOrderStatus(orderId, newStatus) {
     try {
+        const user = JSON.parse(localStorage.getItem('user'));
         const res = await fetch(`${API}/zakazy/${orderId}/status`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: newStatus })
+            body: JSON.stringify({ status: newStatus, sotrudnikId: user?.id ?? 1 })
         });
         if (res.ok) {
             showToast(`Статус заказа #${orderId} изменён на "${newStatus}"`, 'success');
@@ -409,7 +405,8 @@ async function deleteAdminOrder(id) {
     if (!confirmed) return;
 
     try {
-        const res = await fetch(`${API}/zakazy/${id}`, { method: 'DELETE' });
+        const user = JSON.parse(localStorage.getItem('user'));
+        const res = await fetch(`${API}/zakazy/${id}?sotrudnikId=${user?.id ?? 1}`, { method: 'DELETE' });
         if (res.ok) {
             showToast(`Заказ #${id} удален`, 'success');
             loadAdminDashboard();

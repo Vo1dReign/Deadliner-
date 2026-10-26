@@ -5,6 +5,7 @@ const zakazId = urlParams.get('zakazId');
 
 let currentStages = [];
 let allEmployees = [];
+let currentOrder = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     const user = showUserInfo();
@@ -34,10 +35,21 @@ async function loadEmployees() {
 
 async function loadStages() {
     try {
-        const response = await fetch(`${API}/etapyzakaza/zakaz/${zakazId}`);
-        if (!response.ok) throw new Error('Ошибка загрузки этапов');
+        const [stagesRes, orderRes] = await Promise.all([
+            fetch(`${API}/etapyzakaza/zakaz/${zakazId}`),
+            fetch(`${API}/zakazy/${zakazId}`)
+        ]);
+
+        if (orderRes.ok) {
+            currentOrder = await orderRes.json();
+            const mgrFio = currentOrder.menedzher?.fio ?? (currentOrder.idMenedzhera ? `Сотрудник #${currentOrder.idMenedzhera}` : 'Не назначен');
+            const mgrRole = currentOrder.menedzher?.rol?.nazvanie ? ` • ${currentOrder.menedzher.rol.nazvanie}` : '';
+            document.getElementById('orderTitle').textContent = `Технологический маршрут заказа №${zakazId} (Менеджер проекта: ${mgrFio}${mgrRole})`;
+        }
+
+        if (!stagesRes.ok) throw new Error('Ошибка загрузки этапов');
         
-        currentStages = await response.json();
+        currentStages = await stagesRes.json();
         renderProgress(currentStages);
         renderTable(currentStages);
     } catch (err) {
@@ -87,8 +99,9 @@ function renderTable(stages) {
     }
 
     const user = JSON.parse(localStorage.getItem('user')) || {};
-    const isSupervisor = user.idRoli === 1 || (user.rol && user.rol.nazvanie && user.rol.nazvanie.toLowerCase().includes('начальник'));
-    const isManager = user.idRoli === 2;
+    const isSupervisor = user.idRoli === 1 || user.rol === 'Администратор' || (user.rol && user.rol.toLowerCase().includes('начальник'));
+    const isOrderManager = currentOrder && (currentOrder.idMenedzhera === user.id);
+    const canManageStages = isSupervisor || isOrderManager;
 
     const todayStr = new Date().toISOString().slice(0, 10);
 
@@ -131,7 +144,7 @@ function renderTable(stages) {
                 ? `<button class="btn-table-action action-emerald" onclick="completeStage(${item.id}, '${escapeHtml(item.etap?.nazvanie ?? '')}')">Завершить</button>`
                 : `<button class="btn-table-action action-slate" disabled title="Доступно только для: ${requiredRoleName}">Только ${requiredRoleName}</button>`;
 
-            const assignBtn = (isSupervisor || isManager)
+            const assignBtn = canManageStages
                 ? `<button class="btn-table-action action-blue" onclick="openAssignModal(${item.id})">Назначить</button>`
                 : '';
 
@@ -205,18 +218,43 @@ function openAssignModal(stageId) {
     document.getElementById('assignModalTitle').textContent = `Назначение: ${stage.etap?.nazvanie ?? `Этап #${stage.idEtapa}`}`;
 
     const select = document.getElementById('assignEmployeeSelect');
-    select.innerHTML = '<option value="">-- Выберите сотрудника из штата --</option>';
+    select.innerHTML = '<option value="">-- Выберите исполнителя --</option>';
 
-    allEmployees.forEach(emp => {
-        const opt = document.createElement('option');
-        opt.value = emp.id;
-        const roleName = emp.rol?.nazvanie ?? `Роль #${emp.idRoli}`;
-        opt.textContent = `${emp.fio} (${roleName})`;
-        if (stage.idSotrudnika === emp.id) {
-            opt.selected = true;
+    // Определяем характер этапа:
+    // Операции станочного парка/цеха (Кромкооблицовка, Распил, Присадка, Покраска, Сборка, ОТК) имеют IdRoliOtvetstvennogo == 3 или привязаны к роли "Сотрудник цеха".
+    // Бизнес-требование: На кромкооблицовку и другие операции цеха НЕЛЬЗЯ назначать дизайнеров, бухгалтеров и других офисных сотрудников!
+    const reqRole = stage.etap?.idRoliOtvetstvennogo ?? 3;
+    const isWorkshopOperation = reqRole === 3;
+
+    const filteredEmployees = allEmployees.filter(emp => {
+        if (isWorkshopOperation) {
+            // Только станочники и рабочие цеха (Сотрудник цеха)
+            return emp.idRoli === 3 || (emp.rol && emp.rol.nazvanie === 'Сотрудник цеха');
+        } else {
+            // Офисные задачи (мини-дедлайны для дизайнеров, конструкторов, бухгалтеров и т.д.)
+            return emp.idRoli !== 3 && (!emp.rol || emp.rol.nazvanie !== 'Сотрудник цеха');
         }
-        select.appendChild(opt);
     });
+
+    if (filteredEmployees.length === 0) {
+        const warningOpt = document.createElement('option');
+        warningOpt.disabled = true;
+        warningOpt.textContent = isWorkshopOperation 
+            ? 'Внимание: в штате цеха нет сотрудников'
+            : 'Внимание: нет доступных офисных специалистов';
+        select.appendChild(warningOpt);
+    } else {
+        filteredEmployees.forEach(emp => {
+            const opt = document.createElement('option');
+            opt.value = emp.id;
+            const roleName = emp.rol?.nazvanie ?? `Роль #${emp.idRoli}`;
+            opt.textContent = `${emp.fio} (${roleName})`;
+            if (stage.idSotrudnika === emp.id) {
+                opt.selected = true;
+            }
+            select.appendChild(opt);
+        });
+    }
 
     document.getElementById('assignPlanDateInput').value = stage.planData || '';
 
@@ -238,7 +276,10 @@ async function saveStageAssignment() {
 
     if (!stageId) return;
 
-    const payload = {};
+    const user = JSON.parse(localStorage.getItem('user'));
+    const payload = {
+        requesterId: user?.id ?? 1
+    };
     if (empIdVal) {
         payload.idSotrudnika = parseInt(empIdVal);
     }
@@ -258,7 +299,8 @@ async function saveStageAssignment() {
             closeAssignModal();
             loadStages();
         } else {
-            showToast('Не удалось сохранить изменения', 'error');
+            const errData = await res.json().catch(() => ({}));
+            showToast(errData.message || 'Не удалось сохранить изменения', 'error');
         }
     } catch (err) {
         showToast('Ошибка связи с сервером', 'error');

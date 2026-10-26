@@ -187,7 +187,7 @@ async function completeTaskFromWidget(stageId, stageName, orderId) {
             showToast(errData.message || 'Ошибка при завершении этапа', 'error', 'Отказ');
         }
     } catch (err) {
-        showToast('Ошибка связи с сервером', 'error', 'Сеть');
+        showToast('Ошибка связи с сервером', 'error');
     }
 }
 
@@ -304,16 +304,32 @@ function renderTable(orders) {
         return;
     }
 
+    const currentUser = JSON.parse(localStorage.getItem('user')) || {};
+    const isAdmin = currentUser.idRoli === 1 || currentUser.rol === 'Администратор';
+    const isSupervisor = isAdmin || (currentUser.rol && currentUser.rol.toLowerCase().includes('начальник'));
+
     orders.forEach(order => {
         const isShipped = order.status === 'отгружен' || order.status === 'завершён';
         const daysText = isShipped
             ? 'Закрыт'
             : (order.daysLeft < 0 ? `Просрочен на ${Math.abs(order.daysLeft)} дн.` : `${order.daysLeft} дн.`);
 
+        const isMyOrder = currentUser.id && (order.idMenedzhera === currentUser.id);
+        const canManageOrder = isSupervisor || isMyOrder;
+
+        const managerFio = order.menedzher?.fio ?? (order.idMenedzhera ? `Сотрудник #${order.idMenedzhera}` : 'Не назначен');
+        const managerRole = order.menedzher?.rol?.nazvanie ? ` • ${order.menedzher.rol.nazvanie}` : '';
+
         const row = document.createElement('tr');
         row.innerHTML = `
             <td class="mono" style="font-weight:600; color:var(--text-main);">#${order.id}</td>
-            <td style="font-weight:600;">${escapeHtml(order.klient?.fioNazvanie ?? '—')}</td>
+            <td>
+                <div style="font-weight:600; color:var(--text-main);">${escapeHtml(order.klient?.fioNazvanie ?? '—')}</div>
+                <div style="font-size:11.5px; color:var(--text-secondary); margin-top:3px; display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
+                    <span>Менеджер: <strong>${escapeHtml(managerFio)}</strong>${escapeHtml(managerRole)}</span>
+                    ${isMyOrder ? `<span style="font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px; background:var(--brand-primary-light); color:var(--brand-primary);">Вы</span>` : ''}
+                </div>
+            </td>
             <td class="mono" style="color:var(--text-secondary); font-size:13px;">${order.dataPriema}</td>
             <td class="mono" style="font-weight:600; font-size:13px;">${order.planDataOtgruzki}</td>
             <td>
@@ -330,21 +346,21 @@ function renderTable(orders) {
                     <a class="btn-table-action action-purple" href="items.html?zakazId=${order.id}">Изделия</a>
                     <a class="btn-table-action action-blue" href="stages.html?zakazId=${order.id}">Маршрут</a>
                     <a class="btn-table-action action-slate" href="audit.html?zakazId=${order.id}">Аудит</a>
-                    <a class="btn-table-action action-emerald" href="print-order.html?zakazId=${order.id}" target="_blank">Бланк</a>
-                    <a class="btn-table-action action-blue manager-only" href="order.html?id=${order.id}">Изменить</a>
-                    <button class="btn-table-action action-amber manager-only" onclick="openStatusModal(${order.id}, '${escapeHtml(order.status)}')">Статус</button>
-                    ${(order.status === 'готов к отгрузке' || order.status === 'в работе') ? `
-                        <button class="btn-table-action action-emerald manager-only" onclick="shipOrder(${order.id}, '${escapeHtml(order.klient?.fioNazvanie ?? '')}')">Отгрузить</button>
+                    ${canManageOrder ? `
+                        <a class="btn-table-action action-blue" href="order.html?id=${order.id}">Изменить</a>
+                        <button class="btn-table-action action-amber" onclick="openStatusModal(${order.id}, '${escapeHtml(order.status)}')">Статус</button>
+                        ${(order.status === 'готов к отгрузке' || order.status === 'в работе') ? `
+                            <button class="btn-table-action action-emerald" onclick="shipOrder(${order.id}, '${escapeHtml(order.klient?.fioNazvanie ?? '')}')">Отгрузить</button>
+                        ` : ''}
+                        <button class="btn-table-action action-rose" onclick="deleteOrder(${order.id})">Удалить</button>
                     ` : ''}
-                    <button class="btn-table-action action-rose manager-only" onclick="deleteOrder(${order.id})">Удалить</button>
                 </div>
             </td>
         `;
         tbody.appendChild(row);
     });
 
-    const user = JSON.parse(localStorage.getItem('user'));
-    applyRoleRules(user);
+    applyRoleRules(currentUser);
 }
 
 function getStatusColor(status) {
@@ -453,13 +469,15 @@ async function deleteOrder(id) {
     if (!confirmed) return;
 
     try {
-        const res = await fetch(`${API}/zakazy/${id}`, { method: 'DELETE' });
+        const user = JSON.parse(localStorage.getItem('user'));
+        const res = await fetch(`${API}/zakazy/${id}?sotrudnikId=${user?.id ?? 1}`, { method: 'DELETE' });
         if (res.ok) {
             showToast(`Заказ #${id} успешно удалён из системы`, 'success');
             loadOrders();
             loadMyTasks(isSupervisorScope);
         } else {
-            showToast('Не удалось удалить заказ', 'error');
+            const errData = await res.json().catch(() => ({}));
+            showToast(errData.message || 'Не удалось удалить заказ', 'error');
         }
     } catch (err) {
         showToast('Ошибка связи с сервером', 'error');

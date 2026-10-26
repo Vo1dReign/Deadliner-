@@ -57,15 +57,19 @@ function requireAdmin() {
 
 function applyRoleRules(user) {
     if (!user) return;
-    const isAdmin = user.rol === 'Администратор';
-    const isManagerOrAdmin = user.rol === 'Администратор' || user.rol === 'Менеджер' || user.rol === 'Начальник производства';
+    const isAdmin = user.rol === 'Администратор' || user.idRoli === 1;
+    // В мебельной компании менеджером проекта может быть любой сотрудник офиса (дизайнер, конструктор, бухгалтер, логист, начальник, админ).
+    // Только непосредственные рабочие цеха (Сотрудник цеха, idRoli === 3) не имеют доступа к созданию заказов и офисным инструментам.
+    const isOffice = user.rol !== 'Сотрудник цеха' && user.idRoli !== 3;
 
     document.querySelectorAll('.admin-only').forEach(el => {
         if (!isAdmin) el.style.display = 'none';
+        else el.style.removeProperty('display');
     });
 
     document.querySelectorAll('.manager-only').forEach(el => {
-        if (!isManagerOrAdmin) el.style.display = 'none';
+        if (!isOffice) el.style.display = 'none';
+        else el.style.removeProperty('display');
     });
 }
 

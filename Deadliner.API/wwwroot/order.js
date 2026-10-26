@@ -38,16 +38,23 @@ async function loadManager() {
     const staff = await response.json();
 
     const select = document.getElementById('managerId');
-    staff.forEach(s => {
+    select.innerHTML = '<option value="">Выберите сотрудника офиса...</option>';
+
+    // Менеджером проекта может быть любой сотрудник офиса (дизайнер, конструктор, бухгалтер, логист, начальник, админ)
+    // Рабочие цеха (Сотрудник цеха, idRoli === 3) не могут быть менеджерами проектов
+    const officeStaff = staff.filter(s => s.idRoli !== 3 && s.rol?.nazvanie !== 'Сотрудник цеха');
+
+    officeStaff.forEach(s => {
         const option = document.createElement('option');
         option.value = s.id;
-        option.textContent = s.fio;
+        const roleName = s.rol?.nazvanie ? ` (${s.rol.nazvanie})` : '';
+        option.textContent = `${s.fio}${roleName}`;
         select.appendChild(option);
     });
 
     if (!editId) {
         const user = JSON.parse(localStorage.getItem('user'));
-        if (user && user.id) {
+        if (user && user.id && officeStaff.some(s => s.id === user.id)) {
             select.value = user.id;
         }
     }
@@ -68,6 +75,20 @@ async function initEditMode(id) {
         if (!res.ok) throw new Error('Заказ не найден');
 
         const order = await res.json();
+
+        // Проверка прав: редактировать заказ может только назначенный менеджер проекта этого заказа или администратор
+        const user = JSON.parse(localStorage.getItem('user'));
+        const isSupervisor = user && (user.idRoli === 1 || user.rol === 'Администратор' || (user.rol && user.rol.toLowerCase().includes('начальник')));
+        const isProjectManager = user && (order.idMenedzhera === user.id);
+
+        if (!isSupervisor && !isProjectManager) {
+            showToast('У вас нет прав на редактирование этого заказа. Редактировать заказ может только ответственный менеджер проекта или администратор.', 'error');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1600);
+            return;
+        }
+
         document.getElementById('clientId').value = order.idKlienta;
         document.getElementById('managerId').value = order.idMenedzhera;
         document.getElementById('prepayment').value = order.summaPredoplaty ?? 0;
@@ -163,7 +184,8 @@ async function updateOrder(id) {
                 window.location.href = 'index.html';
             }, 1000);
         } else {
-            showToast('Ошибка при сохранении изменений заказа', 'error');
+            const errData = await response.json().catch(() => ({}));
+            showToast(errData.message || 'Ошибка при сохранении изменений заказа', 'error');
         }
     } catch (err) {
         showToast('Ошибка связи с сервером', 'error');
