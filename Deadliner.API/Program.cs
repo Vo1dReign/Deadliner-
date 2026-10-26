@@ -1,6 +1,25 @@
+using System.Reflection;
+using System.Runtime.Loader;
 using Microsoft.EntityFrameworkCore;
 using Deadliner.API.Data;
 using Deadliner.API.Services;
+
+// Автоматическое разрешение зависимостей от netstandard для SqlClient / EF Core
+AssemblyLoadContext.Default.Resolving += (context, assemblyName) =>
+{
+    if (assemblyName.Name == "netstandard")
+    {
+        try
+        {
+            return Assembly.Load("netstandard");
+        }
+        catch
+        {
+            return typeof(object).Assembly;
+        }
+    }
+    return null;
+};
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +34,6 @@ builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializ
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
 app.MapControllers();
 
 app.UseStaticFiles();

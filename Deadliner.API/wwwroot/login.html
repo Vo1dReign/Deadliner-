@@ -17,25 +17,25 @@
 
         .login-card {
             background: #ffffff;
-            padding: 44px 40px;
+            padding: 40px 36px;
             border-radius: var(--radius-lg);
             border: 1px solid var(--border);
             box-shadow: 0 20px 40px -15px rgba(37, 99, 235, 0.15), 0 1px 3px rgba(0,0,0,0.05);
             width: 100%;
-            max-width: 420px;
+            max-width: 440px;
             border-top: 5px solid var(--brand-primary);
         }
 
         .login-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 26px;
         }
 
         .login-header .brand-icon {
             width: 48px;
             height: 48px;
             font-size: 22px;
-            margin: 0 auto 16px auto;
+            margin: 0 auto 14px auto;
         }
 
         .login-header h2 {
@@ -52,7 +52,7 @@
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .form-group label {
@@ -73,6 +73,7 @@
             font-size: 14.5px;
             font-family: inherit;
             transition: all 0.15s ease;
+            box-sizing: border-box;
         }
 
         .form-group input:focus {
@@ -88,25 +89,83 @@
             font-size: 15px;
             font-weight: 700;
             margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
 
         #error {
             color: var(--status-red-text);
             background: var(--status-red-bg);
             border: 1px solid var(--status-red-border);
-            padding: 11px;
+            padding: 11px 14px;
             border-radius: var(--radius-sm);
-            margin-top: 18px;
+            margin-top: 16px;
             text-align: center;
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 600;
             display: none;
+            line-height: 1.4;
+        }
+
+        .demo-accounts {
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .demo-accounts-title {
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .demo-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .demo-pill {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .demo-pill:hover {
+            background: #e0f2fe;
+            border-color: #7dd3fc;
+            color: #0369a1;
+        }
+
+        .demo-pill span {
+            color: var(--text-secondary);
+            font-weight: 400;
+            font-size: 11px;
         }
 
         .register-link {
             display: block;
             text-align: center;
-            margin-top: 22px;
+            margin-top: 20px;
             color: var(--brand-primary);
             text-decoration: none;
             font-size: 13.5px;
@@ -126,34 +185,40 @@
             <p>Авторизация в системе производственной диспетчеризации</p>
         </div>
 
-        <div class="form-group">
-            <label for="login">Имя пользователя (логин)</label>
-            <input id="login" placeholder="Например: admin" type="text" autocomplete="username">
-        </div>
+        <form onsubmit="event.preventDefault(); doLogin();">
+            <div class="form-group">
+                <label for="login">Имя пользователя (логин или телефон)</label>
+                <input id="login" placeholder="Например: admin или +375..." type="text" autocomplete="username" required>
+            </div>
 
-        <div class="form-group">
-            <label for="parol">Пароль доступа</label>
-            <input id="parol" placeholder="••••••••" type="password" autocomplete="current-password">
-        </div>
+            <div class="form-group">
+                <label for="parol">Пароль доступа</label>
+                <input id="parol" placeholder="••••••••" type="password" autocomplete="current-password" required>
+            </div>
 
-        <button class="btn-modern btn-primary btn-submit" onclick="doLogin()">Войти в систему</button>
+            <button type="submit" class="btn-modern btn-primary btn-submit">Войти в систему</button>
+        </form>
         
         <div id="error"></div>
+
+        <div class="demo-accounts">
+            <div class="demo-accounts-title">Быстрый тестовый вход (кликните):</div>
+            <div class="demo-pills">
+                <button type="button" class="demo-pill" onclick="fillCredentials('admin', 'admin123')">
+                    👑 admin <span>(Администратор)</span>
+                </button>
+                <button type="button" class="demo-pill" onclick="fillCredentials('Nesteruk22', '12341234')">
+                    📐 Nesteruk22 <span>(Конструктор)</span>
+                </button>
+                <button type="button" class="demo-pill" onclick="fillCredentials('Miron_Sander', '06620509')">
+                    🎨 Miron_Sander <span>(Дизайнер)</span>
+                </button>
+            </div>
+        </div>
         
         <a href="register.html" class="register-link">Новый сотрудник? Зарегистрироваться</a>
     </div>
 
     <script src="login.js"></script>
-    <script>
-        const errEl = document.getElementById('error');
-        const observer = new MutationObserver(() => {
-            if (errEl.textContent.trim()) {
-                errEl.style.display = 'block';
-            } else {
-                errEl.style.display = 'none';
-            }
-        });
-        observer.observe(errEl, { childList: true, characterData: true, subtree: true });
-    </script>
 </body>
 </html>
