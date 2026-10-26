@@ -1,13 +1,26 @@
 const API = 'http://localhost:5216/api';
 
 let allOrders = [];          // Все загруженные заказы
-let sortColumn = null;       // Текущая колонка сортировки
-let sortAsc = true;          // Направление сортировки
+let filteredOrders = [];     // Отфильтрованные заказы
+let sortColumn = 'id';       // Текущая колонка сортировки
+let sortAsc = false;         // Новые заказы первыми
 let isSupervisorScope = false; // Режим отображения задач (личные или все по цеху)
+
+// Состояние пагинации
+let currentPage = 1;
+let pageSize = 10;
+let totalPages = 1;
+
+// Таймер дебаунса для поиска
+let searchDebounceTimer = null;
+
+// Список заказчиков для фильтра
+let clientsList = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     const user = showUserInfo();
     applyRoleRules(user);
+    loadClientsForFilter();
     loadOrders();
     initTasksWidget(user);
 });
@@ -192,8 +205,29 @@ async function completeTaskFromWidget(stageId, stageName, orderId) {
 }
 
 // ==========================================================================
-// 2. РЕЕСТР ЗАКАЗОВ В ПРОИЗВОДСТВЕ
+// 2. РЕЕСТР ЗАКАЗОВ В ПРОИЗВОДСТВЕ (ФИЛЬТРАЦИЯ, ПОИСК, СОРТИРОВКА, ПАГИНАЦИЯ)
 // ==========================================================================
+
+async function loadClientsForFilter() {
+    try {
+        const res = await fetch(`${API}/klienty`);
+        if (!res.ok) return;
+        clientsList = await res.json();
+        const select = document.getElementById('clientFilter');
+        if (!select) return;
+        
+        select.innerHTML = '<option value="">Все заказчики</option>';
+        clientsList.sort((a, b) => a.fioNazvanie.localeCompare(b.fioNazvanie, 'ru'));
+        clientsList.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = c.fioNazvanie;
+            select.appendChild(opt);
+        });
+    } catch (e) {
+        console.warn('Не удалось загрузить справочник клиентов для фильтра', e);
+    }
+}
 
 async function loadOrders() {
     try {
@@ -248,42 +282,195 @@ function updateMetrics(orders) {
 }
 
 function setQuickTab(status, tabBtn) {
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('#statusTabGroup .tab-btn').forEach(btn => btn.classList.remove('active'));
     tabBtn.classList.add('active');
 
     const statusFilter = document.getElementById('statusFilter');
     if (statusFilter) {
         statusFilter.value = status === 'all' ? '' : status;
     }
+    currentPage = 1;
+    applyFilters();
+}
+
+function onSearchInput() {
+    const input = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('searchClearBtn');
+    if (clearBtn) {
+        clearBtn.style.display = input && input.value.trim().length > 0 ? 'inline-flex' : 'none';
+    }
+
+    if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => {
+        currentPage = 1;
+        applyFilters();
+    }, 150);
+}
+
+function clearSearch() {
+    const input = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('searchClearBtn');
+    if (input) input.value = '';
+    if (clearBtn) clearBtn.style.display = 'none';
+    currentPage = 1;
+    applyFilters();
+}
+
+function toggleAdvancedFilters() {
+    const bar = document.getElementById('advancedFilterBar');
+    const btn = document.getElementById('btnToggleFilters');
+    if (!bar) return;
+
+    const isHidden = window.getComputedStyle(bar).display === 'none';
+    bar.style.display = isHidden ? 'block' : 'none';
+    if (btn) {
+        btn.classList.toggle('active', isHidden);
+    }
+}
+
+function resetFilters() {
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClearBtn');
+    const statusFilter = document.getElementById('statusFilter');
+    const urgencyFilter = document.getElementById('urgencyFilter');
+    const clientFilter = document.getElementById('clientFilter');
+    const dateFrom = document.getElementById('dateFrom');
+    const dateTo = document.getElementById('dateTo');
+
+    if (searchInput) searchInput.value = '';
+    if (searchClear) searchClear.style.display = 'none';
+    if (statusFilter) statusFilter.value = '';
+    if (urgencyFilter) urgencyFilter.value = '';
+    if (clientFilter) clientFilter.value = '';
+    if (dateFrom) dateFrom.value = '';
+    if (dateTo) dateTo.value = '';
+
+    document.querySelectorAll('#statusTabGroup .tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.status === 'all');
+    });
+
+    currentPage = 1;
+    applyFilters();
+    showToast('Все фильтры и условия поиска сброшены', 'info');
+}
+
+function removeFilter(type) {
+    if (type === 'search') clearSearch();
+    if (type === 'status') {
+        const s = document.getElementById('statusFilter');
+        if (s) s.value = '';
+        document.querySelectorAll('#statusTabGroup .tab-btn').forEach(b => b.classList.toggle('active', b.dataset.status === 'all'));
+    }
+    if (type === 'urgency') {
+        const u = document.getElementById('urgencyFilter');
+        if (u) u.value = '';
+    }
+    if (type === 'client') {
+        const c = document.getElementById('clientFilter');
+        if (c) c.value = '';
+    }
+    if (type === 'dates') {
+        const df = document.getElementById('dateFrom');
+        const dt = document.getElementById('dateTo');
+        if (df) df.value = '';
+        if (dt) dt.value = '';
+    }
+    currentPage = 1;
     applyFilters();
 }
 
 function applyFilters() {
-    const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
-    const statusVal = document.getElementById('statusFilter')?.value ?? '';
-    const urgencyVal = document.getElementById('urgencyFilter')?.value ?? '';
+    const searchVal = document.getElementById('searchInput')?.value.trim().toLowerCase() || '';
+    const statusVal = document.getElementById('statusFilter')?.value || '';
+    const urgencyVal = document.getElementById('urgencyFilter')?.value || '';
+    const clientVal = document.getElementById('clientFilter')?.value || '';
+    const dateFromVal = document.getElementById('dateFrom')?.value || '';
+    const dateToVal = document.getElementById('dateTo')?.value || '';
 
-    let filtered = allOrders.filter(order => {
-        const clientName = (order.klient?.fioNazvanie ?? '').toLowerCase();
-        const orderIdStr = order.id.toString();
-
-        const matchesSearch = !searchVal || clientName.includes(searchVal) || orderIdStr.includes(searchVal);
-        const matchesStatus = !statusVal || order.status === statusVal;
-        const matchesUrgency = !urgencyVal || order.colorClass === urgencyVal;
-
-        return matchesSearch && matchesStatus && matchesUrgency;
+    // Синхронизация активной вкладки табов со статусом
+    document.querySelectorAll('#statusTabGroup .tab-btn').forEach(btn => {
+        const s = btn.dataset.status;
+        if (!statusVal && s === 'all') btn.classList.add('active');
+        else if (statusVal && s === statusVal) btn.classList.add('active');
+        else btn.classList.remove('active');
     });
 
+    // Отрисовка фишек активных фильтров (chips) и индикатора
+    const activeChipsContainer = document.getElementById('activeFilterChips');
+    const activeFiltersDot = document.getElementById('activeFiltersDot');
+    let hasActiveFilters = false;
+    let chipsHtml = '';
+
+    if (searchVal) {
+        hasActiveFilters = true;
+        chipsHtml += `<span class="filter-chip">Поиск: «${escapeHtml(searchVal)}» <span class="filter-chip-remove" onclick="removeFilter('search')">✕</span></span>`;
+    }
+    if (statusVal) {
+        hasActiveFilters = true;
+        chipsHtml += `<span class="filter-chip">Статус: ${escapeHtml(statusVal)} <span class="filter-chip-remove" onclick="removeFilter('status')">✕</span></span>`;
+    }
+    if (urgencyVal) {
+        hasActiveFilters = true;
+        const uLabels = { green: '🟢 В графике', yellow: '🟡 3–7 дн.', red: '🔴 Горит дедлайн' };
+        chipsHtml += `<span class="filter-chip">${uLabels[urgencyVal] || urgencyVal} <span class="filter-chip-remove" onclick="removeFilter('urgency')">✕</span></span>`;
+    }
+    if (clientVal) {
+        hasActiveFilters = true;
+        const clientObj = clientsList.find(c => c.id == clientVal);
+        const clientName = clientObj ? clientObj.fioNazvanie : `#${clientVal}`;
+        chipsHtml += `<span class="filter-chip">Клиент: ${escapeHtml(clientName)} <span class="filter-chip-remove" onclick="removeFilter('client')">✕</span></span>`;
+    }
+    if (dateFromVal || dateToVal) {
+        hasActiveFilters = true;
+        const dText = `${dateFromVal || '...'} — ${dateToVal || '...'}`;
+        chipsHtml += `<span class="filter-chip">Срок: ${dText} <span class="filter-chip-remove" onclick="removeFilter('dates')">✕</span></span>`;
+    }
+
+    if (activeChipsContainer) activeChipsContainer.innerHTML = chipsHtml;
+    if (activeFiltersDot) activeFiltersDot.style.display = hasActiveFilters ? 'inline-block' : 'none';
+
+    // Фильтрация массива заказов
+    filteredOrders = allOrders.filter(order => {
+        const clientName = (order.klient?.fioNazvanie ?? '').toLowerCase();
+        const clientPhone = (order.klient?.telefon ?? '').toLowerCase();
+        const orderIdStr = order.id.toString();
+        const managerName = (order.menedzher?.fio ?? '').toLowerCase();
+
+        const matchesSearch = !searchVal || 
+            clientName.includes(searchVal) || 
+            orderIdStr.includes(searchVal) || 
+            clientPhone.includes(searchVal) ||
+            managerName.includes(searchVal);
+
+        const matchesStatus = !statusVal || order.status === statusVal;
+        const matchesUrgency = !urgencyVal || order.colorClass === urgencyVal;
+        const matchesClient = !clientVal || order.idKlienta == clientVal;
+
+        let matchesDate = true;
+        if (dateFromVal && order.planDataOtgruzki < dateFromVal) matchesDate = false;
+        if (dateToVal && order.planDataOtgruzki > dateToVal) matchesDate = false;
+
+        return matchesSearch && matchesStatus && matchesUrgency && matchesClient && matchesDate;
+    });
+
+    // Сортировка
     if (sortColumn) {
-        filtered.sort((a, b) => {
+        filteredOrders.sort((a, b) => {
             let valA, valB;
 
             if (sortColumn === 'klient') {
                 valA = a.klient?.fioNazvanie ?? '';
                 valB = b.klient?.fioNazvanie ?? '';
+                return sortAsc ? valA.localeCompare(valB, 'ru') : valB.localeCompare(valA, 'ru');
+            } else if (sortColumn === 'id') {
+                valA = a.id;
+                valB = b.id;
+            } else if (sortColumn === 'daysLeft') {
+                valA = a.daysLeft;
+                valB = b.daysLeft;
             } else {
-                valA = a[sortColumn];
-                valB = b[sortColumn];
+                valA = a[sortColumn] ?? '';
+                valB = b[sortColumn] ?? '';
             }
 
             if (valA < valB) return sortAsc ? -1 : 1;
@@ -292,10 +479,132 @@ function applyFilters() {
         });
     }
 
-    renderTable(filtered);
+    // Обновление индикаторов сортировки в заголовках таблицы (th)
+    document.querySelectorAll('table.data-table th.sortable').forEach(th => {
+        th.classList.remove('sorted-asc', 'sorted-desc');
+    });
+    if (sortColumn) {
+        const activeTh = document.getElementById(`th-${sortColumn}`);
+        if (activeTh) {
+            activeTh.classList.add(sortAsc ? 'sorted-asc' : 'sorted-desc');
+        }
+    }
+
+    // Обновление счётчиков
+    const resultCountEl = document.getElementById('filterResultCount');
+    const totalCountEl = document.getElementById('filterTotalCount');
+    if (resultCountEl) resultCountEl.textContent = filteredOrders.length;
+    if (totalCountEl) totalCountEl.textContent = allOrders.length;
+
+    // Пагинация
+    const totalCount = filteredOrders.length;
+    let pagedOrders = [];
+    let startIdx = 0;
+    let endIdx = totalCount;
+
+    if (pageSize === 'all') {
+        totalPages = 1;
+        currentPage = 1;
+        pagedOrders = filteredOrders;
+        startIdx = 0;
+        endIdx = totalCount;
+    } else {
+        totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        startIdx = (currentPage - 1) * pageSize;
+        endIdx = Math.min(startIdx + pageSize, totalCount);
+        pagedOrders = filteredOrders.slice(startIdx, endIdx);
+    }
+
+    renderTable(pagedOrders, totalCount);
+    renderPagination(totalCount, startIdx, endIdx);
 }
 
-function renderTable(orders) {
+function sortTable(column) {
+    if (sortColumn === column) {
+        sortAsc = !sortAsc;
+    } else {
+        sortColumn = column;
+        sortAsc = (column === 'id' ? false : true);
+    }
+    applyFilters();
+}
+
+function changePageSize(val) {
+    pageSize = (val === 'all') ? 'all' : parseInt(val, 10);
+    currentPage = 1;
+    applyFilters();
+}
+
+function goToPage(page) {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+    currentPage = page;
+    applyFilters();
+    const panel = document.querySelector('.table-panel');
+    if (panel) {
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function renderPagination(totalCount, startIdx, endIdx) {
+    const infoEl = document.getElementById('paginationInfo');
+    const controlsEl = document.getElementById('paginationControls');
+    const barEl = document.getElementById('paginationBar');
+
+    if (!barEl) return;
+
+    if (totalCount === 0) {
+        if (infoEl) infoEl.textContent = 'Заказы не найдены';
+        if (controlsEl) controlsEl.innerHTML = '';
+        return;
+    }
+
+    if (infoEl) {
+        if (pageSize === 'all') {
+            infoEl.innerHTML = `Показаны все <strong>${totalCount}</strong> ${getNoun(totalCount, 'заказ', 'заказа', 'заказов')}`;
+        } else {
+            infoEl.innerHTML = `Показано <strong>${startIdx + 1}–${endIdx}</strong> из <strong>${totalCount}</strong> ${getNoun(totalCount, 'заказа', 'заказов', 'заказов')}`;
+        }
+    }
+
+    if (!controlsEl) return;
+    if (pageSize === 'all' || totalPages <= 1) {
+        controlsEl.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+
+    // Кнопка «Первая»
+    html += `<button class="pagination-btn" onclick="goToPage(1)" ${currentPage === 1 ? 'disabled' : ''} title="Первая страница">«</button>`;
+    // Кнопка «Назад»
+    html += `<button class="pagination-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} title="Предыдущая страница">‹</button>`;
+
+    // Номера страниц (с умным сокращением)
+    const pageWindow = 2;
+    let prevShown = 0;
+
+    for (let p = 1; p <= totalPages; p++) {
+        if (p === 1 || p === totalPages || (p >= currentPage - pageWindow && p <= currentPage + pageWindow)) {
+            if (prevShown && p - prevShown > 1) {
+                html += `<span class="pagination-ellipsis">…</span>`;
+            }
+            html += `<button class="pagination-btn ${p === currentPage ? 'active' : ''}" onclick="goToPage(${p})">${p}</button>`;
+            prevShown = p;
+        }
+    }
+
+    // Кнопка «Вперёд»
+    html += `<button class="pagination-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} title="Следующая страница">›</button>`;
+    // Кнопка «Последняя»
+    html += `<button class="pagination-btn" onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''} title="Последняя страница">»</button>`;
+
+    controlsEl.innerHTML = html;
+}
+
+function renderTable(orders, totalCount) {
     const tbody = document.getElementById('ordersTable');
     tbody.innerHTML = '';
 

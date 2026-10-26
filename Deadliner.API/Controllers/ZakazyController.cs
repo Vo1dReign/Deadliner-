@@ -16,16 +16,157 @@ public class ZakazyController : ControllerBase
         _context = context;
     }
     
+    /// <summary>
+    /// Получение списка заказов с поддержкой фильтрации, поиска, сортировки и пагинации
+    /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Zakaz>>> GetAll()
+    public async Task<IActionResult> GetAll(
+        [FromQuery] string? search = null,
+        [FromQuery] string? status = null,
+        [FromQuery] int? klientId = null,
+        [FromQuery] int? menedzherId = null,
+        [FromQuery] DateOnly? dateFrom = null,
+        [FromQuery] DateOnly? dateTo = null,
+        [FromQuery] string? dateType = "otgruzka",
+        [FromQuery] string? urgency = null,
+        [FromQuery] string? sortBy = "id",
+        [FromQuery] string? sortDir = "desc",
+        [FromQuery] int? page = null,
+        [FromQuery] int? pageSize = null)
     {
-        return await _context.Zakazy
+        IQueryable<Zakaz> query = _context.Zakazy
             .Include(z => z.Klient)
             .Include(z => z.Menedzher)
                 .ThenInclude(m => m!.Rol)
-            .Include(z => z.EtapyZakaza)
-            .OrderByDescending(z => z.Id)
-            .ToListAsync();
+            .Include(z => z.EtapyZakaza);
+
+        // 1. Полнотекстовый контекстный поиск (номер, клиент, телефон, адрес объекта, менеджер)
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var s = search.Trim().ToLower();
+            query = query.Where(z =>
+                z.Id.ToString().Contains(s) ||
+                (z.Klient != null && (
+                    z.Klient.FioNazvanie.ToLower().Contains(s) ||
+                    (z.Klient.Telefon != null && z.Klient.Telefon.ToLower().Contains(s)) ||
+                    (z.Klient.AdresObekta != null && z.Klient.AdresObekta.ToLower().Contains(s))
+                )) ||
+                (z.Menedzher != null && z.Menedzher.Fio.ToLower().Contains(s))
+            );
+        }
+
+        // 2. Фильтрация по статусу
+        if (!string.IsNullOrWhiteSpace(status) && !status.Equals("all", StringComparison.OrdinalIgnoreCase))
+        {
+            var st = status.Trim().ToLower();
+            if (st == "в работе")
+                query = query.Where(z => z.Status == "в работе");
+            else if (st == "просрочен")
+                query = query.Where(z => z.Status == "просрочен");
+            else if (st == "готов к отгрузке")
+                query = query.Where(z => z.Status == "готов к отгрузке");
+            else if (st == "отгружен")
+                query = query.Where(z => z.Status == "отгружен");
+            else if (st == "завершён" || st == "завершен")
+                query = query.Where(z => z.Status == "завершён" || z.Status == "завершен");
+            else
+                query = query.Where(z => z.Status.ToLower() == st);
+        }
+
+        // 3. Фильтрация по контрагенту (клиенту)
+        if (klientId.HasValue && klientId.Value > 0)
+        {
+            query = query.Where(z => z.IdKlienta == klientId.Value);
+        }
+
+        // 4. Фильтрация по менеджеру проекта
+        if (menedzherId.HasValue && menedzherId.Value > 0)
+        {
+            query = query.Where(z => z.IdMenedzhera == menedzherId.Value);
+        }
+
+        // 5. Фильтрация по календарному периоду (приём или отгрузка)
+        bool filterByPriem = string.Equals(dateType, "priem", StringComparison.OrdinalIgnoreCase);
+        if (filterByPriem)
+        {
+            if (dateFrom.HasValue)
+                query = query.Where(z => z.DataPriema >= dateFrom.Value);
+            if (dateTo.HasValue)
+                query = query.Where(z => z.DataPriema <= dateTo.Value);
+        }
+        else
+        {
+            if (dateFrom.HasValue)
+                query = query.Where(z => z.PlanDataOtgruzki >= dateFrom.Value);
+            if (dateTo.HasValue)
+                query = query.Where(z => z.PlanDataOtgruzki <= dateTo.Value);
+        }
+
+        // 6. Фильтрация по зонам срочности (зеленая, желтая, красная)
+        if (!string.IsNullOrWhiteSpace(urgency))
+        {
+            var u = urgency.Trim().ToLower();
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var threshRed = today.AddDays(2);
+            var threshYellowStart = today.AddDays(3);
+            var threshYellowEnd = today.AddDays(7);
+
+            if (u == "red")
+            {
+                query = query.Where(z => z.PlanDataOtgruzki <= threshRed || z.Status == "просрочен");
+            }
+            else if (u == "yellow")
+            {
+                query = query.Where(z => z.PlanDataOtgruzki >= threshYellowStart && z.PlanDataOtgruzki <= threshYellowEnd &&
+                    z.Status != "просрочен" && z.Status != "отгружен" && z.Status != "завершён");
+            }
+            else if (u == "green")
+            {
+                query = query.Where(z => z.PlanDataOtgruzki > threshYellowEnd &&
+                    z.Status != "просрочен" && z.Status != "отгружен" && z.Status != "завершён");
+            }
+        }
+
+        // 7. Сортировка данных
+        bool isAsc = string.Equals(sortDir, "asc", StringComparison.OrdinalIgnoreCase);
+        query = (sortBy?.ToLower()) switch
+        {
+            "id" => isAsc ? query.OrderBy(z => z.Id) : query.OrderByDescending(z => z.Id),
+            "klient" => isAsc 
+                ? query.OrderBy(z => z.Klient != null ? z.Klient.FioNazvanie : "") 
+                : query.OrderByDescending(z => z.Klient != null ? z.Klient.FioNazvanie : ""),
+            "datapriema" or "datepriem" => isAsc ? query.OrderBy(z => z.DataPriema) : query.OrderByDescending(z => z.DataPriema),
+            "plandataotgruzki" or "deadline" => isAsc ? query.OrderBy(z => z.PlanDataOtgruzki) : query.OrderByDescending(z => z.PlanDataOtgruzki),
+            "status" => isAsc ? query.OrderBy(z => z.Status) : query.OrderByDescending(z => z.Status),
+            _ => isAsc ? query.OrderBy(z => z.Id) : query.OrderByDescending(z => z.Id)
+        };
+
+        int totalCount = await query.CountAsync();
+        Response.Headers["X-Total-Count"] = totalCount.ToString();
+
+        // 8. Постраничная пагинация (если передан параметр page)
+        if (page.HasValue && page.Value > 0)
+        {
+            int size = pageSize.HasValue && pageSize.Value > 0 ? pageSize.Value : 10;
+            int pageNum = page.Value;
+            int totalPages = (int)Math.Ceiling((double)totalCount / size);
+            if (totalPages == 0) totalPages = 1;
+
+            var items = await query.Skip((pageNum - 1) * size).Take(size).ToListAsync();
+
+            return Ok(new PagedResult<Zakaz>
+            {
+                TotalCount = totalCount,
+                Page = pageNum,
+                PageSize = size,
+                TotalPages = totalPages,
+                Items = items
+            });
+        }
+
+        // Если пагинация не запрошена — отдаем полный отфильтрованный список (обратная совместимость)
+        var allItems = await query.ToListAsync();
+        return Ok(allItems);
     }
 
     [HttpGet("{id}")]

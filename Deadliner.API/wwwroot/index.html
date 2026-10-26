@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DeadLiner — Система управления производственными дедлайнами</title>
-    <link rel="stylesheet" href="style.css?v=2.5.2">
+    <link rel="stylesheet" href="style.css?v=2.6.0">
     <style>
         .modal-overlay {
             position: fixed !important;
@@ -196,50 +196,143 @@
                 </div>
             </div>
 
-            <!-- Табличная панель с фильтрацией -->
+            <!-- Табличная панель с фильтрацией, поиском и пагинацией -->
             <div class="table-panel">
                 <div class="panel-toolbar">
-                    <div class="tab-group">
-                        <button class="tab-btn active" onclick="setQuickTab('all', this)">Все заказы</button>
-                        <button class="tab-btn" onclick="setQuickTab('в работе', this)">В работе</button>
-                        <button class="tab-btn" onclick="setQuickTab('просрочен', this)">Просроченные</button>
-                        <button class="tab-btn" onclick="setQuickTab('завершён', this)">Завершённые</button>
+                    <div class="tab-group" id="statusTabGroup">
+                        <button class="tab-btn active" data-status="all" onclick="setQuickTab('all', this)">Все заказы</button>
+                        <button class="tab-btn" data-status="в работе" onclick="setQuickTab('в работе', this)">В работе</button>
+                        <button class="tab-btn" data-status="готов к отгрузке" onclick="setQuickTab('готов к отгрузке', this)">Готовы к отгрузке</button>
+                        <button class="tab-btn" data-status="просрочен" onclick="setQuickTab('просрочен', this)">Просроченные</button>
+                        <button class="tab-btn" data-status="завершён" onclick="setQuickTab('завершён', this)">Завершённые</button>
                     </div>
 
                     <div class="search-box">
                         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                        <input type="text" id="searchInput" class="search-input" placeholder="Поиск по клиенту или номеру..." oninput="applyFilters()">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Поиск по клиенту, номеру, телефону..." oninput="onSearchInput()">
+                        <button type="button" id="searchClearBtn" class="search-clear-btn" onclick="clearSearch()" title="Очистить поиск" style="display:none;">✕</button>
                     </div>
 
-                    <select id="statusFilter" style="display:none;" onchange="applyFilters()">
-                        <option value="">Все статусы</option>
-                        <option value="в работе">В работе</option>
-                        <option value="просрочен">Просрочен</option>
-                        <option value="завершён">Завершён</option>
-                    </select>
-
-                    <select id="urgencyFilter" style="display:none;" onchange="applyFilters()">
-                        <option value="">Все зоны срочности</option>
-                        <option value="green">Зеленая</option>
-                        <option value="yellow">Желтая</option>
-                        <option value="red">Красная</option>
-                    </select>
+                    <button class="btn-toggle-filters" id="btnToggleFilters" onclick="toggleAdvancedFilters()" title="Настроить фильтры">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>
+                        <span>Фильтры</span>
+                        <span class="active-filters-dot" id="activeFiltersDot" style="display:none;"></span>
+                    </button>
                 </div>
 
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th onclick="sortTable('id')" style="width: 80px;">Номер</th>
-                            <th onclick="sortTable('klient')">Контрагент (клиент)</th>
-                            <th onclick="sortTable('dataPriema')" style="width: 140px;">Дата приёма</th>
-                            <th onclick="sortTable('planDataOtgruzki')" style="width: 150px;">Срок отгрузки</th>
-                            <th onclick="sortTable('daysLeft')" style="width: 160px;">Остаток срока</th>
-                            <th onclick="sortTable('status')" style="width: 130px;">Статус</th>
-                            <th class="no-sort" style="width: 290px;">Действия</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ordersTable"></tbody>
-                </table>
+                <!-- Расширенная интерактивная панель многокритериальной фильтрации -->
+                <div class="filter-bar-expanded" id="advancedFilterBar">
+                    <div class="filter-grid">
+                        <div class="filter-item">
+                            <label class="filter-label" for="statusFilter">Статус заказа:</label>
+                            <select id="statusFilter" class="filter-control" onchange="applyFilters()">
+                                <option value="">Все статусы</option>
+                                <option value="в работе">В работе</option>
+                                <option value="готов к отгрузке">Готов к отгрузке</option>
+                                <option value="отгружен">Отгружен</option>
+                                <option value="завершён">Завершён</option>
+                                <option value="просрочен">Просрочен</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-item">
+                            <label class="filter-label" for="urgencyFilter">Зона срочности:</label>
+                            <select id="urgencyFilter" class="filter-control" onchange="applyFilters()">
+                                <option value="">Все зоны срочности</option>
+                                <option value="green">🟢 Зелёная (в графике)</option>
+                                <option value="yellow">🟡 Жёлтая (3–7 дн.)</option>
+                                <option value="red">🔴 Красная (горит дедлайн)</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-item">
+                            <label class="filter-label" for="clientFilter">Контрагент (заказчик):</label>
+                            <select id="clientFilter" class="filter-control" onchange="applyFilters()">
+                                <option value="">Все заказчики</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-item date-range-item">
+                            <label class="filter-label">Период дедлайна отгрузки:</label>
+                            <div class="date-range-inputs">
+                                <input type="date" id="dateFrom" class="filter-control filter-date" onchange="applyFilters()" title="С даты">
+                                <span class="date-sep">—</span>
+                                <input type="date" id="dateTo" class="filter-control filter-date" onchange="applyFilters()" title="По дату">
+                            </div>
+                        </div>
+
+                        <div class="filter-item filter-actions-item">
+                            <label class="filter-label">&nbsp;</label>
+                            <button type="button" class="btn-reset-filters" id="btnResetFilters" onclick="resetFilters()" title="Сбросить все условия фильтрации">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                <span>Сбросить фильтры</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Мета-информация и выбор размера страницы -->
+                <div class="filter-meta-bar" id="filterMetaBar">
+                    <div class="filter-meta-left">
+                        <span class="filter-results-badge">
+                            Найдено: <strong id="filterResultCount">0</strong> из <span id="filterTotalCount">0</span> заказов
+                        </span>
+                        <div class="active-chips" id="activeFilterChips"></div>
+                    </div>
+                    <div class="filter-meta-right">
+                        <label for="pageSizeSelect" style="font-size:12.5px; color:var(--text-secondary); margin-right:6px;">Показывать по:</label>
+                        <select id="pageSizeSelect" class="pagination-size-select" onchange="changePageSize(this.value)">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="all">Все</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="sortable" id="th-id" onclick="sortTable('id')" style="width: 85px;">
+                                    <span>Номер</span>
+                                    <span class="sort-icon"></span>
+                                </th>
+                                <th class="sortable" id="th-klient" onclick="sortTable('klient')">
+                                    <span>Контрагент (клиент)</span>
+                                    <span class="sort-icon"></span>
+                                </th>
+                                <th class="sortable" id="th-dataPriema" onclick="sortTable('dataPriema')" style="width: 140px;">
+                                    <span>Дата приёма</span>
+                                    <span class="sort-icon"></span>
+                                </th>
+                                <th class="sortable" id="th-planDataOtgruzki" onclick="sortTable('planDataOtgruzki')" style="width: 155px;">
+                                    <span>Срок отгрузки</span>
+                                    <span class="sort-icon"></span>
+                                </th>
+                                <th class="sortable" id="th-daysLeft" onclick="sortTable('daysLeft')" style="width: 160px;">
+                                    <span>Остаток срока</span>
+                                    <span class="sort-icon"></span>
+                                </th>
+                                <th class="sortable" id="th-status" onclick="sortTable('status')" style="width: 135px;">
+                                    <span>Статус</span>
+                                    <span class="sort-icon"></span>
+                                </th>
+                                <th class="no-sort" style="width: 290px;">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTable"></tbody>
+                    </table>
+                </div>
+
+                <!-- Панель постраничной пагинации -->
+                <div class="pagination-bar" id="paginationBar">
+                    <div class="pagination-info" id="paginationInfo">
+                        Показано 0 из 0
+                    </div>
+                    <div class="pagination-controls" id="paginationControls"></div>
+                </div>
             </div>
         </main>
 
@@ -374,6 +467,6 @@
     </div>
 
     <script src="auth.js"></script>
-    <script src="app.js?v=2.5.2"></script>
+    <script src="app.js?v=2.6.0"></script>
 </body>
 </html>

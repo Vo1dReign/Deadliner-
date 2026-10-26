@@ -1,4 +1,4 @@
-﻿
+
 
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
@@ -1431,3 +1431,354 @@ footer.app-footer {
     color: var(--text-main);
 }
 
+
+/* ==========================================================================
+   ДЕНЬ 16: МОДУЛЬ ФИЛЬТРАЦИИ, ПОИСКА И ПАГИНАЦИИ (DEADLINER MES)
+   ========================================================================== */
+
+/* Поисковая строка и кнопка очистки */
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-clear-btn {
+    position: absolute;
+    right: 10px;
+    background: #e2e8f0;
+    color: #64748b;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.search-clear-btn:hover {
+    background: #cbd5e1;
+    color: #1e293b;
+}
+
+/* Кнопка переключения расширенной панели фильтров */
+.btn-toggle-filters {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.btn-toggle-filters:hover {
+    background: var(--bg-subtle);
+    border-color: var(--border-hover);
+}
+
+.btn-toggle-filters.active {
+    background: #eff6ff;
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+}
+
+.active-filters-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 7px;
+    height: 7px;
+    background: var(--status-red);
+    border-radius: 50%;
+}
+
+/* Расширенная панель многокритериальной фильтрации */
+.filter-bar-expanded {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 12px 0 14px 0;
+    transition: all 0.25s ease;
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    align-items: end;
+}
+
+@media (min-width: 1200px) {
+    .filter-grid {
+        grid-template-columns: 1.2fr 1.3fr 1.5fr 1.8fr auto;
+    }
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.filter-label {
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+}
+
+.filter-control {
+    width: 100%;
+    padding: 8px 11px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text-main);
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.filter-control:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.date-range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.date-sep {
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.btn-reset-filters {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.btn-reset-filters:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #dc2626;
+}
+
+/* Строка мета-информации по выборке */
+.filter-meta-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    font-size: 13px;
+}
+
+.filter-meta-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-results-badge {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.filter-results-badge strong {
+    color: var(--brand-primary);
+    font-weight: 700;
+}
+
+.active-chips {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+    border-radius: 9999px;
+}
+
+.filter-chip-remove {
+    cursor: pointer;
+    font-weight: 800;
+    color: #94a3b8;
+    line-height: 1;
+}
+
+.filter-chip-remove:hover {
+    color: #ef4444;
+}
+
+.filter-meta-right {
+    display: flex;
+    align-items: center;
+}
+
+.pagination-size-select {
+    padding: 4px 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-main);
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    outline: none;
+    cursor: pointer;
+}
+
+.pagination-size-select:focus {
+    border-color: var(--brand-primary);
+}
+
+/* Интерактивная сортировка в таблице */
+table.data-table th.sortable {
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    transition: background 0.15s, color 0.15s;
+}
+
+table.data-table th.sortable:hover {
+    background: #f1f5f9;
+    color: var(--brand-primary);
+}
+
+.sort-icon {
+    display: inline-block;
+    margin-left: 6px;
+    font-size: 11px;
+    color: #94a3b8;
+    vertical-align: middle;
+}
+
+table.data-table th.sortable.sorted-asc .sort-icon::after {
+    content: "▲";
+    color: var(--brand-primary);
+    font-weight: 900;
+}
+
+table.data-table th.sortable.sorted-desc .sort-icon::after {
+    content: "▼";
+    color: var(--brand-primary);
+    font-weight: 900;
+}
+
+table.data-table th.sortable:not(.sorted-asc):not(.sorted-desc) .sort-icon::after {
+    content: "↕";
+    opacity: 0.45;
+}
+
+/* Панель постраничной пагинации */
+.pagination-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 18px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-top: 1px solid #f1f5f9;
+    border-radius: 0 0 10px 10px;
+}
+
+.pagination-info {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pagination-btn {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.pagination-btn:hover:not(:disabled):not(.active) {
+    background: var(--bg-subtle);
+    border-color: var(--border-hover);
+    color: var(--brand-primary);
+}
+
+.pagination-btn.active {
+    background: var(--brand-primary);
+    border-color: var(--brand-primary);
+    color: #ffffff;
+    font-weight: 700;
+    cursor: default;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: #f8fafc;
+}
+
+.pagination-ellipsis {
+    padding: 0 4px;
+    color: var(--text-muted);
+    font-weight: 700;
+    user-select: none;
+}
