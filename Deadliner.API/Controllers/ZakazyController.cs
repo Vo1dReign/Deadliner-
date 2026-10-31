@@ -189,7 +189,21 @@ public class ZakazyController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Zakaz>> Create(Zakaz zakaz)
     {
-        zakaz.DataPriema = DateOnly.FromDateTime(DateTime.Today);
+        if (zakaz.IdKlienta <= 0)
+            return BadRequest(new { message = "Выберите или укажите заказчика" });
+
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        if (zakaz.DataPriema == default)
+            zakaz.DataPriema = today;
+
+        if (zakaz.PlanDataOtgruzki < zakaz.DataPriema)
+        {
+            return BadRequest(new { message = "Плановая дата отгрузки не может быть раньше даты приёма заказа" });
+        }
+
+        if (zakaz.SummaPredoplaty < 0)
+            return BadRequest(new { message = "Сумма предоплаты не может быть отрицательной" });
+
         zakaz.Status = "в работе";
 
         _context.Zakazy.Add(zakaz);
@@ -355,15 +369,22 @@ public class ZakazyController : ControllerBase
         if (zakaz == null)
             return NotFound();
 
-        if (sotrudnikId.HasValue)
+        if (!sotrudnikId.HasValue)
         {
-            var user = await _context.Sotrudniki.Include(s => s.Rol).FirstOrDefaultAsync(s => s.Id == sotrudnikId.Value);
-            bool isSupervisor = user != null && (user.IdRoli == 1 || (user.Rol != null && user.Rol.Nazvanie.ToLower().Contains("начальник")));
-            bool isProjectManager = zakaz.IdMenedzhera == sotrudnikId.Value;
-            if (!isSupervisor && !isProjectManager)
-            {
-                return StatusCode(403, new { message = "Удалить заказ может только назначенный менеджер проекта или администратор." });
-            }
+            return StatusCode(401, new { message = "Требуется авторизация сотрудника для удаления заказа." });
+        }
+
+        var user = await _context.Sotrudniki.Include(s => s.Rol).FirstOrDefaultAsync(s => s.Id == sotrudnikId.Value);
+        if (user == null)
+        {
+            return StatusCode(401, new { message = "Сотрудник не найден в системе." });
+        }
+
+        bool isSupervisor = user.IdRoli == 1 || (user.Rol != null && user.Rol.Nazvanie.ToLower().Contains("начальник"));
+        bool isProjectManager = zakaz.IdMenedzhera == sotrudnikId.Value;
+        if (!isSupervisor && !isProjectManager)
+        {
+            return StatusCode(403, new { message = "Удалить заказ может только назначенный менеджер проекта или администратор." });
         }
 
         _context.ZhurnalIzmenenii.RemoveRange(zakaz.ZhurnalIzmenenii);

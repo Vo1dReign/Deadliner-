@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Deadliner.API.Data;
 using Deadliner.API.Models;
+using Deadliner.API.Services;
 
 namespace Deadliner.API.Controllers;
 
@@ -10,10 +11,12 @@ namespace Deadliner.API.Controllers;
 public class KlientyController : ControllerBase
 {
     private readonly DeadlinerContext _context;
+    private readonly PhoneVerificationService _phoneService;
 
-    public KlientyController(DeadlinerContext context)
+    public KlientyController(DeadlinerContext context, PhoneVerificationService phoneService)
     {
         _context = context;
+        _phoneService = phoneService;
     }
     
     [HttpGet]
@@ -25,49 +28,66 @@ public class KlientyController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Klient>> GetById(int id)
     {
-        var Klient = await _context.Klienty.FindAsync(id);
+        var klient = await _context.Klienty.FindAsync(id);
 
-        if (Klient == null)
-            return NotFound();
+        if (klient == null)
+            return NotFound(new { message = "Заказчик не найден" });
 
-        return Klient;
+        return klient;
     }
 
     [HttpPost]
-    public async Task<ActionResult<Klient>> Create(Klient Klient)
+    public async Task<ActionResult<Klient>> Create(Klient klient)
     {
-        _context.Klienty.Add(Klient);
+        if (string.IsNullOrWhiteSpace(klient.FioNazvanie))
+            return BadRequest(new { message = "Наименование или ФИО заказчика обязательно для заполнения" });
+
+        klient.FioNazvanie = klient.FioNazvanie.Trim();
+        klient.Telefon = _phoneService.NormalizePhone(klient.Telefon);
+        if (!string.IsNullOrWhiteSpace(klient.AdresObekta))
+            klient.AdresObekta = klient.AdresObekta.Trim();
+
+        _context.Klienty.Add(klient);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetById), new {id = Klient.Id}, Klient);
+        return CreatedAtAction(nameof(GetById), new { id = klient.Id }, klient);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Klient Klient)
+    public async Task<IActionResult> Update(int id, Klient klient)
     {
-        if (id != Klient.Id)
-            return BadRequest();
+        if (id != klient.Id)
+            return BadRequest(new { message = "Несоответствие идентификатора заказчика" });
+
+        if (string.IsNullOrWhiteSpace(klient.FioNazvanie))
+            return BadRequest(new { message = "Наименование или ФИО заказчика не может быть пустым" });
 
         var existing = await _context.Klienty.FindAsync(id);
         if (existing == null)
-            return NotFound();
+            return NotFound(new { message = "Заказчик не найден" });
 
-        existing.FioNazvanie = Klient.FioNazvanie;
-        existing.Telefon = Klient.Telefon;
-        existing.AdresObekta = Klient.AdresObekta;
+        existing.FioNazvanie = klient.FioNazvanie.Trim();
+        existing.Telefon = _phoneService.NormalizePhone(klient.Telefon);
+        existing.AdresObekta = klient.AdresObekta?.Trim();
 
         await _context.SaveChangesAsync();
-
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var klient = await _context.Klienty.FindAsync(id);
+        var klient = await _context.Klienty
+            .Include(k => k.Zakazy)
+            .FirstOrDefaultAsync(k => k.Id == id);
 
         if (klient == null)
-            return NotFound();
+            return NotFound(new { message = "Заказчик не найден" });
+
+        if (klient.Zakazy.Any())
+        {
+            return BadRequest(new { message = "Нельзя удалить заказчика, у которого есть оформленные производственные заказы" });
+        }
 
         _context.Klienty.Remove(klient);
         await _context.SaveChangesAsync();

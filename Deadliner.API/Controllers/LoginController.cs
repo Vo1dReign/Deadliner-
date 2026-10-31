@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Deadliner.API.Data;
+using Deadliner.API.Services;
 
 namespace Deadliner.API.Controllers;
 
@@ -9,10 +10,17 @@ namespace Deadliner.API.Controllers;
 public class LoginController : ControllerBase
 {
     private readonly DeadlinerContext _db;
+    private readonly PasswordHasherService _hasher;
+    private readonly PhoneVerificationService _phoneService;
 
-    public LoginController(DeadlinerContext db)
+    public LoginController(
+        DeadlinerContext db, 
+        PasswordHasherService hasher,
+        PhoneVerificationService phoneService)
     {
         _db = db;
+        _hasher = hasher;
+        _phoneService = phoneService;
     }
 
     [HttpPost]
@@ -26,19 +34,33 @@ public class LoginController : ControllerBase
         var loginInput = req.Login.Trim();
         var parolInput = req.Parol.Trim();
 
-        // Поиск по точному совпадению логина или телефона, без учета регистра
-        var cleanInput = new string(loginInput.Where(char.IsDigit).ToArray());
+        // Нормализация номера телефона, если пользователь вводит телефон вместо логина
+        var normalizedPhone = _phoneService.NormalizePhone(loginInput);
+        var cleanDigits = new string(loginInput.Where(char.IsDigit).ToArray());
 
+        // Ищем сотрудника по совпадению логина или номера телефона
         var sotrudnik = await _db.Sotrudniki
             .Include(s => s.Rol)
             .FirstOrDefaultAsync(s => 
-                (s.Login.ToLower() == loginInput.ToLower() || 
-                 (s.Telefon != null && s.Telefon == loginInput) ||
-                 (!string.IsNullOrEmpty(cleanInput) && cleanInput.Length >= 7 && s.Telefon != null && s.Telefon.Contains(cleanInput))) 
-                && s.Parol == parolInput);
+                s.Login.ToLower() == loginInput.ToLower() ||
+                (normalizedPhone != null && s.Telefon != null && s.Telefon == normalizedPhone) ||
+                (s.Telefon != null && s.Telefon == loginInput) ||
+                (!string.IsNullOrEmpty(cleanDigits) && cleanDigits.Length >= 7 && s.Telefon != null && s.Telefon.Contains(cleanDigits)));
 
         if (sotrudnik == null)
             return Unauthorized(new { message = "Неверный логин или пароль" });
+
+        // Проверка пароля через криптографический PBKDF2 хэшер
+        var (isValid, needsRehash) = _hasher.VerifyPassword(parolInput, sotrudnik.Parol);
+        if (!isValid)
+            return Unauthorized(new { message = "Неверный логин или пароль" });
+
+        // Бесшовный перехэш: если пароль хранился в открытом виде (legacy), хэшируем его прямо сейчас!
+        if (needsRehash)
+        {
+            sotrudnik.Parol = _hasher.HashPassword(parolInput);
+            await _db.SaveChangesAsync();
+        }
 
         return Ok(new
         {

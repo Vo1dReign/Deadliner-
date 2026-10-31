@@ -17,26 +17,26 @@
 
         .register-card {
             background: #ffffff;
-            padding: 40px;
+            padding: 40px 36px;
             border-radius: var(--radius-lg);
             border: 1px solid var(--border);
             box-shadow: 0 20px 40px -15px rgba(37, 99, 235, 0.15), 0 1px 3px rgba(0,0,0,0.05);
             width: 100%;
-            max-width: 460px;
-            border-top: 5px solid var(--brand-purple);
+            max-width: 480px;
+            border-top: 5px solid var(--brand-primary);
         }
 
         .card-header {
             text-align: center;
-            margin-bottom: 26px;
+            margin-bottom: 24px;
         }
 
-        .card-header .brand-icon {
-            width: 44px;
-            height: 44px;
-            font-size: 20px;
-            margin: 0 auto 14px auto;
-            background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+        .card-header img {
+            height: 46px;
+            max-width: 140px;
+            margin: 0 auto 10px auto;
+            display: block;
+            object-fit: contain;
         }
 
         .card-header h2 {
@@ -52,7 +52,7 @@
         }
 
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 15px;
         }
 
         .form-group label {
@@ -73,13 +73,100 @@
             font-size: 14px;
             font-family: inherit;
             transition: all 0.15s ease;
+            box-sizing: border-box;
         }
 
         .form-group input:focus, .form-group select:focus {
             outline: none;
             background: #ffffff;
-            border-color: var(--brand-purple);
-            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .phone-input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .phone-input-row input {
+            flex: 1;
+        }
+
+        .btn-send-code {
+            padding: 0 14px;
+            white-space: nowrap;
+            font-size: 12.5px;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-send-code:hover:not(:disabled) {
+            background: #e0f2fe;
+            border-color: #38bdf8;
+            color: #0284c7;
+        }
+
+        .btn-send-code:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .otp-verification-box {
+            display: none;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            margin-top: 8px;
+        }
+
+        .otp-verification-box.active {
+            display: block;
+        }
+
+        .otp-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .otp-input-row input {
+            width: 140px;
+            letter-spacing: 4px;
+            font-size: 16px;
+            font-weight: 700;
+            text-align: center;
+            background: #ffffff;
+        }
+
+        .btn-verify-otp {
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            background: #16a34a;
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+        }
+
+        .btn-verify-otp:hover {
+            background: #15803d;
+        }
+
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #16a34a;
+            font-size: 12.5px;
+            font-weight: 700;
+            margin-top: 4px;
         }
 
         .btn-register {
@@ -87,14 +174,14 @@
             padding: 13px;
             font-size: 15px;
             font-weight: 700;
-            margin-top: 10px;
-            background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+            margin-top: 14px;
+            cursor: pointer;
         }
 
         .link-back {
             display: block;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 18px;
             color: var(--text-secondary);
             text-decoration: none;
             font-size: 13.5px;
@@ -110,45 +197,67 @@
 <body>
     <div class="register-card">
         <div class="card-header">
-            <div class="brand-icon">D</div>
+            <img src="logo.png" alt="МикМебель">
             <h2>Регистрация сотрудника</h2>
-            <p>Создание учётной записи в системе DeadLiner</p>
+            <p>Защищённая регистрация в системе DeadLiner MES</p>
         </div>
         
         <div class="form-group">
-            <label for="fio">ФИО сотрудника</label>
+            <label for="fio">ФИО сотрудника <span style="color:var(--status-red-text)">*</span></label>
             <input id="fio" placeholder="Например: Иванов Иван Иванович" type="text" required>
         </div>
 
         <div class="form-group">
-            <label for="telefon">Контактный номер телефона</label>
-            <input id="telefon" placeholder="+375 (29) 000-00-00" type="text">
+            <label for="telefon">Номер телефона (для входа и 2FA) <span style="color:var(--status-red-text)">*</span></label>
+            <div class="phone-input-row">
+                <input id="telefon" placeholder="+375 (29) 000-00-00" type="tel" oninput="formatPhoneInput(this)">
+                <button type="button" class="btn-send-code" id="btnSendSms" onclick="requestSmsCode()">
+                    Получить код
+                </button>
+            </div>
+            <div id="phoneVerifiedStatus" style="display:none;" class="verified-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Номер телефона подтверждён
+            </div>
+
+            <!-- Блок ввода проверочного SMS-кода -->
+            <div id="otpBox" class="otp-verification-box">
+                <div style="font-size: 12px; color: #166534; font-weight: 600; margin-bottom: 6px;">
+                    Введите 4-значный проверочный SMS-код:
+                </div>
+                <div class="otp-input-row">
+                    <input id="verificationCode" type="text" maxlength="4" placeholder="••••" autocomplete="one-time-code">
+                    <button type="button" class="btn-verify-otp" onclick="confirmSmsCode()">Подтвердить</button>
+                </div>
+                <div id="smsTimerText" style="font-size: 11.5px; color: #4b5563; margin-top: 6px;"></div>
+            </div>
         </div>
 
         <div class="form-group">
-            <label for="rol">Должность в компании</label>
+            <label for="rol">Должность в компании <span style="color:var(--status-red-text)">*</span></label>
             <select id="rol">
-                <option value="1">Администратор</option>
-                <option value="3">Сотрудник цеха</option>
-                <option value="1002">Дизайнер</option>
-                <option value="1003">Конструктор</option>
-                <option value="1004">Бухгалтер</option>
+                <option value="1003">Конструктор (Офис)</option>
+                <option value="1002">Дизайнер (Офис)</option>
+                <option value="1004">Бухгалтер (Офис)</option>
                 <option value="1005">Начальник производства</option>
                 <option value="1006">Логист</option>
+                <option value="3">Сотрудник цеха (Станочник)</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="login">Логин пользователя</label>
+            <label for="login">Логин пользователя <span style="color:var(--status-red-text)">*</span></label>
             <input id="login" placeholder="ivanov_ii" type="text" autocomplete="username" required>
         </div>
 
         <div class="form-group">
-            <label for="parol">Пароль учётной записи</label>
+            <label for="parol">Пароль (хэшируется алгоритмом PBKDF2) <span style="color:var(--status-red-text)">*</span></label>
             <input id="parol" placeholder="Минимум 6 знаков" type="password" autocomplete="new-password" required>
         </div>
 
-        <button class="btn-modern btn-primary btn-register" onclick="registerUser()">Зарегистрировать</button>
+        <button class="btn-modern btn-primary btn-register" id="btnSubmitRegister" onclick="registerUser()">Зарегистрировать аккаунт</button>
         <a href="login.html" class="link-back">← Вернуться ко входу</a>
     </div>
 

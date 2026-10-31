@@ -16,7 +16,8 @@ public class Sotrudnik
 
     public string Login { get; set; } = string.Empty;
 
-    // Пароль хранится в виде хэша (не открытый текст!)
+    // Пароль хранится в виде криптостойкого PBKDF2 хэша (никогда не возвращается клиенту!)
+    [System.Text.Json.Serialization.JsonIgnore]
     public string Parol { get; set; } = string.Empty;
 
     // Фото профиля (base64 Data URL или URL изображения)

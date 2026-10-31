@@ -27,7 +27,6 @@
 </head>
 <body>
 
-    <!-- БОКОВОЕ МЕНЮ (SIDEBAR) -->
     <aside class="sidebar">
         <a href="index.html" class="sidebar-brand">
             <img src="logo.png" alt="МикМебель" class="sidebar-logo-img">
@@ -107,12 +106,10 @@
 
         <div class="sidebar-footer">
             <div id="userInfo">
-                <!-- Заполняется auth.js -->
             </div>
         </div>
     </aside>
 
-    <!-- ОСНОВНОЕ РАБОЧЕЕ ПРОСТРАНСТВО -->
     <div class="app-canvas">
         
         <header class="topbar">
@@ -151,7 +148,6 @@
                 </div>
             </div>
 
-            <!-- Оперативные виджеты метрик -->
             <div class="stats-row">
                 <div class="stat-card alert-blue">
                     <div class="stat-label">Всего заказов</div>
@@ -171,7 +167,6 @@
                 </div>
             </div>
 
-            <!-- Виджет персональных технологических задач и мини-дедлайнов -->
             <div class="tasks-widget" id="tasksWidget">
                 <div class="tasks-widget-header">
                     <div class="tasks-widget-title">
@@ -196,7 +191,6 @@
                 </div>
             </div>
 
-            <!-- Табличная панель с фильтрацией, поиском и пагинацией -->
             <div class="table-panel">
                 <div class="panel-toolbar">
                     <div class="tab-group" id="statusTabGroup">
@@ -220,7 +214,6 @@
                     </button>
                 </div>
 
-                <!-- Расширенная интерактивная панель многокритериальной фильтрации -->
                 <div class="filter-bar-expanded" id="advancedFilterBar">
                     <div class="filter-grid">
                         <div class="filter-item">
@@ -271,7 +264,6 @@
                     </div>
                 </div>
 
-                <!-- Мета-информация и выбор размера страницы -->
                 <div class="filter-meta-bar" id="filterMetaBar">
                     <div class="filter-meta-left">
                         <span class="filter-results-badge">
@@ -326,7 +318,6 @@
                     </table>
                 </div>
 
-                <!-- Панель постраничной пагинации -->
                 <div class="pagination-bar" id="paginationBar">
                     <div class="pagination-info" id="paginationInfo">
                         Показано 0 из 0
@@ -342,12 +333,11 @@
                 <span class="footer-tag">v2.4.0 Beta</span>
             </div>
             <div>
-                <span>Частное Лицо • Ревенко Е.А. VoidReign 2026</span>
+                <span>Частное Лицо • Ревенко Е.А. • VoidReign 2026</span>
             </div>
         </footer>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО СМЕНЫ СТАТУСА ЗАКАЗА (ДЛЯ МЕНЕДЖЕРА) -->
     <div class="modal-overlay" id="statusModal" style="display: none;">
         <div class="modal-box" style="border-top-color: var(--brand-cyan);">
             <div class="modal-header">
@@ -381,13 +371,12 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ИМПОРТА ВЫГРУЗКИ ИЗ 1С (EXCEL) -->
     <div class="modal-overlay" id="import1CModal" style="display: none;">
         <div class="modal-box" style="max-width: 960px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; padding: 26px; border-top-color: var(--status-green);">
             <div class="modal-header" style="margin-bottom: 12px;">
                 <div>
                     <h3 style="display:flex; align-items:center; gap:8px;">
-                        <span>📥</span>
+                        <span></span>
                         <span>Загрузка заказов из 1С (Excel / .xls / .xlsx)</span>
                     </h3>
                     <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
@@ -397,7 +386,6 @@
                 <button class="modal-close-btn" onclick="closeImport1CModal()">✕</button>
             </div>
 
-            <!-- Шаг 1: Выбор файла и параметров -->
             <div id="importStepUpload" style="margin-bottom: 14px;">
                 <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 14px; align-items: end;">
                     <div class="form-group" style="margin-bottom: 0;">
@@ -416,7 +404,6 @@
                 </div>
             </div>
 
-            <!-- Шаг 2: Таблица предпросмотра (появляется после парсинга) -->
             <div id="importStepPreview" style="display: none; flex: 1; flex-direction: column; min-height: 0; overflow: hidden;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border);">
                     <div style="display: flex; gap: 18px; font-size: 13.5px;">
@@ -431,7 +418,7 @@
                 </div>
 
                 <div style="font-size: 12px; color: var(--text-secondary); background: #f8fafc; border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 16px;">💡</span>
+                    <span style="font-size: 16px;"></span>
                     <span><strong>Умное распознавание 1С:</strong> Спецификации отделены от адресов объектов. Если в файле нет даты отгрузки — применён производственный норматив цеха (дату можно изменить прямо в таблице).</span>
                 </div>
 
@@ -458,7 +445,7 @@
                     <div style="display: flex; gap: 10px;">
                         <button type="button" class="btn-modern btn-ghost" onclick="closeImport1CModal()">Отмена</button>
                         <button type="button" class="btn-modern btn-primary" id="btnConfirmImport1C" onclick="execute1CImport()" style="padding: 10px 24px;">
-                            <span>📥 Импортировать выбранные (<span id="btnSelectedCount">0</span>)</span>
+                            <span> Импортировать выбранные (<span id="btnSelectedCount">0</span>)</span>
                         </button>
                     </div>
                 </div>

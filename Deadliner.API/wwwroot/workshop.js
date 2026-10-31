@@ -11,13 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
     updateClock();
     loadWorkshop();
 
-    // Каждую секунду обновляем часы
     setInterval(updateClock, 1000);
 
-    // Каждые 30 секунд обновляем заказы без участия человека
     setInterval(loadWorkshop, 30000);
 
-    // Логика автоскрытия курсора мыши при простое (через 3 секунды)
     initCursorHiding();
 });
 
@@ -51,7 +48,7 @@ async function loadWorkshop() {
             let colorClass = 'green';
             if (daysLeft <= thresh.redDays) {
                 colorClass = 'red';
-                hasCriticalOrders = true; // Зафиксирован критический заказ
+                hasCriticalOrders = true;
             } else if (daysLeft >= thresh.yellowFrom && daysLeft <= thresh.yellowTo) {
                 colorClass = 'yellow';
             }
@@ -72,7 +69,6 @@ async function loadWorkshop() {
             tbody.appendChild(row);
         });
 
-        // Если включен звук и есть критические заказы — издаем звуковой зуммер
         if (soundEnabled && hasCriticalOrders) {
             playAlertBeep();
         }
@@ -81,7 +77,6 @@ async function loadWorkshop() {
     }
 }
 
-// 1. Полноэкранный режим Kiosk Mode
 function toggleFullScreen() {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(err => {
@@ -94,7 +89,6 @@ function toggleFullScreen() {
     }
 }
 
-// 2. Включение / выключение звукового сигнала
 function toggleSound() {
     soundEnabled = !soundEnabled;
     const btn = document.getElementById('soundBtn');
@@ -108,11 +102,11 @@ function toggleSound() {
             <span>Звук: ВКЛ</span>
         `;
         btn.style.background = '#10b981';
-        // Инициализируем AudioContext по клику пользователя
+
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
-        playAlertBeep(); // Тестовый пик
+        playAlertBeep();
     } else {
         btn.innerHTML = `
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -123,9 +117,9 @@ function toggleSound() {
         `;
         btn.style.background = '#334155';
     }
-}
+} 
 
-// Генерация звука тревоги через встроенный Web Audio API
+
 function playAlertBeep() {
     try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -134,7 +128,7 @@ function playAlertBeep() {
         const gain = audioCtx.createGain();
 
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime); // 880 Гц (нота Ля)
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
         gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
 
         osc.connect(gain);
