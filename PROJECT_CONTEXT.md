@@ -156,22 +156,35 @@ d:\УП РСПО\
 
 ---
 
-## 7. Критические технические нюансы и исправления
+## 7. Критические технические нюансы, безопасность и шифрование
 
-1. **Сборка `netstandard, Version=2.0.0.0` в среде .NET 10:**
-   * Драйвер `Microsoft.Data.SqlClient` в EF Core при выполнении параметризованных запросов в .NET 10 запрашивает старую сборку `netstandard 2.0.0.0`, что вызывало `System.IO.FileNotFoundException`.
-   * **Решение:** В [`Program.cs`](file:///d:/УП%20РСПО/project/Deadliner.API/Program.cs) на самом верху зарегистрирован `AssemblyLoadContext.Default.Resolving`, который перенаправляет запрос на загруженную сборку .NET Core.
-2. **Создание изделий (`Izdelie`):**
-   * В [`Models/Izdelie.cs`](file:///d:/УП%20РСПО/project/Deadliner.API/Models/Izdelie.cs) навигационное свойство `Zakaz?` помечено атрибутом `[JsonIgnore]`, а в [`IzdeliyaController.cs`](file:///d:/УП%20РСПО/project/Deadliner.API/Controllers/IzdeliyaController.cs) синхронизируются поля `ZakazId` и `IdZakaza`. Изделия создаются штатно без ошибок валидации.
-3. **Блокировка `Deadliner.API.exe` при пересборке:**
-   * Перед выполнением `dotnet build` или `dotnet run` необходимо убедиться, что предыдущий процесс остановлен:
+1. **Шифрование HTTPS и криптографическая защита:**
+   - Веб-сервер работает по защищённому протоколу **HTTPS** (`https://localhost:7145`) и HTTP (`http://localhost:5216`).
+   - Добавлены заголовки безопасности: `Strict-Transport-Security` (HSTS), `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `X-XSS-Protection: 1; mode=block`.
+2. **Криптографическое хэширование паролей (PBKDF2):**
+   - Реализован [`PasswordHasherService`](file:///d:/УП%20РСПО/project/Deadliner.API/Services/PasswordHasherService.cs) на базе алгоритма `PBKDF2-HMAC-SHA256` (100 000 итераций, 128-битная криптографическая соль).
+   - В модели `Sotrudnik.cs` поле `Parol` помечено `[JsonIgnore]` — пароли гарантированно никогда не утекают в сеть в ответах API.
+   - Внедрена бесшовная миграция: при первом входе старый пароль проверяется и мгновенно перезаписывается в базе в виде безопасного хэша `PBKDF2$...`.
+3. **Двухфакторная верификация телефона через SMS/OTP код:**
+   - Реализован [`PhoneVerificationService`](file:///d:/УП%20РСПО/project/Deadliner.API/Services/PhoneVerificationService.cs) и контроллер [`AuthController`](file:///d:/УП%20РСПО/project/Deadliner.API/Controllers/AuthController.cs).
+   - Проверка формата номеров РБ (+375 и 80, операторы 29, 33, 44, 25, 17) и автоматическая нормализация в формат `+375XXXXXXXXX`.
+   - Генерация одноразовых 4-значных кодов с ограничением попыток (rate limiting) и временем жизни 3 минуты. На странице регистрации [`register.html`](file:///d:/УП%20РСПО/project/Deadliner.API/wwwroot/register.html) внедрён блок ввода OTP с таймером и валидацией.
+4. **Устранение уязвимостей авторизации и валидация:**
+   - В `ZakazyController.cs` закрыта лазейка анонимного удаления заказов: теперь обязательно проверяются права администратора или назначенного менеджера проекта.
+   - Добавлена валидация дат (`PlanDataOtgruzki >= DataPriema`) и сумм предоплаты.
+   - В `KlientyController.cs` добавлена нормализация телефонов и защита от удаления клиентов с активными заказами.
+5. **Сборка `netstandard, Version=2.0.0.0` в среде .NET 10:**
+   - Драйвер `Microsoft.Data.SqlClient` в EF Core при выполнении параметризованных запросов в .NET 10 запрашивает старую сборку `netstandard 2.0.0.0`, что вызывало `System.IO.FileNotFoundException`.
+   - **Решение:** В [`Program.cs`](file:///d:/УП%20РСПО/project/Deadliner.API/Program.cs) на самом верху зарегистрирован `AssemblyLoadContext.Default.Resolving`, который перенаправляет запрос на загруженную сборку .NET Core.
+6. **Создание изделий (`Izdelie`):**
+   - В [`Models/Izdelie.cs`](file:///d:/УП%20РСПО/project/Deadliner.API/Models/Izdelie.cs) навигационное свойство `Zakaz?` помечено атрибутом `[JsonIgnore]`, а в [`IzdeliyaController.cs`](file:///d:/УП%20РСПО/project/Deadliner.API/Controllers/IzdeliyaController.cs) синхронизируются поля `ZakazId` и `IdZakaza`. Изделия создаются штатно без ошибок валидации.
+7. **Блокировка `Deadliner.API.exe` при пересборке:**
+   - Перед выполнением `dotnet build` или `dotnet run` необходимо убедиться, что предыдущий процесс остановлен:
      ```powershell
      Get-Process -Name "Deadliner.API" -ErrorAction SilentlyContinue | Stop-Process -Force
      ```
-4. **Кодировка PowerShell 5.1:**
-   * При запуске скриптов `.ps1` с кириллицей через PowerShell 5.1 обязательно сохранять файлы с **UTF-8 BOM** (`New-Object System.Text.UTF8Encoding($true)`), иначе кириллица повреждается (модзибейк).
-5. **Git-коммиты:**
-   * Автор коммитов **строго**: `Vo1dReign <erevenko39@gmail.com>`.
+8. **Git-коммиты:**
+   - Автор коммитов **строго**: `Vo1dReign <erevenko39@gmail.com>`.
 
 ---
 
