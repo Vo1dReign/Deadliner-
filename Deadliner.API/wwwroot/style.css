@@ -1,4 +1,4 @@
-
+﻿
 
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
@@ -6,19 +6,19 @@
     --bg-body: #f8fafc;
     --bg-sidebar: #ffffff;
     --bg-card: #ffffff;
-    --bg-subtle: #f1f5f9;
-    --border: #e2e8f0;
+    --bg-subtle: #f4f4f5;
+    --border: #e4e4e7;
     --border-hover: #cbd5e1;
     
-    --text-main: #0f172a;
-    --text-secondary: #475569;
+    --text-main: #09090b;
+    --text-secondary: #52525b;
     --text-muted: #94a3b8;
     
 
-    --brand-primary: #2563eb;
-    --brand-gradient: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
-    --brand-purple: #7c3aed;
-    --brand-cyan: #0284c7;
+    --brand-primary: #ea580c;
+    --brand-gradient: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    --brand-purple: #ea580c;
+    --brand-cyan: #18181b;
     
 
     --status-green: #10b981;
@@ -42,7 +42,7 @@
     
     --shadow-subtle: 0 1px 3px 0 rgba(15, 23, 42, 0.04);
     --shadow-card: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.03);
-    --shadow-glow: 0 4px 14px 0 rgba(37, 99, 235, 0.25);
+    --shadow-glow: 0 4px 14px 0 rgba(234, 88, 12, 0.25);
 }
 
 * {
@@ -110,7 +110,7 @@ aside.sidebar {
     font-weight: 800;
     font-size: 18px;
     letter-spacing: -0.5px;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 10px rgba(234, 88, 12, 0.3);
 }
 
 .brand-info {
@@ -188,7 +188,7 @@ aside.sidebar {
 .nav-link.active {
     background: var(--brand-primary);
     color: #ffffff;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    box-shadow: 0 4px 10px rgba(234, 88, 12, 0.25);
 }
 
 .nav-link.active svg {
@@ -415,7 +415,7 @@ main.main-content {
 .search-input:focus {
     outline: none;
     border-color: var(--brand-primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.12);
 }
 
 table.data-table {
@@ -500,10 +500,10 @@ table.data-table tr:hover td {
 .btn-primary {
     background: var(--brand-gradient);
     color: #ffffff;
-    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 2px 6px rgba(234, 88, 12, 0.3);
 }
 .btn-primary:hover {
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4);
     transform: translateY(-1px);
 }
 
@@ -599,7 +599,7 @@ table.data-table tr:hover td {
 .form-control:focus, .form-group input:focus, .form-group select:focus {
     outline: none;
     border-color: var(--brand-primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.12);
 }
 
 /* ==============================================================================
@@ -663,7 +663,7 @@ footer.app-footer {
     font-weight: 800;
     font-size: 14px;
     flex-shrink: 0;
-    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+    box-shadow: 0 2px 6px rgba(234, 88, 12, 0.25);
 }
 
 .user-text-name {
@@ -742,7 +742,7 @@ footer.app-footer {
     font-size: 32px;
     font-weight: 800;
     margin: 0 auto 16px;
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28);
+    box-shadow: 0 8px 20px rgba(234, 88, 12, 0.28);
 }
 
 .profile-hero-name {
@@ -1555,7 +1555,7 @@ footer.app-footer {
 
 .filter-control:focus {
     border-color: var(--brand-primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1);
 }
 
 .date-range-inputs {
@@ -1781,4 +1781,32 @@ table.data-table th.sortable:not(.sorted-asc):not(.sorted-desc) .sort-icon::afte
     color: var(--text-muted);
     font-weight: 700;
     user-select: none;
+}
+
+
+.footer-tag {
+    background: #18181b;
+    color: #f97316;
+    border: 1px solid rgba(249, 115, 22, 0.4);
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+}
+
+.badge-alpha {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 7px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-radius: 4px;
+    background: #18181b;
+    color: #f97316;
+    border: 1px solid rgba(249, 115, 22, 0.4);
+    margin-left: 6px;
+    vertical-align: middle;
 }

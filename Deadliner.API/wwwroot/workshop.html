@@ -42,7 +42,7 @@
         }
 
         .brand-tag {
-            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
             color: #ffffff;
             font-size: 13px;
             font-weight: 800;
@@ -86,12 +86,12 @@
         }
 
         .btn-kiosk {
-            background: #2563eb;
+            background: #ea580c;
             display: inline-flex;
             align-items: center;
             gap: 7px;
         }
-        .btn-kiosk:hover { background: #1d4ed8; }
+        .btn-kiosk:hover { background: #c2410c; }
 
         .btn-sound {
             background: #334155;
@@ -331,7 +331,7 @@
     <header>
         <div class="brand-box">
             <span class="brand-tag">ЦЕХ</span>
-            <span class="brand-title">DeadLiner — Оперативное табло</span>
+            <span class="brand-title">DeadLiner — Табло цеха <span class="badge-alpha" style="background:#18181b; color:#f97316; border:1px solid rgba(249,115,22,0.4); padding:2px 7px; border-radius:4px; font-size:10px; font-weight:800; vertical-align:middle; text-transform:uppercase;">Alpha</span></span>
             <span id="clock">00:00:00</span>
         </div>
         
@@ -374,5 +374,14 @@
 
     <script src="auth.js"></script>
     <script src="workshop.js"></script>
+    <footer style="padding:14px 32px; background:#0f172a; border-top:1px solid #1e293b; display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#94a3b8; margin-top:40px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <span>ООО «МикМебель» 2011–2026</span>
+            <span style="background:#18181b; color:#f97316; border:1px solid rgba(249,115,22,0.4); padding:2px 8px; border-radius:4px; font-weight:700;">Альфа-версия v1.0</span>
+        </div>
+        <div>
+            <span>Цеховой терминал диспетчеризации MES</span>
+        </div>
+    </footer>
 </body>
 </html>

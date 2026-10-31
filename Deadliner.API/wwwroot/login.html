@@ -11,7 +11,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: radial-gradient(circle at 10% 20%, #eff6ff 0%, #f8fafc 90%);
+            background: radial-gradient(circle at 10% 20%, #fff7ed 0%, #f8fafc 90%);
             padding: 24px;
         }
 
@@ -20,7 +20,7 @@
             padding: 40px 36px;
             border-radius: var(--radius-lg);
             border: 1px solid var(--border);
-            box-shadow: 0 20px 40px -15px rgba(37, 99, 235, 0.15), 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 20px 40px -15px rgba(234, 88, 12, 0.15), 0 1px 3px rgba(0,0,0,0.05);
             width: 100%;
             max-width: 440px;
             border-top: 5px solid var(--brand-primary);
@@ -31,18 +31,15 @@
             margin-bottom: 26px;
         }
 
-        .login-header .brand-icon {
-            width: 48px;
-            height: 48px;
-            font-size: 22px;
-            margin: 0 auto 14px auto;
-        }
-
         .login-header h2 {
             font-size: 24px;
             font-weight: 800;
             color: var(--text-main);
             letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
         .login-header p {
@@ -80,7 +77,7 @@
             outline: none;
             background: #ffffff;
             border-color: var(--brand-primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
         }
 
         .btn-submit {
@@ -151,9 +148,9 @@
         }
 
         .demo-pill:hover {
-            background: #e0f2fe;
-            border-color: #7dd3fc;
-            color: #0369a1;
+            background: #ffedd5;
+            border-color: #fdba74;
+            color: #c2410c;
         }
 
         .demo-pill span {
@@ -165,7 +162,7 @@
         .register-link {
             display: block;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 18px;
             color: var(--brand-primary);
             text-decoration: none;
             font-size: 13.5px;
@@ -175,14 +172,27 @@
         .register-link:hover {
             text-decoration: underline;
         }
+
+        .card-company-footer {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 11.5px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            padding-top: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
     </style>
 </head>
 <body>
     <div class="login-card">
         <div class="login-header">
             <img src="logo.png" alt="МикМебель" style="height: 48px; max-width: 150px; margin: 0 auto 12px auto; display: block; object-fit: contain;">
-            <h2>DeadLiner MES</h2>
-            <p>Авторизация в системе производственной диспетчеризации</p>
+            <h2>DeadLiner MES <span class="badge-alpha">Alpha</span></h2>
+            <p>ООО «МикМебель» • Диспетчеризация производства</p>
         </div>
 
         <form onsubmit="event.preventDefault(); doLogin();">
@@ -211,6 +221,12 @@
         </div>
         
         <a href="register.html" class="register-link">Новый сотрудник? Зарегистрироваться</a>
+
+        <div class="card-company-footer">
+            <span>ООО «МикМебель» 2011–2026</span>
+            <span>•</span>
+            <span class="footer-tag" style="font-size:10px;">Альфа-версия v1.0</span>
+        </div>
     </div>
 
     <script src="login.js"></script>
