@@ -3,24 +3,25 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-    --bg-body: #f8fafc;
+    --bg-body: #f1f4f9;
     --bg-sidebar: #ffffff;
     --bg-card: #ffffff;
-    --bg-subtle: #f4f4f5;
-    --border: #e4e4e7;
+    --bg-subtle: #f8fafc;
+    --bg-input: #ffffff;
+    --bg-active-nav: #eef2f8;
+    --border: #e2e8f0;
     --border-hover: #cbd5e1;
     
-    --text-main: #09090b;
-    --text-secondary: #52525b;
+    --text-main: #0f172a;
+    --text-secondary: #475569;
     --text-muted: #94a3b8;
     
-
     --brand-primary: #ea580c;
+    --brand-primary-hover: #c2410c;
     --brand-gradient: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
     --brand-purple: #ea580c;
     --brand-cyan: #18181b;
     
-
     --status-green: #10b981;
     --status-green-bg: #ecfdf5;
     --status-green-text: #047857;
@@ -42,7 +43,93 @@
     
     --shadow-subtle: 0 1px 3px 0 rgba(15, 23, 42, 0.04);
     --shadow-card: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.03);
-    --shadow-glow: 0 4px 14px 0 rgba(234, 88, 12, 0.25);
+    --shadow-glow: 0 4px 14px 0 rgba(234, 88, 12, 0.22);
+}
+
+/* ==============================================================================
+   DARK THEME - INDUSTRIAL GRAPHITE & SLATE PALETTE (ООО «МикМебель»)
+   ============================================================================== */
+[data-theme="dark"] {
+    --bg-body: #0b0f17;
+    --bg-sidebar: #0f141f;
+    --bg-card: #141b27;
+    --bg-subtle: #1a2232;
+    --bg-input: #0c1018;
+    --bg-active-nav: #1c2537;
+    --border: #232d3f;
+    --border-hover: #37455d;
+    
+    --text-main: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    
+    --brand-primary: #f97316;
+    --brand-primary-hover: #ea580c;
+    --brand-gradient: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+    --brand-purple: #f97316;
+    --brand-cyan: #e2e8f0;
+    
+    --status-green: #10b981;
+    --status-green-bg: rgba(16, 185, 129, 0.12);
+    --status-green-text: #34d399;
+    --status-green-border: rgba(16, 185, 129, 0.28);
+    
+    --status-yellow: #f59e0b;
+    --status-yellow-bg: rgba(245, 158, 11, 0.12);
+    --status-yellow-text: #fbbf24;
+    --status-yellow-border: rgba(245, 158, 11, 0.28);
+    
+    --status-red: #ef4444;
+    --status-red-bg: rgba(239, 68, 68, 0.12);
+    --status-red-text: #f87171;
+    --status-red-border: rgba(239, 68, 68, 0.28);
+    
+    --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
+    --shadow-card: 0 4px 12px -2px rgba(0, 0, 0, 0.45), 0 2px 4px -2px rgba(0, 0, 0, 0.35);
+    --shadow-glow: 0 4px 14px 0 rgba(249, 115, 22, 0.18);
+}
+
+/* ==============================================================================
+   DARK THEME - INDUSTRIAL GRAPHITE & SLATE PALETTE (ООО «МикМебель»)
+   ============================================================================== */
+[data-theme="dark"] {
+    --bg-body: #0b0f17;
+    --bg-sidebar: #0f141f;
+    --bg-card: #141b27;
+    --bg-subtle: #1a2232;
+    --bg-input: #0c1018;
+    --bg-active-nav: #1c2537;
+    --border: #232d3f;
+    --border-hover: #37455d;
+    
+    --text-main: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    
+    --brand-primary: #f97316;
+    --brand-primary-hover: #ea580c;
+    --brand-gradient: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+    --brand-purple: #f97316;
+    --brand-cyan: #e2e8f0;
+    
+    --status-green: #10b981;
+    --status-green-bg: rgba(16, 185, 129, 0.12);
+    --status-green-text: #34d399;
+    --status-green-border: rgba(16, 185, 129, 0.28);
+    
+    --status-yellow: #f59e0b;
+    --status-yellow-bg: rgba(245, 158, 11, 0.12);
+    --status-yellow-text: #fbbf24;
+    --status-yellow-border: rgba(245, 158, 11, 0.28);
+    
+    --status-red: #ef4444;
+    --status-red-bg: rgba(239, 68, 68, 0.12);
+    --status-red-text: #f87171;
+    --status-red-border: rgba(239, 68, 68, 0.28);
+    
+    --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
+    --shadow-card: 0 4px 12px -2px rgba(0, 0, 0, 0.45), 0 2px 4px -2px rgba(0, 0, 0, 0.35);
+    --shadow-glow: 0 4px 14px 0 rgba(249, 115, 22, 0.18);
 }
 
 * {
@@ -89,7 +176,7 @@ aside.sidebar {
 }
 
 .sidebar-brand:hover {
-    background: #f8fafc;
+    background: var(--bg-subtle);
 }
 
 .sidebar-logo-img {
@@ -162,12 +249,13 @@ aside.sidebar {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 12px;
+    padding: 9px 12px;
     color: var(--text-secondary);
     text-decoration: none;
     font-size: 13.5px;
     font-weight: 600;
     border-radius: var(--radius-sm);
+    border-left: 3px solid transparent;
     transition: all 0.15s ease;
 }
 
@@ -178,27 +266,34 @@ aside.sidebar {
     stroke: currentColor;
     fill: none;
     flex-shrink: 0;
+    transition: stroke 0.15s ease;
 }
 
 .nav-link:hover {
     background: var(--bg-subtle);
-    color: var(--brand-primary);
+    color: var(--text-main);
+}
+
+.nav-link:hover svg {
+    stroke: var(--brand-primary);
 }
 
 .nav-link.active {
-    background: var(--brand-primary);
-    color: #ffffff;
-    box-shadow: 0 4px 10px rgba(234, 88, 12, 0.25);
+    background: var(--bg-active-nav);
+    color: var(--text-main);
+    border-left-color: var(--brand-primary);
+    font-weight: 700;
+    box-shadow: none;
 }
 
 .nav-link.active svg {
-    stroke: #ffffff;
+    stroke: var(--brand-primary);
 }
 
 .sidebar-footer {
     padding: 16px;
     border-top: 1px solid var(--border);
-    background: #fafafa;
+    background: var(--bg-subtle);
 }
 
 .app-canvas {
@@ -210,7 +305,7 @@ aside.sidebar {
 
 header.topbar {
     height: 64px;
-    background: #ffffff;
+    background: var(--bg-card);
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -349,7 +444,7 @@ main.main-content {
     align-items: center;
     gap: 16px;
     flex-wrap: wrap;
-    background: #ffffff;
+    background: var(--bg-card);
 }
 
 .tab-group {
@@ -377,7 +472,7 @@ main.main-content {
 }
 
 .tab-btn.active {
-    background: #ffffff;
+    background: var(--bg-card);
     color: var(--brand-primary);
     box-shadow: var(--shadow-subtle);
 }
@@ -406,7 +501,7 @@ main.main-content {
     font-size: 13.5px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border);
-    background: #ffffff;
+    background: var(--bg-input);
     font-family: inherit;
     color: var(--text-main);
     transition: all 0.15s ease;
@@ -425,7 +520,7 @@ table.data-table {
 }
 
 table.data-table th {
-    background: #f8fafc;
+    background: var(--bg-subtle);
     color: var(--text-secondary);
     padding: 13px 18px;
     font-size: 11.5px;
@@ -444,14 +539,14 @@ table.data-table th:hover:not(.no-sort) {
 
 table.data-table td {
     padding: 14px 18px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border);
     font-size: 13.5px;
     color: var(--text-main);
     vertical-align: middle;
 }
 
 table.data-table tr:hover td {
-    background: #fbfcfe;
+    background: var(--bg-subtle);
 }
 
 
@@ -508,7 +603,7 @@ table.data-table tr:hover td {
 }
 
 .btn-ghost {
-    background: #ffffff;
+    background: var(--bg-card);
     color: var(--text-secondary);
     border: 1px solid var(--border);
 }
@@ -587,7 +682,7 @@ table.data-table tr:hover td {
 .form-control, .form-group input, .form-group select {
     width: 100%;
     padding: 10px 14px;
-    background: #ffffff;
+    background: var(--bg-input);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     color: var(--text-main);
@@ -606,7 +701,7 @@ table.data-table tr:hover td {
    ФУТЕР
    ============================================================================== */
 footer.app-footer {
-    background: #ffffff;
+    background: var(--bg-card);
     border-top: 1px solid var(--border);
     padding: 18px 36px;
     display: flex;
@@ -637,7 +732,7 @@ footer.app-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #ffffff;
+    background: var(--bg-card);
     padding: 10px 12px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border);
@@ -839,7 +934,7 @@ footer.app-footer {
     gap: 12px;
     padding: 14px 18px;
     border-radius: var(--radius-md);
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid var(--border);
     box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
     animation: toastSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -947,7 +1042,7 @@ footer.app-footer {
 }
 
 .custom-confirm-box {
-    background: #ffffff;
+    background: var(--bg-card);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
     box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
@@ -1010,7 +1105,7 @@ footer.app-footer {
    WIDGET: ПЕРСОНАЛЬНЫЕ МИНИ-ДЕДЛАЙНЫ И ТЕХНОЛОГИЧЕСКИЕ ЗАДАЧИ
    ========================================================================== */
 .tasks-widget {
-    background: #ffffff;
+    background: var(--bg-card);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -2px rgba(0,0,0,0.02);
@@ -1075,7 +1170,7 @@ footer.app-footer {
 }
 
 .tasks-filter-btn.active {
-    background: #ffffff;
+    background: var(--bg-card);
     color: var(--text-main);
     box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
@@ -1108,7 +1203,7 @@ footer.app-footer {
 }
 
 .task-card {
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     padding: 14px 16px;
@@ -1263,7 +1358,7 @@ footer.app-footer {
 }
 
 .kpi-card {
-    background: #ffffff;
+    background: var(--bg-card);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
     padding: 22px;
@@ -1387,7 +1482,7 @@ footer.app-footer {
 }
 
 .modal-box {
-    background: #ffffff;
+    background: var(--bg-card);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
     box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
@@ -1474,7 +1569,7 @@ footer.app-footer {
     font-size: 13px;
     font-weight: 600;
     color: var(--text-main);
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 8px;
     cursor: pointer;
@@ -1505,7 +1600,7 @@ footer.app-footer {
 
 /* Расширенная панель многокритериальной фильтрации */
 .filter-bar-expanded {
-    background: #f8fafc;
+    background: var(--bg-subtle);
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 14px 18px;
@@ -1546,7 +1641,7 @@ footer.app-footer {
     font-size: 13px;
     font-family: inherit;
     color: var(--text-main);
-    background: #ffffff;
+    background: var(--bg-input);
     border: 1px solid var(--border);
     border-radius: 6px;
     outline: none;
@@ -1576,8 +1671,8 @@ footer.app-footer {
     padding: 8px 14px;
     font-size: 13px;
     font-weight: 600;
-    color: #64748b;
-    background: #ffffff;
+    color: var(--text-secondary);
+    background: var(--bg-card);
     border: 1px solid #cbd5e1;
     border-radius: 6px;
     cursor: pointer;
@@ -1599,7 +1694,7 @@ footer.app-footer {
     flex-wrap: wrap;
     gap: 10px;
     padding: 10px 14px;
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-bottom: none;
     border-radius: 8px 8px 0 0;
@@ -1721,9 +1816,9 @@ table.data-table th.sortable:not(.sorted-asc):not(.sorted-desc) .sort-icon::afte
     flex-wrap: wrap;
     gap: 12px;
     padding: 14px 18px;
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid var(--border);
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid var(--border);
     border-radius: 0 0 10px 10px;
 }
 
@@ -1748,7 +1843,7 @@ table.data-table th.sortable:not(.sorted-asc):not(.sorted-desc) .sort-icon::afte
     font-size: 13px;
     font-weight: 600;
     color: var(--text-main);
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 6px;
     cursor: pointer;
@@ -1773,7 +1868,8 @@ table.data-table th.sortable:not(.sorted-asc):not(.sorted-desc) .sort-icon::afte
 .pagination-btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
-    background: #f8fafc;
+    background: var(--bg-subtle);
+    border-color: var(--border);
 }
 
 .pagination-ellipsis {
@@ -1809,4 +1905,132 @@ table.data-table th.sortable:not(.sorted-asc):not(.sorted-desc) .sort-icon::afte
     border: 1px solid rgba(249, 115, 22, 0.4);
     margin-left: 6px;
     vertical-align: middle;
+}
+
+/* ==============================================================================
+   THEME TOGGLE BUTTON COMPONENT
+   ============================================================================== */
+.btn-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.btn-theme-toggle:hover {
+    background: var(--bg-subtle);
+    color: var(--text-main);
+    border-color: var(--border-hover);
+    transform: translateY(-1px);
+}
+
+.btn-theme-toggle svg {
+    stroke: var(--brand-primary);
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.btn-theme-toggle:hover svg {
+    transform: rotate(15deg);
+}
+
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.theme-toggle-floating {
+    position: fixed;
+    top: 18px;
+    right: 20px;
+    z-index: 10000;
+}
+
+.floating-theme-btn {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(8px);
+    background: var(--bg-card);
+    padding: 8px 14px;
+}
+
+/* ==============================================================================
+   AUTH SCREENS DARK THEME STYLING
+   ============================================================================== */
+[data-theme="dark"] body {
+    background: radial-gradient(circle at 10% 20%, #151c29 0%, #0b0f17 90%) !important;
+}
+
+[data-theme="dark"] .login-card,
+[data-theme="dark"] .register-card {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    box-shadow: 0 20px 45px -12px rgba(0, 0, 0, 0.75) !important;
+}
+
+[data-theme="dark"] .login-header h2,
+[data-theme="dark"] .card-header h2 {
+    color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .form-group label {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .login-card input,
+[data-theme="dark"] .register-card input,
+[data-theme="dark"] .register-card select {
+    background: var(--bg-input) !important;
+    border-color: var(--border) !important;
+    color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .demo-accounts {
+    background: var(--bg-subtle) !important;
+    border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .demo-accounts-title {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .demo-pill {
+    background: var(--bg-card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .demo-pill:hover {
+    background: var(--bg-subtle) !important;
+    border-color: var(--brand-primary) !important;
+}
+
+[data-theme="dark"] .card-company-footer {
+    border-color: var(--border) !important;
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .register-link {
+    color: var(--brand-primary) !important;
+}
+
+[data-theme="dark"] .otp-verification-box {
+    background: rgba(16, 185, 129, 0.08) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+[data-theme="dark"] .btn-send-code {
+    background: var(--bg-subtle) !important;
+    border-color: var(--border) !important;
+    color: var(--brand-primary) !important;
 }
