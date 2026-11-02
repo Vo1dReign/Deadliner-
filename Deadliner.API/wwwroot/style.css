@@ -142,6 +142,23 @@ aside.sidebar {
     height: 38px;
     max-width: 90px;
     object-fit: contain;
+    transition: opacity 0.2s ease;
+}
+
+.company-logo {
+    object-fit: contain;
+    transition: opacity 0.2s ease;
+}
+
+/* Автоматическая смена логотипа в зависимости от темы оформления */
+[data-theme="dark"] .sidebar-logo-img,
+[data-theme="dark"] .company-logo {
+    content: url('logo_dark.png');
+}
+
+[data-theme="light"] .sidebar-logo-img,
+[data-theme="light"] .company-logo {
+    content: url('logo.png');
 }
 
 .brand-icon {

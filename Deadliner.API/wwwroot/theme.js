@@ -3,12 +3,31 @@
  * ООО «МикМебель»
  */
 
+// Экран цеха (workshop.html) и печатная форма (print-order.html) работают в фиксированном режиме без переключателя
+const isWorkshopScreen = window.location.pathname.toLowerCase().includes('workshop.html');
+const isPrintScreen = window.location.pathname.toLowerCase().includes('print-order.html');
+
 (function () {
     try {
+        if (isWorkshopScreen) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            return;
+        }
+        if (isPrintScreen) {
+            return;
+        }
+
         const savedTheme = localStorage.getItem('deadliner_theme');
-        // Если тема ещё не была сохранена, по умолчанию включаем тёмную тему (или системную)
+        // Если тема ещё не была сохранена, по умолчанию включаем тёмную тему
         const activeTheme = savedTheme || 'dark';
         document.documentElement.setAttribute('data-theme', activeTheme);
+        
+        // Быстрое обновление логотипа при первой готовности документа
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => updateLogos(activeTheme));
+        } else {
+            updateLogos(activeTheme);
+        }
     } catch (e) {
         console.warn('Theme initialization error:', e);
     }
@@ -18,16 +37,34 @@ function getTheme() {
     return document.documentElement.getAttribute('data-theme') || 'dark';
 }
 
+function updateLogos(theme) {
+    if (isWorkshopScreen || isPrintScreen) return;
+    const isDark = (theme === 'dark');
+    const targetSrc = isDark ? 'logo_dark.png' : 'logo.png';
+    const logos = document.querySelectorAll('.sidebar-logo-img, .company-logo, .login-header img, .card-header img, img[alt*="МикМебель"]');
+    logos.forEach(img => {
+        const src = img.getAttribute('src') || '';
+        if (src.includes('logo.png') || src.includes('logo_dark.png')) {
+            if (!src.endsWith(targetSrc)) {
+                img.src = targetSrc;
+            }
+        }
+    });
+}
+
 function setTheme(theme) {
+    if (isWorkshopScreen || isPrintScreen) return;
     const targetTheme = (theme === 'light') ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', targetTheme);
     try {
         localStorage.setItem('deadliner_theme', targetTheme);
     } catch (e) {}
     updateThemeButtons();
+    updateLogos(targetTheme);
 }
 
 function toggleTheme() {
+    if (isWorkshopScreen || isPrintScreen) return;
     const nextTheme = getTheme() === 'dark' ? 'light' : 'dark';
     setTheme(nextTheme);
     if (typeof showToast === 'function') {
@@ -41,7 +78,6 @@ function toggleTheme() {
 
 function getThemeButtonHtml(isDark) {
     if (isDark) {
-        // Текущая тема тёмная -> кнопка предлагает включить светлую
         return `
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="5"></circle>
@@ -57,7 +93,6 @@ function getThemeButtonHtml(isDark) {
             <span class="theme-btn-label">Светлая тема</span>
         `;
     } else {
-        // Текущая тема светлая -> кнопка предлагает включить тёмную
         return `
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -68,6 +103,7 @@ function getThemeButtonHtml(isDark) {
 }
 
 function updateThemeButtons() {
+    if (isWorkshopScreen || isPrintScreen) return;
     const isDark = getTheme() === 'dark';
     document.querySelectorAll('.btn-theme-toggle').forEach(btn => {
         btn.innerHTML = getThemeButtonHtml(isDark);
@@ -77,6 +113,7 @@ function updateThemeButtons() {
 }
 
 function initThemeUI() {
+    if (isWorkshopScreen || isPrintScreen) return;
     const isDark = getTheme() === 'dark';
 
     // 1. Если на странице есть .topbar-actions (все основные рабочие экраны)
@@ -92,7 +129,7 @@ function initThemeUI() {
         topbarActions.insertBefore(btn, topbarActions.firstChild);
     }
 
-    // 2. Если на странице нет topbar (авторизация login.html, register.html, workshop.html, print-order.html)
+    // 2. Если на странице нет topbar (авторизация login.html, register.html)
     if (!topbarActions && !document.getElementById('floatingThemeToggle')) {
         const floatingBox = document.createElement('div');
         floatingBox.id = 'floatingThemeToggle';
@@ -108,10 +145,15 @@ function initThemeUI() {
         floatingBox.appendChild(btn);
         document.body.appendChild(floatingBox);
     }
+
+    // Инициализация логотипа
+    updateLogos(getTheme());
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initThemeUI);
-} else {
-    initThemeUI();
+if (!isWorkshopScreen && !isPrintScreen) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initThemeUI);
+    } else {
+        initThemeUI();
+    }
 }
