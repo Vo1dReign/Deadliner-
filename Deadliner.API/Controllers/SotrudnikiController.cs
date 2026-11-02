@@ -67,19 +67,28 @@ public class SotrudnikiController : ControllerBase
             return BadRequest(new { message = "Некорректный номер телефона. Формат: +375 (XX) XXX-XX-XX" });
         }
 
-        // Проверка SMS-кода подтверждения (если передан) или проверка кэша подтверждения
-        if (!string.IsNullOrEmpty(dto.VerificationCode))
+        // Проверка подтверждения номера телефона:
+        if (!string.IsNullOrEmpty(normalizedPhone))
         {
-            bool codeValid = _phoneService.VerifyCode(dto.Telefon ?? "", dto.VerificationCode);
-            if (!codeValid)
+            // 1. Проверяем, был ли номер уже предварительно подтверждён через кнопку в интерфейсе (/api/auth/verify-code)
+            bool isAlreadyVerified = _phoneService.IsPhoneVerified(normalizedPhone);
+
+            // 2. Если номер еще не подтвержден в кэше, но передан код — проверяем код
+            if (!isAlreadyVerified)
             {
-                return BadRequest(new { message = "Неверный проверочный SMS-код или срок его действия истёк" });
+                if (!string.IsNullOrEmpty(dto.VerificationCode))
+                {
+                    bool codeValid = _phoneService.VerifyCode(normalizedPhone, dto.VerificationCode);
+                    if (!codeValid)
+                    {
+                        return BadRequest(new { message = "Неверный проверочный SMS-код или срок его действия истёк" });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new { message = "Номер телефона не подтверждён. Подтвердите номер SMS-кодом перед регистрацией." });
+                }
             }
-        }
-        else if (!string.IsNullOrEmpty(normalizedPhone) && !_phoneService.IsPhoneVerified(normalizedPhone))
-        {
-            // Если код не передан и телефон не был предварительно подтвержден
-            // Примечание: для административных пользователей или без телефона подтверждение пропускается
         }
 
         var cleanLogin = dto.Login.Trim().ToLower();

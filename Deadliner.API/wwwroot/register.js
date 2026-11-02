@@ -184,7 +184,10 @@ async function registerUser() {
             body: JSON.stringify(newSotrudnik)
         });
 
-        const data = await res.json();
+        let data = null;
+        try {
+            data = await res.json();
+        } catch (_) {}
 
         if (res.ok) {
             showToast('Сотрудник успешно зарегистрирован с PBKDF2 шифрованием пароля!', 'success', 'Успех');
@@ -192,7 +195,13 @@ async function registerUser() {
                 window.location.href = 'login.html';
             }, 1400);
         } else {
-            showToast(data.message || 'Ошибка при регистрации. Проверьте данные.', 'error', 'Ошибка');
+            let errorText = 'Ошибка при регистрации. Проверьте данные.';
+            if (res.status >= 500) {
+                errorText = 'Сервер базы данных недоступен (MSSQL). Убедитесь, что Docker Desktop запущен.';
+            } else if (data && data.message) {
+                errorText = data.message;
+            }
+            showToast(errorText, 'error', 'Ошибка');
             submitBtn.disabled = false;
             submitBtn.innerText = 'Зарегистрировать аккаунт';
         }

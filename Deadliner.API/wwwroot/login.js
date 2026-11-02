@@ -32,12 +32,16 @@ async function doLogin() {
 
         if (!res.ok) {
             let msg = 'Неверный логин или пароль';
-            try {
-                const data = await res.json();
-                if (data && data.message) {
-                    msg = data.message;
-                }
-            } catch (_) {}
+            if (res.status >= 500) {
+                msg = 'Сервер базы данных недоступен (MSSQL). Убедитесь, что Docker Desktop запущен и контейнер deadliner-db активен.';
+            } else {
+                try {
+                    const data = await res.json();
+                    if (data && data.message) {
+                        msg = data.message;
+                    }
+                } catch (_) {}
+            }
             showError(msg);
             return;
         }

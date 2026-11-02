@@ -44,10 +44,13 @@ public class PasswordHasherService
         if (string.IsNullOrEmpty(providedPassword) || string.IsNullOrEmpty(storedHashOrPlain))
             return (false, false);
 
+        string stored = storedHashOrPlain.Trim();
+        string provided = providedPassword.Trim();
+
         // 1. Проверка формата PBKDF2
-        if (storedHashOrPlain.StartsWith("PBKDF2$"))
+        if (stored.StartsWith("PBKDF2$"))
         {
-            var parts = storedHashOrPlain.Split('$');
+            var parts = stored.Split('$');
             if (parts.Length != 4)
                 return (false, false);
 
@@ -58,7 +61,7 @@ public class PasswordHasherService
             byte[] expectedHash = Convert.FromBase64String(parts[3]);
 
             byte[] actualHash = Rfc2898DeriveBytes.Pbkdf2(
-                providedPassword,
+                provided,
                 salt,
                 iterations,
                 HashAlgorithmName.SHA256,
@@ -70,7 +73,7 @@ public class PasswordHasherService
 
         // 2. Обратная совместимость для старых открытых паролей (legacy plaintext)
         // Если в базе лежит старый незахэшированный пароль (например 'admin123')
-        if (providedPassword == storedHashOrPlain)
+        if (provided == stored)
         {
             // Пароль верный, но требует немедленного перехэширования в БД!
             return (true, true);
