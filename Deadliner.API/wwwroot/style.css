@@ -128,10 +128,11 @@ aside.sidebar {
     padding: 16px 20px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
     border-bottom: 1px solid var(--border);
     text-decoration: none;
     transition: background 0.15s ease;
+    min-height: 68px;
 }
 
 .sidebar-brand:hover {
@@ -139,8 +140,9 @@ aside.sidebar {
 }
 
 .sidebar-logo-img {
-    height: 38px;
-    max-width: 90px;
+    height: 42px;
+    max-width: 170px;
+    width: auto;
     object-fit: contain;
     transition: opacity 0.2s ease;
 }
