@@ -1,4 +1,4 @@
-const API = 'http://localhost:5216/api';
+﻿const API = '/api';
 
 let soundEnabled = false;
 let audioCtx = null;

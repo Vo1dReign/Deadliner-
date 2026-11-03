@@ -1,4 +1,4 @@
-const API = 'http://localhost:5216/api';
+﻿const API = '/api';
 
 let allOrders = [];          // Все загруженные заказы
 let filteredOrders = [];     // Отфильтрованные заказы

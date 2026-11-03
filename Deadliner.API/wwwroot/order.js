@@ -1,4 +1,4 @@
-const API = 'http://localhost:5216/api';
+﻿const API = '/api';
 
 const urlParams = new URLSearchParams(window.location.search);
 const editId = urlParams.get('id');

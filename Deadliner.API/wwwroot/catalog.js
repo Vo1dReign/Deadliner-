@@ -1,4 +1,4 @@
-const API = 'http://localhost:5216/api';
+﻿const API = '/api';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Проверка прав и пользователя
